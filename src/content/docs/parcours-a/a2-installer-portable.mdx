@@ -1,0 +1,326 @@
+---
+title: "A2 · Installer le portable"
+description: Installer et vérifier winget, VS Code, Git, l'identité Git, la connexion GitHub, les extensions, Lua et Node.js sur le portable.
+parcours: A
+module: A2
+duree: 1 h 30
+ou: portable
+prerequis: Module A1 (savoir ouvrir le terminal et lire une erreur). Ton compte GitHub.
+resultat: Sur le portable, `git`, `code`, `lua` et `node` répondent avec leur version, et ton identité Git est protégée.
+objectifs:
+  - Installer un logiciel officiel avec winget et vérifier qu'il fonctionne
+  - Configurer Git (éditeur, branche main, fins de ligne, identité noreply)
+  - Installer les extensions VS Code recommandées
+  - Installer Lua 5.4 et Node.js LTS
+sidebar:
+  order: 2
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : vérifier ce qui est déjà installé (aucune installation)."
+  quarante="Étapes 1 à 3 : VS Code et Git installés et configurés."
+  deuxh="Tout le module : le portable est prêt, exercices et quiz compris."
+/>
+
+**Pourquoi c'est utile ?** Le portable est ta **machine de code** : c'est là que tu feras les parcours A à D, que tu écriras tes scripts et que tu lanceras ce site. Une installation propre = zéro temps perdu plus tard.
+
+<Encadre type="piege" titre="⚠️ Avant de commencer">
+Toutes les commandes viennent de la documentation officielle mais n'ont **pas été testées sur Windows**. Le détail complet de chaque outil (options, erreurs, désinstallation) est dans le [tutoriel d'installation](/installer/tutoriel/) : ce module te guide dans l'ordre et te fait vérifier chaque étape. **Ne fais pas tout d'un coup** : une étape, une pause.
+</Encadre>
+
+## Étape 1 · Faire l'état des lieux (15 min)
+
+Avant d'installer, on **vérifie** : peut-être que VS Code est déjà là. Ces commandes ne modifient rien.
+
+```powershell
+winget --version
+code --version
+git --version
+lua -v
+node --version
+```
+
+Pour chaque ligne, deux cas :
+- un **numéro de version** s'affiche → l'outil est installé ;
+- une erreur « … n'est pas reconnu… » → il faudra l'installer.
+
+Note le résultat dans ta [checklist](/installer/checklist/) (section portable).
+
+<Encadre type="retenir">
+**Vérifier avant d'agir** est un réflexe de développeur. Et après chaque installation, on **revérifie** avec la même commande : c'est la preuve que ça marche.
+</Encadre>
+
+<FinEtape id="A2-e1" titre="État des lieux du portable" victoire="tu sais exactement ce qui manque sur ton portable." prochaine="installer VS Code (étape 2)." />
+
+## Étape 2 · Installer VS Code (15 min)
+
+Si `code --version` a fonctionné, passe directement à l'étape 3. Sinon :
+
+```powershell
+winget install --id Microsoft.VisualStudioCode -e --source winget
+```
+
+Comment lire cette commande : `install` (installer), `--id` (l'identifiant exact du paquet, vérifié dans le catalogue officiel), `-e` (correspondance exacte), `--source winget` (catalogue officiel uniquement). Si winget demande d'accepter les conditions, tape `Y` puis Entrée. Si Windows demande une autorisation, vérifie que l'éditeur est **Microsoft Corporation**, puis **Oui**.
+
+**Ferme le terminal, rouvre-le**, puis vérifie :
+
+```powershell
+code --version
+```
+
+Détails, alternative manuelle (« User setup ») et erreurs : [tutoriel, section 3](/installer/tutoriel/#3-vs-code).
+
+<FinEtape id="A2-e2" titre="VS Code installé" victoire="`code --version` affiche un numéro de version." prochaine="installer et configurer Git (étape 3)." />
+
+## Étape 3 · Installer et configurer Git (20 min)
+
+```powershell
+winget install --id Git.Git -e --source winget
+```
+
+Rouvre le terminal, vérifie `git --version`, puis configure les trois réglages recommandés :
+
+```powershell
+git config --global core.editor "code --wait"
+git config --global init.defaultBranch main
+git config --global core.autocrlf true
+```
+
+Ligne par ligne : VS Code devient l'éditeur de Git ; tes nouveaux dépôts commenceront sur la branche `main` (comme GitHub) ; Git convertit les fins de ligne Windows/Unix automatiquement (réglage recommandé par GitHub sous Windows).
+
+Ensuite, **ton identité**, avec l'adresse **noreply** de GitHub pour ne pas exposer ta vraie adresse e-mail. Suis le [tutoriel, section 5](/installer/tutoriel/#5-ton-identité-git-et-ladresse-e-mail--noreply-) pour trouver ton adresse dans **Settings → Emails** (case **Keep my email addresses private**), puis :
+
+```powershell
+git config --global user.name "TonPseudo"
+git config --global user.email "ID+PSEUDO@users.noreply.github.com"
+```
+
+<Encadre type="piege">
+Remplace bien `TonPseudo` et `ID+PSEUDO` par **tes** valeurs, copiées depuis GitHub. Une faute dans l'adresse et tes commits ne seront pas reliés à ton compte.
+</Encadre>
+
+<FinEtape id="A2-e3" titre="Git installé et configuré" victoire="`git config --global --list` affiche ton pseudo, ton adresse noreply, l'éditeur et la branche main." prochaine="installer les extensions VS Code (étape 4)." />
+
+## Étape 4 · Extensions VS Code et Settings Sync (15 min)
+
+Installe le petit jeu d'extensions recommandé (identifiants vérifiés sur le Marketplace) :
+
+```powershell
+code --install-extension sumneko.lua
+code --install-extension go-horse-studios.nanos-world
+code --install-extension MS-CEINTL.vscode-language-pack-fr
+code --install-extension streetsidesoftware.code-spell-checker
+code --install-extension streetsidesoftware.code-spell-checker-french
+code --install-extension usernamehw.errorlens
+code --install-extension mhutchie.git-graph
+```
+
+Vérifie avec `code --list-extensions`. Puis active **Settings Sync** : roue dentée en bas à gauche → **Backup and Sync Settings...** → **Sign in** → **GitHub**. Sur le PC fixe, tu retrouveras tout automatiquement.
+
+Ce que fait chaque extension et comment vérifier qu'elle marche : [tutoriel, section 7](/installer/tutoriel/#7-extensions-vs-code-et-réglages).
+
+<FinEtape id="A2-e4" titre="Extensions et Settings Sync" victoire="VS Code est en français, comprend Lua et synchronise tes réglages." prochaine="installer Lua et Node.js (étape 5)." />
+
+## Étape 5 · Lua 5.4 et Node.js (15 min)
+
+```powershell
+winget install --id DEVCOM.Lua -e --source winget
+winget install --id OpenJS.NodeJS.LTS -e --source winget
+```
+
+Rouvre le terminal et vérifie :
+
+```powershell
+lua -v
+node --version
+```
+
+Résultats attendus : `Lua 5.4.6  Copyright (C) 1994-2023 Lua.org, PUC-Rio` puis `v24.x.x`.
+
+Pourquoi **Lua 5.4** ? Parce que la documentation officielle de Nanos World indique que le jeu utilise **Lua 5.4** : tu apprends directement la bonne version. Pourquoi Node.js ? Pour construire et lancer ce site du cours sur ta machine (module A4).
+
+<Encadre type="bloque">
+`lua` n'est pas reconnu après installation ? Ferme **tous** les terminaux et VS Code, rouvre, réessaie. Toujours rien : [tutoriel, section 8.4](/installer/tutoriel/#84-erreurs-fréquentes) et [Dépannage](/outils/depannage/).
+</Encadre>
+
+<FinEtape id="A2-e5" titre="Lua et Node.js installés" victoire="ton portable connaît `lua` et `node` : il est prêt pour coder." prochaine="faire les exercices de vérification puis le quiz." />
+
+## Erreurs fréquentes
+
+| Ce que tu vois | Solution |
+|---|---|
+| `... n'est pas reconnu...` juste après une installation | Ferme et rouvre le terminal (le PATH est relu à l'ouverture) |
+| `No package found matching input criteria.` | Vérifie l'identifiant, majuscules comprises |
+| Fenêtre de contrôle de compte d'utilisateur | Vérifie l'éditeur affiché, puis **Oui** |
+| `npm.ps1 cannot be loaded because running scripts is disabled` | [Tutoriel, section 9.4](/installer/tutoriel/#94-la-politique-dexécution-powershell) |
+
+## Exercices
+
+<Exercice id="A2-ex01" titre="Lire une commande winget" niveau="vert">
+Explique avec tes mots chaque morceau de : `winget install --id Git.Git -e --source winget`.
+
+<div slot="indice1">Il y a cinq morceaux : le programme, l'action, l'identifiant, l'option d'exactitude et la source.</div>
+<div slot="indice2">`--id` attend le nom exact du paquet dans le catalogue.</div>
+<div slot="indice3">`-e` est la version courte de `--exact`.</div>
+<div slot="solution">
+
+- `winget` : le gestionnaire de paquets de Windows ;
+- `install` : l'action (installer) ;
+- `--id Git.Git` : l'identifiant exact du paquet ;
+- `-e` : correspondance exacte (évite d'installer un paquet au nom proche) ;
+- `--source winget` : chercher seulement dans le catalogue officiel.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex02" titre="Prouver qu'un outil est installé" niveau="vert">
+Écris les quatre commandes qui prouvent que Git, VS Code, Lua et Node.js sont installés, et ce que chacune doit afficher.
+
+<div slot="indice1">Chaque outil a une option qui affiche sa version.</div>
+<div slot="indice2">Pour trois d'entre eux c'est `--version` ; Lua utilise une option plus courte.</div>
+<div slot="indice3">`lua -v`.</div>
+<div slot="solution">
+
+```powershell
+git --version     # git version 2.xx.x.windows.x
+code --version    # trois lignes : version, identifiant, x64
+lua -v            # Lua 5.4.6  Copyright (C) 1994-2023 Lua.org, PUC-Rio
+node --version    # v24.x.x
+```
+</div>
+</Exercice>
+
+<Exercice id="A2-ex03" titre="Ma configuration Git" niveau="vert">
+Affiche toute ta configuration Git globale et vérifie qu'elle contient les cinq réglages du module.
+
+<div slot="indice1">C'est une commande `git config` avec une option qui **liste**.</div>
+<div slot="indice2">`--global` vise ta configuration personnelle (pour tous tes dépôts).</div>
+<div slot="indice3">`git config --global --list`.</div>
+<div slot="solution">
+
+```powershell
+git config --global --list
+```
+On doit y voir `user.name=...`, `user.email=...@users.noreply.github.com`, `core.editor=code --wait`, `init.defaultbranch=main`, `core.autocrlf=true`.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex04" titre="Débogage : l'adresse qui fuit" niveau="jaune" type="debug">
+Un ami a configuré Git ainsi : `git config --global user.email "lucas.martin@gmail.com"`. Au premier `push`, GitHub refuse avec `GH007: Your push would publish a private email address.` Explique le problème et corrige la configuration.
+
+<div slot="indice1">Lis le message : GitHub parle d'adresse **privée** qui serait **publiée**.</div>
+<div slot="indice2">L'option « Block command line pushes that expose my email » est activée sur son compte : c'est une protection.</div>
+<div slot="indice3">Il doit utiliser l'adresse noreply affichée dans Settings → Emails, puis corriger le dernier commit.</div>
+<div slot="solution">
+
+Sa vraie adresse serait visible publiquement dans l'historique : GitHub le protège en bloquant le push.
+```powershell
+git config --global user.email "ID+PSEUDO@users.noreply.github.com"
+git commit --amend --reset-author --no-edit
+git push
+```
+La deuxième commande réécrit l'auteur du dernier commit avec la nouvelle adresse.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex05" titre="Trouver un identifiant winget" niveau="jaune">
+Sans l'installer, cherche avec winget le paquet officiel de **Blender** et note son identifiant.
+
+<div slot="indice1">winget sait **chercher** (*search*) en plus d'installer.</div>
+<div slot="indice2">`winget search` suivi d'un mot-clé.</div>
+<div slot="indice3">`winget search Blender`, puis regarde la colonne `Id` et l'éditeur.</div>
+<div slot="solution">
+
+```powershell
+winget search Blender
+```
+L'identifiant officiel est `BlenderFoundation.Blender` (vérifié dans le catalogue winget). Méfie-toi des paquets aux noms proches publiés par d'autres : regarde toujours l'éditeur.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex06" titre="Lecture : que s'est-il passé ?" niveau="jaune" type="lecture">
+Un débutant tape `lua -v` juste après `winget install --id DEVCOM.Lua -e`, dans **le même** terminal, et obtient « lua n'est pas reconnu ». Le paquet est pourtant bien installé. Pourquoi ? Que doit-il faire ?
+
+<div slot="indice1">Le terminal a une liste de dossiers où chercher les programmes.</div>
+<div slot="indice2">Cette liste (le PATH) est lue au démarrage du terminal.</div>
+<div slot="indice3">L'installation a modifié le PATH… après l'ouverture de ce terminal.</div>
+<div slot="solution">
+
+Le terminal a lu la variable **PATH** à son ouverture, avant l'installation : il ne connaît pas encore le nouveau dossier de Lua. Il suffit de **fermer et rouvrir le terminal** (et VS Code, qui a son propre terminal), puis de refaire `lua -v`.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex07" titre="Vérifier une extension" niveau="jaune">
+Prouve que l'extension Lua fonctionne : crée `~\Dev\brouillon\test.lua`, ouvre-le dans VS Code et provoque une erreur de syntaxe que l'extension souligne.
+
+<div slot="indice1">`code chemin\du\fichier` ouvre un fichier dans VS Code (il le crée s'il n'existe pas).</div>
+<div slot="indice2">Écris une instruction incomplète, par exemple un `if` sans `then`.</div>
+<div slot="indice3">Tape `if true print("x") end` : l'extension doit souligner l'erreur (et Error Lens afficher le message au bout de la ligne).</div>
+<div slot="solution">
+
+```powershell
+code ~\Dev\brouillon\test.lua
+```
+Dans le fichier : `if true print("x") end`. La ligne est soulignée en rouge et le survol affiche une erreur de syntaxe. Corrige en `if true then print("x") end` : le soulignement disparaît. L'extension marche.
+</div>
+</Exercice>
+
+<Exercice id="A2-ex08" titre="Défi : désinstaller proprement" niveau="rouge">
+Tu as installé par erreur le mauvais paquet `GitHub.cli` et tu veux l'enlever. Écris la commande, puis celle qui prouve qu'il n'est plus là. (Ne le fais que si tu l'as vraiment installé.)
+
+<div slot="indice1">L'action inverse de `install`.</div>
+<div slot="indice2">On garde `--id` et `-e` pour viser exactement le bon paquet.</div>
+<div slot="indice3">Pour vérifier : `winget list` accepte aussi `--id`.</div>
+<div slot="solution">
+
+```powershell
+winget uninstall --id GitHub.cli -e
+winget list --id GitHub.cli
+```
+La deuxième commande ne doit plus trouver le paquet. Savoir désinstaller fait partie de « maîtriser ses outils ».
+</div>
+</Exercice>
+
+## Quiz du module A2
+
+<Quiz id="A2-quiz" questions={[
+  { q: "Pourquoi vérifier avec `git --version` avant d'installer Git ?", choix: ["Pour accélérer l'installation", "Pour savoir s'il est déjà installé et éviter un doublon", "C'est obligatoire pour winget", "Pour configurer Git"], ok: 1, pourquoi: "On vérifie avant d'agir : peut-être que l'outil est déjà là." },
+  { q: "Que fait l'option `-e` de winget ?", choix: ["Elle installe en anglais", "Elle exige une correspondance exacte de l'identifiant", "Elle efface le paquet", "Elle installe pour tous les utilisateurs"], ok: 1, pourquoi: "`-e` (`--exact`) évite d'installer un paquet au nom proche." },
+  { q: "Après une installation, `code` n'est pas reconnu. Première chose à faire ?", choix: ["Réinstaller", "Fermer et rouvrir le terminal", "Redémarrer Windows", "Changer de version"], ok: 1, pourquoi: "Le PATH est relu à l'ouverture du terminal." },
+  { q: "À quoi sert `git config --global core.editor \"code --wait\"` ?", choix: ["À installer VS Code", "À faire de VS Code l'éditeur utilisé par Git", "À ouvrir GitHub", "À accélérer Git"], ok: 1, pourquoi: "Quand Git a besoin d'un texte (message de commit long), il ouvre VS Code et attend que tu fermes l'onglet." },
+  { q: "Pourquoi utiliser l'adresse e-mail noreply de GitHub ?", choix: ["Elle est plus courte", "Elle évite d'exposer ta vraie adresse dans l'historique public", "Elle est obligatoire pour cloner", "Elle accélère les push"], ok: 1, pourquoi: "Chaque commit contient l'adresse de son auteur, visible publiquement." },
+  { q: "Quelle version de Lua installe-t-on et pourquoi ?", choix: ["5.1, la plus connue", "5.4, la version utilisée par Nanos World", "LuaJIT, la plus rapide", "N'importe laquelle"], ok: 1, pourquoi: "La doc officielle de Nanos World indique Lua 5.4." },
+  { q: "À quoi sert Node.js dans ce cours ?", choix: ["À exécuter les scripts Lua", "À construire et lancer le site du cours en local", "À lancer Nanos World", "À remplacer Git"], ok: 1, pourquoi: "Le site est construit avec Astro, qui fonctionne avec Node.js." },
+  { q: "Quelle extension apporte l'autocomplétion de l'API Nanos World ?", choix: ["`Derpius.nanosworld`", "`go-horse-studios.nanos-world`", "`usernamehw.errorlens`", "`mhutchie.git-graph`"], ok: 1, pourquoi: "C'est l'extension officielle recommandée par la doc Nanos World ; l'autre est communautaire." },
+  { q: "Settings Sync de VS Code sert à…", choix: ["Synchroniser ton code entre les machines", "Retrouver tes réglages et extensions VS Code sur l'autre machine", "Sauvegarder tes fichiers sur GitHub", "Mettre à jour Windows"], ok: 1, pourquoi: "Ton **code** se synchronise avec Git ; tes **réglages VS Code** avec Settings Sync." },
+  { q: "Une fenêtre Windows demande « Voulez-vous autoriser cette application… ». Que vérifies-tu ?", choix: ["Rien, je clique Oui", "L'éditeur affiché (Microsoft, The Git Development Community…)", "L'heure", "La taille du fichier"], ok: 1, pourquoi: "Vérifier l'éditeur est un réflexe de sécurité avant d'accorder des droits." },
+]} />
+
+## Récapitulatif
+
+- Méthode : **vérifier → installer (winget) → rouvrir le terminal → revérifier**.
+- Git : éditeur VS Code, branche `main`, `core.autocrlf true`, identité avec l'adresse **noreply**.
+- Extensions : Lua, nanos world Lua (officielle), français, correcteur, Error Lens, Git Graph ; Settings Sync activé.
+- Lua **5.4** (comme Nanos World) et Node.js **24 LTS** (pour le site).
+
+## Je suis bloqué, que faire ?
+
+Compare avec le [tutoriel complet](/installer/tutoriel/), cherche ton message dans [Dépannage](/outils/depannage/), puis demande de l'aide avec un [modèle de question](/outils/ia-tuteur/) (message exact, commande tapée, version de Windows).
+
+<Videos recherche="installer VS Code et Git Windows 11 tutoriel français" liste={[
+  { titre: "Comment Installer Visual Studio Code sur Windows", id: "Gu_FEF4yj5A", couvre: "installation de VS Code depuis le site officiel" },
+  { titre: "VS Code : Installation étape par étape (Windows)", id: "GK-O9nWWTeU", couvre: "installation pas à pas de VS Code" },
+  { titre: "[1/??] Installation des outils - Git & GitHub pour Débutants - Tutoriel français 2018", id: "HnwNsCKqqT8", couvre: "installation de Git (vidéo de 2018, écrans possiblement différents)" },
+]} />
+
+## Pour aller plus loin
+
+- [Doc officielle : WinGet](https://learn.microsoft.com/windows/package-manager/winget/)
+- [Doc officielle : Settings Sync de VS Code](https://code.visualstudio.com/docs/configure/settings-sync)
+- [Doc officielle Nanos World : configuration de l'éditeur](https://docs.nanos-world.com/docs/getting-started/editor-setup)

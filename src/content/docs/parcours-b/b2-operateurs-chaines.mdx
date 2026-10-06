@@ -1,0 +1,223 @@
+---
+title: "B2 · Opérateurs et chaînes"
+description: Calculer, comparer, coller et transformer du texte, convertir entre texte et nombre.
+parcours: B
+module: B2
+duree: 3 h
+ou: les-deux
+prerequis: Module B1.
+resultat: Un ticket de caisse calculé et mis en forme par Lua.
+objectifs:
+  - Utiliser les opérateurs + - * / // % ^ et les parenthèses
+  - Comparer des valeurs avec == ~= < > <= >=
+  - Coller des chaînes avec .. et mesurer leur longueur avec #
+  - Convertir avec tostring et tonumber
+  - Mettre en forme avec string.format, string.upper, string.sub, string.rep
+sidebar:
+  order: 2
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : les opérateurs de calcul."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Étapes 1 à 4 et exercices 1 à 6."
+/>
+
+**Pourquoi c'est utile ?** Calculer un salaire, un prix avec une remise, afficher « Sam a 1 650 € » proprement : un serveur roleplay calcule et affiche en permanence.
+
+## Étape 1 · Calculer (20 min)
+
+| Opérateur | Sens | Exemple | Résultat |
+|---|---|---|---|
+| `+` `-` `*` | addition, soustraction, multiplication | `12 * 3` | `36` |
+| `/` | division (toujours décimale) | `10 / 4` | `2.5` |
+| `//` | division entière (arrondie vers le bas) | `17 // 5` | `3` |
+| `%` | reste de la division (modulo) | `17 % 5` | `2` |
+| `^` | puissance (résultat décimal) | `2 ^ 3` | `8.0` |
+
+Priorités : comme en maths, `^` puis `*` `/` `//` `%`, puis `+` `-`. Les **parenthèses** imposent l'ordre : `(2 + 3) * 4` vaut `20`.
+
+<Encadre type="analogie">
+`//` et `%` répondent à « 17 bonbons pour 5 enfants » : chacun en a `17 // 5 = 3`, il en reste `17 % 5 = 2`. En RP : combien de pleins d'essence complets avec ton argent, et combien il te reste.
+</Encadre>
+
+<FinEtape id="B2-e1" titre="Calculer" victoire="tu utilises les sept opérateurs et les parenthèses." prochaine="comparer des valeurs (étape 2)." />
+
+## Étape 2 · Comparer (20 min)
+
+Une comparaison donne un **booléen** :
+
+```lua title="b2/comparer.lua"
+local argent = 1500
+print(argent >= 1000)   --> true  (supérieur ou égal)
+print(argent == 1500)   --> true  (égal : DEUX signes =)
+print(argent ~= 1500)   --> false (différent : ~=)
+print("taxi" == "Taxi") --> false (les majuscules comptent)
+```
+
+<Encadre type="piege">
+`=` **range** une valeur ; `==` **compare**. Et « différent » s'écrit `~=` en Lua (pas `!=` comme dans d'autres langages). Comparer un nombre et une chaîne avec `<` provoque l'erreur `attempt to compare number with string`.
+</Encadre>
+
+<FinEtape id="B2-e2" titre="Comparer" victoire="tu sais produire true ou false à partir d'une comparaison." prochaine="coller et mesurer du texte (étape 3)." />
+
+## Étape 3 · Coller, mesurer, convertir (25 min)
+
+```lua title="b2/textes.lua"
+local nom = "Sam"
+local argent = 1500
+print("Bonjour " .. nom .. ", tu as " .. argent .. " €")  -- .. colle ; le nombre est converti
+print(#nom)                     --> 3 : # donne la longueur
+print(tonumber("250") + 50)     --> 300 : texte → nombre
+print(tonumber("abc"))          --> nil : conversion impossible
+print(tostring(42) .. "!")      --> 42! : nombre → texte
+```
+
+- `..` colle des chaînes (et convertit les nombres en texte au passage) ;
+- `#` donne la longueur en **octets** : `#"Sam"` vaut `3`, mais une lettre accentuée compte pour 2 (`#"é"` vaut `2`) car Lua stocke le texte en UTF-8 ;
+- `tonumber` renvoie `nil` si le texte n'est pas un nombre : très utile pour vérifier une saisie.
+
+<FinEtape id="B2-e3" titre="Coller et convertir" victoire="tu construis des phrases avec des variables et tu convertis texte ↔ nombre." prochaine="transformer et mettre en forme du texte (étape 4)." />
+
+## Étape 4 · La boîte à outils `string` (25 min)
+
+| Fonction | Exemple | Résultat |
+|---|---|---|
+| `string.upper(s)` / `string.lower(s)` | `string.upper("taxi")` | `TAXI` |
+| `string.sub(s, debut, fin)` | `string.sub("garagiste", 1, 4)` | `gara` |
+| `string.rep(s, n)` | `string.rep("=", 5)` | `=====` |
+| `string.format(modele, ...)` | `string.format("%.2f €", 3.5)` | `3.50 €` |
+
+Les **marqueurs** de `string.format` : `%s` (texte), `%d` (entier), `%.2f` (décimal avec 2 chiffres après la virgule), `%5d` (entier sur 5 caractères, aligné à droite).
+
+Raccourci : `("taxi"):upper()` équivaut à `string.upper("taxi")` (syntaxe avec `:`, expliquée au module B8).
+
+<Encadre type="piege" titre="⚠️ Les accents">
+`string.upper("é")` laisse `é` tel quel : les fonctions `string` de Lua traitent les octets, pas les lettres accentuées. Pour les noms affichés en majuscules, préfère des textes sans accents.
+</Encadre>
+
+<FinEtape id="B2-e4" titre="La boîte à outils string" victoire="tu mets en forme du texte comme un pro avec string.format." prochaine="les exercices, puis le mini-projet du ticket de caisse." />
+
+## Erreurs fréquentes
+
+| Message | Cause | Solution |
+|---|---|---|
+| `attempt to perform arithmetic on a string value (constant 'Total : ')` | `+` utilisé pour coller du texte | Utilise `..` |
+| `attempt to concatenate a nil value (global 'nom')` | `..` avec une variable vide | Vérifie la variable (B1) |
+| `attempt to compare number with string` | `5 < "10"` | Convertis avec `tonumber` |
+| Affiche `2.4000000000000004` | Les décimaux sont approximatifs en informatique | `string.format("%.2f", x)` |
+
+## Exercices
+
+<Exercice id="B2-ex01" titre="La calculatrice du garage" niveau="vert" dossier="B2/ex01" fichier="calculs.lua">
+Un pneu coûte 12 €, il en faut 3. Affiche le total, puis `17 // 5` et `17 % 5` sur une même ligne, puis `2 ^ 3`.
+
+<div slot="indice1">Range le prix et la quantité dans des variables.</div>
+<div slot="indice2">Plusieurs valeurs dans un même `print`, séparées par des virgules.</div>
+<div slot="indice3">`print(17 // 5, 17 % 5)` ; `^` donne un décimal.</div>
+<div slot="solution">`2 ^ 3` affiche `8.0` car la puissance donne toujours un décimal.</div>
+</Exercice>
+
+<Exercice id="B2-ex02" titre="Message de bienvenue" niveau="vert" dossier="B2/ex02" fichier="bienvenue.lua">
+Avec les variables `nom` et `argent`, affiche la phrase attendue en une seule chaîne construite avec `..`.
+
+<div slot="indice1">Alterne texte entre guillemets et variables, reliés par `..`.</div>
+<div slot="indice2">Attention aux espaces : `..` n'en ajoute pas.</div>
+<div slot="indice3">`"Bonjour " .. nom .. ", tu as " .. argent .. " €"`.</div>
+<div slot="solution">Le nombre `argent` est converti en texte automatiquement par `..`.</div>
+</Exercice>
+
+<Exercice id="B2-ex03" titre="Conversions" niveau="vert" dossier="B2/ex03" fichier="conversions.lua">
+Une saisie arrive sous forme de texte `"250"`. Ajoute-lui 50, montre que `"abc"` ne se convertit pas, colle `42` à `"!"` et affiche la longueur de `"Nanos"`.
+
+<div slot="indice1">`tonumber` transforme un texte en nombre (ou renvoie `nil`).</div>
+<div slot="indice2">`tostring` fait l'inverse.</div>
+<div slot="indice3">La longueur s'obtient avec `#`.</div>
+<div slot="solution">`tonumber` renvoie `nil` quand la conversion échoue : on s'en servira au module B3 pour refuser une saisie invalide.</div>
+</Exercice>
+
+<Exercice id="B2-ex04" titre="Débogage : le total qui plante" niveau="jaune" type="debug" dossier="B2/ex04" fichier="total.lua">
+Ce programme plante. Lis l'erreur et corrige.
+
+<div slot="indice1">Le message parle d'arithmétique sur une chaîne (*string value*).</div>
+<div slot="indice2">Quel opérateur sert à additionner ? Lequel sert à coller ?</div>
+<div slot="indice3">Remplace `+` par `..` sur la ligne d'affichage.</div>
+<div slot="solution">Lua essaie de transformer `"Total : "` en nombre pour l'additionner, échoue, et s'arrête. Pour coller : `..`.</div>
+</Exercice>
+
+<Exercice id="B2-ex05" titre="Lecture : priorités" niveau="jaune" type="lecture" dossier="B2/ex05" fichier="priorites.lua">
+Sans exécuter, prédis les six valeurs affichées.
+
+<div slot="indice1">`*` passe avant `+`, sauf parenthèses.</div>
+<div slot="indice2">`/` donne un décimal, `//` un entier arrondi **vers le bas**.</div>
+<div slot="indice3">Vers le bas, pour un nombre négatif, ça veut dire vers −∞ : `-3.5` devient `-4`.</div>
+<div slot="solution">Le piège est `-7 // 2` : `-4`, pas `-3`, car `//` arrondit vers le bas.</div>
+</Exercice>
+
+<Exercice id="B2-ex06" titre="Le badge du garagiste" niveau="jaune" dossier="B2/ex06" fichier="badge.lua">
+À partir de `local metier = "garagiste"`, affiche : le métier en majuscules, sa longueur, ses 4 premières lettres, une ligne de 10 `=`, puis `TAXI` obtenu avec la syntaxe `:`.
+
+<div slot="indice1">Toutes ces fonctions sont dans la bibliothèque `string`.</div>
+<div slot="indice2">`string.sub(texte, 1, 4)` découpe du 1er au 4e caractère.</div>
+<div slot="indice3">`("taxi"):upper()`.</div>
+<div slot="solution">`string.sub` compte à partir de **1** en Lua (pas 0).</div>
+</Exercice>
+
+<Exercice id="B2-ex07" titre="Défi : string.format" niveau="rouge" dossier="B2/ex07" fichier="format.lua">
+Produis exactement les quatre lignes attendues avec `string.format` : un décimal arrondi à 2 chiffres, une phrase avec `%d`, une avec `%s` et `%d`, et un nombre aligné à droite sur 5 caractères suivi de `|`.
+
+<div slot="indice1">Un modèle (texte avec des `%`) puis les valeurs, dans l'ordre.</div>
+<div slot="indice2">`%.2f` pour 2 décimales, `%5d` pour 5 caractères.</div>
+<div slot="indice3">`string.format("%5d|", 42)` donne trois espaces puis `42|`.</div>
+<div slot="solution">`string.format` est ton meilleur ami pour les HUD et les tickets : il évite de compter les espaces à la main (souviens-toi de la bannière du module A5).</div>
+</Exercice>
+
+<Exercice id="B2-ex08" titre="Mini-projet : ticket de caisse" niveau="jaune" type="projet" dossier="B2/ex08" fichier="ticket.lua">
+La supérette vend 2 pains à 1,20 € et 3 bouteilles d'eau à 0,80 €. Calcule les sous-totaux et le total, puis affiche le ticket attendu (prix toujours avec 2 décimales).
+
+<div slot="validation">Changer un prix ou une quantité met à jour tout le ticket.</div>
+<div slot="indice1">Une variable par prix et par quantité, puis des variables de sous-total.</div>
+<div slot="indice2">En Lua, la virgule décimale s'écrit avec un **point** : `1.20`.</div>
+<div slot="indice3">`string.format("%s x%d : %.2f €", "Pain", qtePain, totalPain)`.</div>
+<div slot="solution">`0.80 * 3` donne en réalité `2.4000000000000004` (imprécision des décimaux) : `%.2f` l'affiche proprement `2.40`.</div>
+</Exercice>
+
+## Quiz du module B2
+
+<Quiz id="B2-quiz" questions={[
+  { q: "Que vaut `17 % 5` ?", choix: ["3", "2", "3.4", "85"], ok: 1, pourquoi: "`%` donne le reste : 17 = 3 × 5 + 2." },
+  { q: "Que vaut `(2 + 3) * 4` ?", choix: ["14", "20", "24", "9"], ok: 1, pourquoi: "Les parenthèses passent d'abord : 5 × 4." },
+  { q: "Comment écrit-on « différent de » en Lua ?", choix: ["`!=`", "`<>`", "`~=`", "`=/=`"], ok: 2, pourquoi: "Lua utilise `~=`." },
+  { q: "Qu'affiche `print(\"Sam\" .. 25)` ?", choix: ["`Sam 25`", "`Sam25`", "Une erreur", "`Sam..25`"], ok: 1, pourquoi: "`..` colle sans espace et convertit le nombre." },
+  { q: "Que renvoie `tonumber(\"abc\")` ?", choix: ["0", "`\"abc\"`", "`nil`", "Une erreur"], ok: 2, pourquoi: "Conversion impossible : `nil`." },
+  { q: "Que vaut `#\"Lua\"` ?", choix: ["2", "3", "4", "Une erreur"], ok: 1, pourquoi: "3 caractères (sans accents, 1 octet chacun)." },
+  { q: "Quel marqueur affiche un décimal avec 2 chiffres après la virgule ?", choix: ["`%d`", "`%s`", "`%.2f`", "`%2`"], ok: 2, pourquoi: "`%.2f` : f pour *float*, .2 pour 2 décimales." },
+  { q: "Pourquoi `print(\"Total : \" + 36)` plante ?", choix: ["36 est trop grand", "`+` additionne : Lua ne peut pas convertir le texte en nombre", "Il manque un point-virgule", "print n'accepte pas les nombres"], ok: 1, pourquoi: "Pour coller, c'est `..`." },
+  { q: "Que vaut `-7 // 2` ?", choix: ["-3", "-4", "-3.5", "3"], ok: 1, pourquoi: "`//` arrondit vers le bas (vers −∞)." },
+  { q: "`string.sub(\"garagiste\", 1, 4)` donne…", choix: ["`gara`", "`arag`", "`garag`", "`iste`"], ok: 0, pourquoi: "Du 1er au 4e caractère inclus ; on compte à partir de 1." },
+]} />
+
+## Récapitulatif
+
+- Calcul : `+ - * / // % ^`, parenthèses pour l'ordre. Comparaison : `== ~= < > <= >=` → booléen.
+- Texte : `..` colle, `#` mesure, `tostring` / `tonumber` convertissent.
+- `string.upper`, `lower`, `sub`, `rep`, et surtout `string.format("%s %d %.2f", ...)`.
+
+## Je suis bloqué, que faire ?
+
+Découpe : affiche chaque morceau séparément (`print(prix)`, `print(quantite)`) avant de les combiner. Pour `string.format`, vérifie que le nombre de `%` correspond au nombre de valeurs.
+
+<Videos recherche="Lua opérateurs chaînes de caractères tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : expressions et opérateurs](https://www.lua.org/manual/5.4/manual.html#3.4)
+- [Manuel Lua 5.4 : la bibliothèque string](https://www.lua.org/manual/5.4/manual.html#6.4)
+- [Doc Nanos World : bibliothèque string](https://docs.nanos-world.com/docs/scripting-reference/standard-libraries/string)

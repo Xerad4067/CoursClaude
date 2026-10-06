@@ -1,0 +1,6 @@
+string
+number
+integer
+float
+function
+5.0

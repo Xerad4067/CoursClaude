@@ -1,0 +1,54 @@
+---
+title: "Bilan du parcours A : mes deux machines sont prêtes"
+description: Point de contrôle final du parcours A, checklist et quiz de bilan.
+parcours: A
+module: Bilan A
+duree: 20 min
+ou: les-deux
+prerequis: Modules A1 à A5.
+resultat: Le parcours A validé et la checklist des deux machines complète.
+sidebar:
+  order: 6
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+## ✅ Point de contrôle : tu sais maintenant…
+
+- ouvrir PowerShell, te déplacer (`cd`, `cd ..`, `cd ~`), lister (`dir`) et créer des dossiers (`mkdir`) ;
+- installer un logiciel officiel avec `winget` et **prouver** qu'il fonctionne ;
+- configurer Git (éditeur, branche `main`, fins de ligne, identité **noreply**) et te connecter à GitHub **par le navigateur** ;
+- faire `add` → `commit` → `push` sur une machine et `pull` sur l'autre, et réparer un push refusé ou un conflit ;
+- écrire, exécuter et déboguer un petit programme Lua ;
+- chercher une erreur efficacement et demander de l'aide à une IA **sans tricher**.
+
+## La checklist « Mes deux machines sont prêtes »
+
+Ouvre la [Checklist par machine](/installer/checklist/) et vérifie que toutes les cases du **portable** et du **PC fixe** sont cochées (sauf celles marquées « quand l'accès est ouvert » et « parcours F »). Si une case résiste, reviens au module correspondant.
+
+<Encadre type="astuce" titre="💾 Avant de passer au parcours B">
+Exporte ta progression ([Ma progression](/moi/progression/)) et range le fichier dans ton dépôt `mon-apprentissage` avec `git add`, `git commit`, `git push`. C'est ton premier vrai usage de Git pour toi-même.
+</Encadre>
+
+<FinEtape id="Bilan-A-e1" titre="Checklist des deux machines" victoire="tes deux machines sont prêtes et synchronisées." prochaine="faire le quiz de bilan, puis commencer le parcours B (module B1)." />
+
+## Quiz de bilan du parcours A
+
+<Quiz id="Bilan-A-quiz" questions={[
+  { q: "Tu viens d'installer Node.js et `node` n'est pas reconnu. Que fais-tu ?", choix: ["Je réinstalle Windows", "Je ferme et rouvre le terminal, puis je revérifie", "Je change d'ordinateur", "J'abandonne Node.js"], ok: 1, pourquoi: "Le PATH est relu à l'ouverture du terminal." },
+  { q: "Quelle séquence envoie un nouveau fichier sur GitHub ?", choix: ["`git push` puis `git add`", "`git add`, `git commit -m`, `git push`", "`git pull`, `git clone`", "`git commit` seul"], ok: 1, pourquoi: "Préparer, sauvegarder, envoyer." },
+  { q: "Pourquoi l'argent d'un joueur doit-il être géré par le serveur ?", choix: ["C'est plus rapide", "Parce que le client peut être modifié par un tricheur", "Parce que Lua l'exige", "Pour économiser de la mémoire"], ok: 1, pourquoi: "Le serveur est l'arbitre : on ne fait jamais confiance au client." },
+  { q: "Où se connecte-t-on à GitHub lors du premier push ?", choix: ["Dans le terminal avec son mot de passe", "Dans le navigateur, via Git Credential Manager", "Dans un fichier .env", "Nulle part"], ok: 1, pourquoi: "Jamais de mot de passe dans le terminal, jamais de jeton dans un fichier." },
+  { q: "Que signifie `lua: test.lua:4: attempt to call a nil value (global 'pirnt')` ?", choix: ["Ligne 4 : fonction `pirnt` inconnue (faute de frappe)", "Le fichier n'existe pas", "Lua n'est pas installé", "Il manque un `end`"], ok: 0, pourquoi: "Fichier : ligne : message ; ici une faute dans `print`." },
+  { q: "Quelle version de Lua utilise Nanos World d'après sa documentation ?", choix: ["5.1", "5.3", "5.4", "Luau"], ok: 2, pourquoi: "Lua 5.4, c'est pourquoi le cours l'utilise partout." },
+  { q: "Quelle machine pour Unreal Engine ?", choix: ["Le portable", "Le PC fixe uniquement", "Les deux", "Aucune"], ok: 1, pourquoi: "Le portable n'a qu'un GPU intégré et 512 Go." },
+  { q: "Ta progression du cours est stockée…", choix: ["Sur GitHub automatiquement", "Dans le navigateur de chaque machine (export/import pour la transporter)", "Sur un serveur du cours", "Dans Lua"], ok: 1, pourquoi: "Le site est statique : export/import, ou fichier rangé dans ton dépôt." },
+  { q: "Que fait `git pull` ?", choix: ["Il envoie tes commits", "Il récupère les commits présents sur GitHub", "Il supprime le dépôt", "Il crée une branche"], ok: 1, pourquoi: "`pull` récupère, `push` envoie." },
+  { q: "Qu'affiche `print(\"2 + 2 = \" .. 2 + 2)` ?", choix: ["`2 + 2 = 4`", "`2 + 2 = 2 + 2`", "Une erreur", "`4`"], ok: 0, pourquoi: "Le calcul `2 + 2` est fait avant le collage (l'addition est prioritaire sur `..`) : Lua colle ensuite `4` au texte." },
+]} />
+
+<Encadre type="retenir">
+Bravo : c'est la partie la moins « fun » du cours, et tu l'as faite. À partir du parcours B, on code pour de vrai, avec des exemples de serveur roleplay. Prochaine étape : [B1 · Variables et types](/parcours-b/b1-variables-types/).
+</Encadre>

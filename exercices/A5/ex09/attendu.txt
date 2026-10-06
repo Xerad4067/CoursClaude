@@ -1,0 +1,4 @@
+Bienvenue sur mon futur serveur roleplay !
+Version de Lua : Lua 5.4
+Auteur : Sam
+Prochaine étape : le parcours B.

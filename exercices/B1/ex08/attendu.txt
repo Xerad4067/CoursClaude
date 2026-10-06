@@ -1,0 +1,6 @@
+=== Fiche du personnage ===
+Nom :	Sam Rivera
+Âge :	24
+Métier :	chauffeur de taxi
+Argent :	1500
+Permis de conduire :	true

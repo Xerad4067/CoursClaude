@@ -1,0 +1,230 @@
+---
+title: "A3 · Installer le PC fixe"
+description: Reproduire la configuration du portable sur le PC fixe, et préparer (sans l'installer) ce qui attendra l'accès à Nanos World.
+parcours: A
+module: A3
+duree: 45 min
+ou: pc
+prerequis: Module A2 terminé sur le portable.
+resultat: Le PC fixe a la même configuration Git et VS Code que le portable.
+objectifs:
+  - Refaire une installation seul, en suivant ta propre checklist
+  - Retrouver tes réglages VS Code grâce à Settings Sync
+  - Savoir ce qui sera installé plus tard sur le PC fixe (Nanos World, Unreal 5.7) et pourquoi
+sidebar:
+  order: 3
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+<TroisDurees
+  quinze="Étape 1 : état des lieux du PC fixe."
+  quarante="Étapes 1 et 2 : PC fixe configuré comme le portable."
+  deuxh="Tout le module + avance sur le module A4."
+/>
+
+**Pourquoi c'est utile ?** Le PC fixe est ta machine **principale** : c'est elle qui lancera le jeu et Unreal Engine. Refaire l'installation **seul**, sans relire chaque explication, prouve que tu as compris (et c'est exactement ce qu'on te demandera en entreprise sur un nouveau poste).
+
+## Étape 1 · État des lieux et installations (20 min)
+
+Lance les mêmes vérifications qu'au module A2 :
+
+```powershell
+winget --version
+code --version
+git --version
+lua -v
+node --version
+```
+
+Tu as peut-être déjà VS Code sur cette machine : dans ce cas, garde-le. Installe ce qui manque avec les mêmes commandes qu'au [module A2](/parcours-a/a2-installer-portable/) (Node.js est facultatif ici : utile seulement si tu veux lancer le site du cours sur le PC fixe).
+
+Puis applique la **même configuration Git**, avec **la même identité** que sur le portable :
+
+```powershell
+git config --global core.editor "code --wait"
+git config --global init.defaultBranch main
+git config --global core.autocrlf true
+git config --global user.name "TonPseudo"
+git config --global user.email "ID+PSEUDO@users.noreply.github.com"
+```
+
+<Encadre type="piege">
+Si l'identité diffère entre les deux machines (faute dans l'adresse), GitHub affichera tes commits comme venant de deux personnes différentes. Copie-colle exactement la même adresse.
+</Encadre>
+
+<FinEtape id="A3-e1" titre="PC fixe installé" victoire="les cinq commandes de vérification répondent sur le PC fixe." prochaine="retrouver tes réglages VS Code avec Settings Sync (étape 2)." />
+
+## Étape 2 · Settings Sync : la magie (10 min)
+
+Dans VS Code : roue dentée → **Backup and Sync Settings...** → **Sign in** → **GitHub**, avec **le même compte** que sur le portable. Après quelques secondes, tes extensions et réglages arrivent tout seuls. Vérifie :
+
+```powershell
+code --list-extensions
+```
+
+Tu dois retrouver la même liste que sur le portable.
+
+<FinEtape id="A3-e2" titre="Settings Sync sur le PC fixe" victoire="VS Code est identique sur tes deux machines sans rien réinstaller à la main." prochaine="découvrir ce qui viendra plus tard sur le PC fixe (étape 3)." />
+
+## Étape 3 · Ce qui attendra ton accès Nanos World (15 min)
+
+Ne l'installe **pas** maintenant : lis seulement, pour savoir à quoi t'attendre.
+
+| Outil | Pourquoi plus tard | Ce qu'il faut savoir |
+|---|---|---|
+| Steam + Nanos World | Accès en *Closed Testing* | Clé Steam reçue après sélection, ou playtest public ([Plan B](/outils/plan-b-nanos-world/)) |
+| Serveur dédié | Parcours E | Très léger : peut aussi tourner sur le portable d'après la doc |
+| Epic Games Launcher + **Unreal Engine 5.7** | Parcours F | Version exigée par la doc Nanos World au 06/10/2026 : **5.7.X** (à revérifier avant d'installer) |
+| Windows SDK | Parcours F | Nécessaire pour « cooker » des assets |
+| Blender | Optionnel | Petits objets 3D |
+
+<Encadre type="retenir" titre="📌 16 Go de RAM et Unreal">
+Epic recommande **32 Go de RAM** pour Unreal Engine 5.7 ; ton PC fixe en a 16. C'est suffisant pour de **petites maps** si tu fermes navigateur, Discord et jeu pendant le mapping, baisses la qualité de l'éditeur, laisses Windows gérer le fichier d'échange sur un SSD et sauvegardes souvent. Tout est détaillé dans le [tutoriel, section 15](/installer/tutoriel/#15-unreal-engine-57-avec-16-go-de-ram).
+</Encadre>
+
+<FinEtape id="A3-e3" titre="Préparer la suite sur le PC fixe" victoire="tu sais ce qui t'attend sur le PC fixe et pourquoi ce n'est pas pour tout de suite." prochaine="module A4 : créer ton dépôt GitHub et synchroniser tes deux machines." />
+
+## Exercices
+
+<Exercice id="A3-ex01" titre="Ma checklist personnelle" niveau="vert">
+Sans regarder le module A2, écris dans ton journal la liste **ordonnée** des installations et réglages à faire sur une nouvelle machine.
+
+<div slot="indice1">Commence par ce qui permet d'installer le reste.</div>
+<div slot="indice2">winget d'abord, puis l'éditeur, puis l'outil de versions…</div>
+<div slot="indice3">winget → VS Code → Git → réglages Git → identité → extensions → Lua → Node.js.</div>
+<div slot="solution">
+
+1. Vérifier winget ; 2. VS Code ; 3. Git ; 4. `core.editor`, `init.defaultBranch`, `core.autocrlf` ; 5. `user.name`, `user.email` (noreply) ; 6. extensions + Settings Sync ; 7. Lua 5.4 ; 8. Node.js LTS ; 9. vérifier chaque outil.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex02" titre="Comparer deux configurations" niveau="vert">
+Affiche ton adresse e-mail Git sur le PC fixe et compare-la à celle du portable.
+
+<div slot="indice1">Une commande `git config` qui lit **une seule** valeur.</div>
+<div slot="indice2">Donne le nom du réglage sans valeur après.</div>
+<div slot="indice3">`git config --global user.email`.</div>
+<div slot="solution">
+
+```powershell
+git config --global user.email
+```
+Les deux machines doivent afficher **exactement** la même adresse noreply.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex03" titre="Les bonnes machines" niveau="vert">
+Pour chaque logiciel, indique s'il va sur le portable, le PC fixe ou les deux : VS Code, Unreal Engine, Git, client Nanos World, Lua, Blender.
+
+<div slot="indice1">Le portable n'a qu'une carte graphique intégrée et 512 Go.</div>
+<div slot="indice2">Tout ce qui sert à **écrire du code** va sur les deux.</div>
+<div slot="indice3">Ce qui affiche de la 3D lourde va seulement sur le PC fixe.</div>
+<div slot="solution">
+
+- Les deux : VS Code, Git, Lua.
+- PC fixe uniquement : Unreal Engine, client Nanos World, Blender.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex04" titre="Lire la checklist" niveau="jaune">
+Ouvre la page [Checklist par machine](/installer/checklist/), lance toutes les commandes de la section PC fixe et coche ce qui est vérifié.
+
+<div slot="indice1">Chaque point a sa commande et le résultat à obtenir.</div>
+<div slot="indice2">Ne coche que lorsque tu vois le résultat attendu.</div>
+<div slot="indice3">Les points sans commande (Settings Sync, connexion GitHub) se vérifient dans VS Code et sur GitHub.</div>
+<div slot="solution">La checklist est complète quand tous les points actuels du PC fixe sont cochés, sauf ceux marqués « quand l'accès est ouvert » et « parcours F ».</div>
+</Exercice>
+
+<Exercice id="A3-ex05" titre="Débogage : deux identités" niveau="jaune" type="debug">
+Sur GitHub, une partie de tes commits affiche ta photo, l'autre une silhouette grise. `git config --global user.email` affiche `12345+leo@users.noreply.github.com` sur le portable et `12345+Leo@users.noreply.github.con` sur le PC fixe. Trouve l'erreur et corrige.
+
+<div slot="indice1">Compare les deux adresses caractère par caractère.</div>
+<div slot="indice2">Regarde la toute fin de l'adresse.</div>
+<div slot="indice3">`.con` au lieu de `.com`.</div>
+<div slot="solution">
+
+L'adresse du PC fixe se termine par `.con` : GitHub ne la reconnaît pas, d'où la silhouette grise. Corrige sur le PC fixe en copiant l'adresse exacte depuis Settings → Emails :
+```powershell
+git config --global user.email "12345+leo@users.noreply.github.com"
+```
+Les prochains commits seront bien reliés à ton compte.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex06" titre="Version d'Unreal : où vérifier ?" niveau="jaune">
+Le jour où tu installeras Unreal, comment sauras-tu quelle version prendre ? Écris l'adresse de la page officielle et la ligne à chercher.
+
+<div slot="indice1">C'est Nanos World qui impose la version, pas Epic.</div>
+<div slot="indice2">La page s'appelle *Setting Up Unreal Engine* dans la doc officielle.</div>
+<div slot="indice3">Cherche « currently nanos world is on » dans la page.</div>
+<div slot="solution">
+
+https://docs.nanos-world.com/docs/assets-modding/creating-assets/setting-up-ue · la ligne dit « currently nanos world is on **5.7.X** » (au 06/10/2026). Revérifie toujours avant d'installer : la version change avec les mises à jour du jeu.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex07" titre="Lecture : pourquoi pas sur le portable ?" niveau="jaune" type="lecture">
+Un ami te conseille d'installer Unreal sur ton portable « pour faire du mapping en cours ». Avec les informations du cours, explique en trois arguments pourquoi c'est une mauvaise idée.
+
+<div slot="indice1">Pense à la carte graphique, au stockage et à la mémoire.</div>
+<div slot="indice2">Epic recommande 32 Go de RAM et une carte DirectX 12.</div>
+<div slot="indice3">Le portable a un GPU intégré basse consommation et 512 Go partagés avec tout le reste.</div>
+<div slot="solution">
+
+1. **Carte graphique** : intégrée et basse consommation, alors qu'Unreal est fait pour des cartes dédiées.
+2. **Stockage** : Unreal + caches + projets prennent des dizaines de Go sur un SSD de 512 Go.
+3. **Rôle de la machine** : le portable doit rester léger et rapide pour coder ; le PC fixe (RTX 5060 Ti) est fait pour ça.
+</div>
+</Exercice>
+
+<Exercice id="A3-ex08" titre="Défi : préparer le PC fixe pour Unreal" niveau="rouge">
+Sans rien installer, vérifie l'espace libre sur le disque de ton PC fixe et la quantité de mémoire. Conclus : as-tu assez de place pour Unreal Engine (plusieurs dizaines de Go) et tes projets ?
+
+<div slot="indice1">Deux commandes en lecture seule de la [Checklist](/installer/checklist/).</div>
+<div slot="indice2">L'une donne l'espace des disques, l'autre les informations du système.</div>
+<div slot="indice3">`Get-PSDrive C` et `systeminfo` (ligne « Mémoire physique totale »).</div>
+<div slot="solution">
+
+```powershell
+Get-PSDrive C
+systeminfo
+```
+Lis la colonne `Free (GB)` et la ligne de mémoire physique. Si le disque C: a moins d'une centaine de Go libres, prévois un autre disque (SSD de préférence) pour Unreal et tes projets. Note ta conclusion dans ton journal : tu la retrouveras au parcours F.
+</div>
+</Exercice>
+
+## Quiz du module A3
+
+<Quiz id="A3-quiz" questions={[
+  { q: "Pourquoi utiliser exactement la même identité Git sur les deux machines ?", choix: ["Git refuse sinon de fonctionner", "Pour que tous tes commits soient reliés au même compte GitHub", "Pour aller plus vite", "Ce n'est pas nécessaire"], ok: 1, pourquoi: "GitHub relie un commit à un compte grâce à l'adresse e-mail." },
+  { q: "Settings Sync synchronise…", choix: ["Ton code", "Tes réglages et extensions VS Code", "Tes fichiers Windows", "Ta progression du cours"], ok: 1, pourquoi: "Le code passe par Git ; la progression par l'export/import." },
+  { q: "Quelle version d'Unreal la doc Nanos World indiquait-elle au 06/10/2026 ?", choix: ["4.27", "5.3", "5.7.X", "6.0"], ok: 2, pourquoi: "La page *Setting Up Unreal Engine* indique 5.7.X. À revérifier avant d'installer." },
+  { q: "Combien de RAM Epic recommande-t-il pour Unreal Engine 5.7 ?", choix: ["8 Go", "16 Go", "32 Go", "64 Go"], ok: 2, pourquoi: "32 Go recommandés ; avec 16 Go, il faut être économe (petites maps, applications fermées)." },
+  { q: "Que faire pendant une séance de mapping avec 16 Go de RAM ?", choix: ["Garder le jeu ouvert pour tester", "Fermer navigateur, Discord et jeu", "Ouvrir plusieurs projets", "Désactiver le fichier d'échange"], ok: 1, pourquoi: "Chaque application ouverte prend de la mémoire dont Unreal a besoin." },
+  { q: "Node.js est-il indispensable sur le PC fixe ?", choix: ["Oui, pour Unreal", "Non, seulement utile pour lancer le site du cours localement", "Oui, pour Git", "Oui, pour Lua"], ok: 1, pourquoi: "Node.js sert à construire et lancer ce site ; le portable suffit pour ça." },
+  { q: "Quel outil installe-t-on en premier sur une nouvelle machine ?", choix: ["Unreal", "On vérifie winget, puis VS Code", "Blender", "Node.js"], ok: 1, pourquoi: "winget permet d'installer le reste ; VS Code avant Git pour le choisir comme éditeur." },
+  { q: "Le client Nanos World s'installe…", choix: ["Sur le portable", "Sur le PC fixe", "Sur les deux", "Nulle part"], ok: 1, pourquoi: "Le client a besoin de la carte graphique dédiée du PC fixe." },
+  { q: "Pour voir ton adresse e-mail Git, tu tapes…", choix: ["`git email`", "`git config --global user.email`", "`git show email`", "`git --email`"], ok: 1, pourquoi: "Avec un nom de réglage et sans valeur, `git config` affiche la valeur actuelle." },
+  { q: "Où trouver l'espace libre du disque C: en lecture seule ?", choix: ["`Get-PSDrive C`", "`format C:`", "`mkdir C`", "`cd C:`"], ok: 0, pourquoi: "`Get-PSDrive C` affiche l'espace utilisé et libre ; `format` effacerait le disque !" },
+]} />
+
+## Récapitulatif
+
+- Même procédure que le portable, en **autonomie** : vérifier → installer → rouvrir → revérifier.
+- **Même identité Git** sur les deux machines, Settings Sync pour VS Code.
+- Unreal Engine (5.7.X selon la doc), Steam et Nanos World : **plus tard**, sur le PC fixe uniquement.
+
+## Je suis bloqué, que faire ?
+
+Reprends le [module A2](/parcours-a/a2-installer-portable/) étape par étape, puis [Dépannage](/outils/depannage/). Si une commande marche sur le portable mais pas sur le PC fixe, compare les versions (`winget --version`, version de Windows avec `systeminfo`).
+
+## Pour aller plus loin
+
+- [Doc Nanos World : Setting Up Unreal Engine](https://docs.nanos-world.com/docs/assets-modding/creating-assets/setting-up-ue)
+- [Epic : configuration matérielle d'Unreal Engine](https://dev.epicgames.com/documentation/unreal-engine/hardware-and-software-specifications-for-unreal-engine)
+- [Tutoriel : Unreal Engine 5.7 avec 16 Go de RAM](/installer/tutoriel/#15-unreal-engine-57-avec-16-go-de-ram)

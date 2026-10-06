@@ -1,0 +1,359 @@
+---
+title: "A4 · Git et GitHub : synchroniser mes deux machines"
+description: Créer ton dépôt, premier commit, push, clone sur l'autre machine, pull, et lancer le site du cours en local.
+parcours: A
+module: A4
+duree: 1 h 15
+ou: les-deux
+prerequis: Modules A2 et A3 (Git installé et configuré sur les deux machines).
+resultat: Un fichier modifié sur le portable apparaît sur le PC fixe après push et pull, et inversement.
+objectifs:
+  - Expliquer dépôt, commit, push, pull et clone avec tes mots
+  - Créer un dépôt GitHub et le cloner sur deux machines
+  - Faire un aller-retour portable → GitHub → PC fixe → GitHub → portable
+  - Réparer un push refusé et un conflit simple
+sidebar:
+  order: 4
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : comprendre Git avec l'analogie des sauvegardes de jeu."
+  quarante="Étapes 1 à 3 : ton dépôt existe et ton premier commit est sur GitHub."
+  deuxh="Tout le module : synchronisation complète, conflit simulé et site du cours lancé en local."
+/>
+
+**Pourquoi c'est utile ?** Git est l'outil que **toutes** les équipes de développement utilisent (et la gestion de versions fait partie des compétences du BTS SIO SLAM). Pour toi, il règle aussi un vrai problème : retrouver ton travail sur tes deux machines.
+
+## Étape 1 · Git, c'est quoi ? (15 min)
+
+<Encadre type="analogie">
+Git, c'est le **système de sauvegarde d'un jeu**, appliqué à ton code. Un **commit** est un point de sauvegarde avec une description (« avant le boss »). Tu peux revenir à n'importe quel point. **GitHub**, c'est la **sauvegarde dans le cloud** : `push` envoie tes sauvegardes, `pull` récupère celles faites sur l'autre machine.
+</Encadre>
+
+| Mot | Sens | Commande |
+|---|---|---|
+| **Dépôt** (*repository*) | Un dossier suivi par Git, avec tout son historique | `git clone`, `git init` |
+| **Commit** | Un point de sauvegarde avec un message | `git commit -m "message"` |
+| **Préparer** (*stage*) | Choisir ce qui ira dans le prochain commit | `git add` |
+| **Push** | Envoyer tes commits sur GitHub | `git push` |
+| **Pull** | Récupérer les commits de GitHub | `git pull` |
+| **Clone** | Copier un dépôt GitHub sur ta machine | `git clone adresse` |
+
+Le cycle de base : **modifier → `git add` → `git commit` → `git push`**. Et sur l'autre machine : **`git pull`**.
+
+<FinEtape id="A4-e1" titre="Comprendre Git" victoire="tu peux expliquer commit, push et pull avec l'image des sauvegardes de jeu." prochaine="créer ton dépôt sur GitHub et le cloner sur le portable (étape 2)." />
+
+## Étape 2 · Créer le dépôt et le cloner sur le portable 💻 (15 min)
+
+1. Sur https://github.com : **+** → **New repository** → nom `mon-apprentissage` → **Private** ou **Public** → coche **Add a README file** → **Create repository**.
+2. Bouton vert **Code** → onglet **HTTPS** → copie l'adresse.
+3. Dans le terminal du portable :
+
+```powershell
+cd ~\Dev
+git clone https://github.com/TonPseudo/mon-apprentissage.git
+cd mon-apprentissage
+dir
+```
+
+Résultat attendu : le dossier contient `README.md`. Si le dépôt est privé, une fenêtre **Connect to GitHub** s'ouvre : choisis **Sign in with your browser** et autorise Git Credential Manager **dans le navigateur**. Tu ne tapes jamais ton mot de passe dans le terminal.
+
+<FinEtape id="A4-e2" titre="Dépôt créé et cloné" victoire="ton dépôt GitHub existe sur le portable." prochaine="faire ton premier commit et ton premier push (étape 3)." />
+
+## Étape 3 · Premier commit, premier push (15 min)
+
+```powershell
+code journal.md
+```
+
+Écris dans le fichier : `# Mon journal` puis `- Jour 1 : outils installés sur le portable.` et enregistre (`Ctrl+S`). Puis :
+
+```powershell
+git status
+git add journal.md
+git commit -m "Ajoute mon journal de bord"
+git push
+```
+
+Ligne par ligne :
+1. `git status` : `journal.md` apparaît en rouge sous **Untracked files** (fichier non suivi).
+2. `git add journal.md` : tu le prépares pour la sauvegarde.
+3. `git commit -m "..."` : tu crées le point de sauvegarde. Le message dit **ce que fait** le commit, avec un verbe (« Ajoute », « Corrige »).
+4. `git push` : tu l'envoies sur GitHub.
+
+Recharge la page du dépôt sur GitHub : `journal.md` est là. 🎉
+
+<FinEtape id="A4-e3" titre="Premier commit et push" victoire="ton premier commit est visible sur GitHub." prochaine="récupérer le dépôt sur le PC fixe (étape 4)." />
+
+## Étape 4 · Aller-retour avec le PC fixe 🖥️ (15 min)
+
+Sur le PC fixe :
+
+```powershell
+cd ~\Dev
+git clone https://github.com/TonPseudo/mon-apprentissage.git
+cd mon-apprentissage
+code journal.md
+```
+
+Ajoute la ligne `- Jour 1 : PC fixe prêt.`, enregistre, puis :
+
+```powershell
+git add journal.md
+git commit -m "Note l'installation du PC fixe"
+git push
+```
+
+Retour sur le **portable** :
+
+```powershell
+cd ~\Dev\mon-apprentissage
+git pull
+```
+
+La ligne écrite sur le PC fixe apparaît dans `journal.md`. **Tes deux machines sont synchronisées.**
+
+<Encadre type="retenir" titre="📌 La règle d'or">
+**En t'asseyant** devant une machine : `git pull`. **Avant de te lever** : `git add`, `git commit`, `git push`.
+</Encadre>
+
+<FinEtape id="A4-e4" titre="Aller-retour réussi" victoire="un changement fait sur une machine apparaît sur l'autre." prochaine="apprendre à réparer les erreurs de synchronisation (étape 5)." />
+
+## Étape 5 · Quand ça coince (15 min)
+
+**Cas 1 : tu as oublié `git pull`.** Tu modifies sur le portable alors que le PC fixe a déjà poussé autre chose. Au `git push` :
+
+```text
+ ! [rejected]        main -> main (fetch first)
+error: failed to push some refs to 'https://github.com/TonPseudo/mon-apprentissage.git'
+hint: Updates were rejected because the remote contains work that you do not
+hint: have locally.
+```
+
+Solution : `git pull`, puis `git push`.
+
+**Cas 2 : conflit.** La **même ligne** a été modifiée sur les deux machines. `git pull` affiche `CONFLICT (content): Merge conflict in journal.md`. Dans VS Code, le fichier montre :
+
+```text
+<<<<<<< HEAD
+- Jour 2 : j'ai fini A4 (écrit sur le portable)
+=======
+- Jour 2 : j'ai commencé A5 (écrit sur le PC fixe)
+>>>>>>> 1a2b3c4
+```
+
+Au-dessus de `=======` : ta version ; en dessous : celle qui arrive. Clique sur **Accept Current**, **Accept Incoming** ou **Accept Both**, vérifie qu'il ne reste aucun marqueur `<<<<<<<`, `=======`, `>>>>>>>`, enregistre, puis :
+
+```powershell
+git add journal.md
+git commit -m "Résout le conflit du journal"
+git push
+```
+
+<Encadre type="astuce">
+Le meilleur remède aux conflits : des commits **petits et fréquents**, et `git pull` en début de séance.
+</Encadre>
+
+<FinEtape id="A4-e5" titre="Réparer push refusé et conflit" victoire="tu sais réparer les deux erreurs de synchronisation les plus courantes." prochaine="lancer le site du cours en local sur le portable (étape 6)." />
+
+## Étape 6 · Lancer ce site en local 💻 (10 min)
+
+```powershell
+cd ~\Dev
+git clone https://github.com/Xerad4067/CoursClaude.git
+cd CoursClaude
+npm install
+npm run dev
+```
+
+Ouvre l'adresse affichée (`http://localhost:4321/CoursClaude/`). Le cours tourne **sur ta machine**, même hors ligne. `Ctrl+C` dans le terminal l'arrête. Pour mettre à jour le cours plus tard : `git pull` dans ce dossier.
+
+<FinEtape id="A4-e6" titre="Site du cours en local" victoire="le cours tourne sur ton portable." prochaine="module A5 : écrire et exécuter ton premier programme Lua." />
+
+## Exercices
+
+<Exercice id="A4-ex01" titre="Le cycle de base" niveau="vert">
+Dans `mon-apprentissage`, crée un fichier `objectifs.md` contenant trois objectifs pour janvier, puis envoie-le sur GitHub.
+
+<div slot="indice1">Quatre commandes Git : regarder, préparer, sauvegarder, envoyer.</div>
+<div slot="indice2">`git status`, puis `git add`, puis `git commit -m`, puis…</div>
+<div slot="indice3">`git push`. Vérifie ensuite sur la page GitHub du dépôt.</div>
+<div slot="solution">
+
+```powershell
+cd ~\Dev\mon-apprentissage
+code objectifs.md
+git status
+git add objectifs.md
+git commit -m "Ajoute mes objectifs pour janvier"
+git push
+```
+</div>
+</Exercice>
+
+<Exercice id="A4-ex02" titre="Lire l'historique" niveau="vert">
+Affiche l'historique de ton dépôt, une ligne par commit. Combien y en a-t-il ?
+
+<div slot="indice1">La commande s'appelle « log ».</div>
+<div slot="indice2">Une option la rend compacte.</div>
+<div slot="indice3">`git log --oneline`.</div>
+<div slot="solution">
+
+```powershell
+git log --oneline
+```
+Chaque ligne = un commit : un identifiant court (7 caractères) et le message. Le premier commit (« Initial commit ») vient de la création du README par GitHub.
+</div>
+</Exercice>
+
+<Exercice id="A4-ex03" titre="Lecture : que dit git status ?" niveau="vert" type="lecture">
+Que signifie cette sortie, et que dois-tu faire ?
+
+```text
+On branch main
+Your branch is ahead of 'origin/main' by 1 commit.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+```
+
+<div slot="indice1">« ahead » veut dire « en avance ».</div>
+<div slot="indice2">`origin/main` est la branche `main` sur GitHub.</div>
+<div slot="indice3">Git te donne lui-même la commande à taper entre parenthèses.</div>
+<div slot="solution">Tu as **un commit local** que GitHub n'a pas encore, et aucun fichier modifié en attente. Il faut faire `git push`. Git donne souvent la solution dans ses messages : lis-les en entier.</div>
+</Exercice>
+
+<Exercice id="A4-ex04" titre="Débogage : push refusé" niveau="jaune" type="debug">
+Tu tapes `git push` et tu obtiens `! [rejected] main -> main (fetch first)`. Explique ce qui s'est passé et répare.
+
+<div slot="indice1">Lis la ligne « hint » : GitHub contient quelque chose que tu n'as pas.</div>
+<div slot="indice2">Tu as probablement travaillé sur l'autre machine et oublié une commande en t'asseyant.</div>
+<div slot="indice3">Récupère d'abord, envoie ensuite.</div>
+<div slot="solution">
+
+GitHub a des commits (poussés depuis l'autre machine) que ton dépôt local n'a pas. Git refuse d'écraser ce travail.
+```powershell
+git pull
+git push
+```
+</div>
+</Exercice>
+
+<Exercice id="A4-ex05" titre="Simuler et résoudre un conflit" niveau="jaune">
+Provoque volontairement un conflit : modifie **la même ligne** de `journal.md` sur les deux machines, commite des deux côtés, pousse depuis le PC fixe, puis fais `git pull` sur le portable. Résous-le.
+
+<div slot="indice1">Ne fais pas `git pull` sur le portable avant de modifier : c'est le but.</div>
+<div slot="indice2">Au `git pull`, VS Code affiche les deux versions avec des marqueurs.</div>
+<div slot="indice3">Choisis une version (ou les deux), retire les marqueurs, puis `git add`, `git commit`, `git push`.</div>
+<div slot="solution">
+
+```powershell
+# Sur le portable, après avoir modifié la même ligne et commité
+git pull                 # CONFLICT (content): Merge conflict in journal.md
+code journal.md          # choisir, enlever <<<<<<< ======= >>>>>>>
+git add journal.md
+git commit -m "Résout le conflit du journal"
+git push
+```
+Un conflit n'est pas une erreur grave : c'est Git qui te demande de décider.
+</div>
+</Exercice>
+
+<Exercice id="A4-ex06" titre="Un bon message de commit" niveau="jaune">
+Classe ces messages du meilleur au pire et explique : « modif », « Ajoute le calcul du salaire horaire », « j'ai changé des trucs dans le fichier lua parce que ça marchait pas trop », « Corrige l'oubli du pull dans le journal ».
+
+<div slot="indice1">Un bon message dit **ce que fait** le commit, en peu de mots.</div>
+<div slot="indice2">Convention : un verbe à l'impératif présent (« Ajoute », « Corrige »).</div>
+<div slot="indice3">« modif » ne dit rien ; le message trop long raconte ta vie au lieu de décrire le changement.</div>
+<div slot="solution">
+
+1. « Ajoute le calcul du salaire horaire » : précis, verbe d'action.
+2. « Corrige l'oubli du pull dans le journal » : précis.
+3. « j'ai changé des trucs… » : vague et long.
+4. « modif » : n'apprend rien à personne (ni à toi dans trois mois).
+</div>
+</Exercice>
+
+<Exercice id="A4-ex07" titre="Ranger ta fiche terminal" niveau="jaune">
+Déplace `aide-terminal.txt` (exercice A1-ex09) de `~\Dev\brouillon` vers `~\Dev\mon-apprentissage\parcours-a\`, puis versionne-le.
+
+<div slot="indice1">Crée d'abord le dossier `parcours-a` dans le dépôt.</div>
+<div slot="indice2">PowerShell déplace un fichier avec `Move-Item source destination`.</div>
+<div slot="indice3">`git add parcours-a` ajoute tout le dossier.</div>
+<div slot="solution">
+
+```powershell
+cd ~\Dev\mon-apprentissage
+mkdir parcours-a
+Move-Item ~\Dev\brouillon\aide-terminal.txt parcours-a\
+git add parcours-a
+git commit -m "Ajoute ma fiche d'aide du terminal"
+git push
+```
+</div>
+</Exercice>
+
+<Exercice id="A4-ex08" titre="Défi : la séance complète sur deux machines" niveau="rouge">
+Simule une vraie journée : le matin sur le portable (pull, ajout d'une ligne au journal, commit, push), le soir sur le PC fixe (pull, ajout, commit, push), le lendemain sur le portable (pull). À la fin, `git log --oneline` doit afficher les mêmes commits sur les deux machines.
+
+<div slot="indice1">Chaque séance commence par la même commande.</div>
+<div slot="indice2">Chaque séance finit par trois commandes.</div>
+<div slot="indice3">Compare `git log --oneline -3` sur les deux machines à la fin.</div>
+<div slot="solution">
+
+```powershell
+# Début de chaque séance
+git pull
+# ... travail ...
+git add journal.md
+git commit -m "Note la séance du matin"
+git push
+```
+Si les identifiants de commit affichés par `git log --oneline -3` sont identiques sur les deux machines, la synchronisation est parfaite.
+</div>
+</Exercice>
+
+## Quiz du module A4
+
+<Quiz id="A4-quiz" questions={[
+  { q: "Un commit, c'est…", choix: ["Un envoi sur GitHub", "Un point de sauvegarde de tes fichiers, avec un message", "Un fichier spécial", "Une branche"], ok: 1, pourquoi: "Le commit est local ; c'est `git push` qui l'envoie sur GitHub." },
+  { q: "Que fait `git add journal.md` ?", choix: ["Il envoie le fichier sur GitHub", "Il prépare le fichier pour le prochain commit", "Il crée le fichier", "Il supprime le fichier"], ok: 1, pourquoi: "`git add` met le fichier dans la zone de préparation." },
+  { q: "La règle d'or en s'asseyant devant une machine ?", choix: ["`git push`", "`git pull`", "`git commit`", "`git clone`"], ok: 1, pourquoi: "On récupère d'abord le travail fait ailleurs." },
+  { q: "`git clone` sert à…", choix: ["Copier un dépôt GitHub sur ta machine", "Dupliquer un fichier", "Créer un compte", "Annuler un commit"], ok: 0, pourquoi: "On clone une seule fois par machine ; ensuite on utilise `pull`." },
+  { q: "`Updates were rejected because the remote contains work that you do not have locally` signifie…", choix: ["Ton compte est bloqué", "GitHub a des commits que tu n'as pas : fais `git pull`", "Ton fichier est trop gros", "Tu dois réinstaller Git"], ok: 1, pourquoi: "Récupère d'abord (`git pull`), puis renvoie (`git push`)." },
+  { q: "Dans un conflit, que contient la partie entre `<<<<<<< HEAD` et `=======` ?", choix: ["La version qui arrive", "Ta version locale", "Un commentaire de Git", "Rien d'important"], ok: 1, pourquoi: "HEAD = ta version ; après `=======`, la version qui arrive." },
+  { q: "Quel est le meilleur message de commit ?", choix: ["« update »", "« Ajoute la fiche du personnage »", "« aaa »", "« fichier »"], ok: 1, pourquoi: "Un verbe d'action et ce qui change." },
+  { q: "Lors de la première connexion à GitHub, où t'identifies-tu ?", choix: ["Dans le terminal, avec ton mot de passe", "Dans le navigateur, via Git Credential Manager", "Dans un fichier texte", "Par e-mail"], ok: 1, pourquoi: "Jamais de mot de passe dans le terminal ; la connexion se fait par le navigateur." },
+  { q: "`Your branch is ahead of 'origin/main' by 2 commits` : que faire ?", choix: ["`git pull`", "`git push`", "`git clone`", "Rien"], ok: 1, pourquoi: "Tu as 2 commits locaux à envoyer." },
+  { q: "Pourquoi faire des commits petits et fréquents ?", choix: ["GitHub l'exige", "Moins de conflits et un historique plus clair", "Ça prend moins de place", "Pour gagner de l'XP"], ok: 1, pourquoi: "Petits changements = conflits rares et faciles à résoudre." },
+]} />
+
+## Récapitulatif
+
+- **Dépôt** = dossier suivi ; **commit** = sauvegarde locale ; **push** = envoyer ; **pull** = récupérer ; **clone** = première copie.
+- Cycle : `git status` → `git add` → `git commit -m "Verbe + quoi"` → `git push`.
+- Règle d'or : `pull` en arrivant, `push` en partant.
+- Push refusé → `git pull` puis `git push`. Conflit → choisir, retirer les marqueurs, `add`, `commit`, `push`.
+
+## Je suis bloqué, que faire ?
+
+Lis la sortie de `git status` : elle dit presque toujours quoi faire. Puis consulte la section Git du [Dépannage](/outils/depannage/). Si tu as peur d'avoir « tout cassé » : rien n'est perdu tant que tu n'as pas supprimé le dossier ; demande de l'aide avant de tenter des commandes trouvées au hasard.
+
+<Videos recherche="Git GitHub tutoriel débutant français push pull" liste={[
+  { titre: "Apprendre Git & GitHub en 13 minutes - Tutoriel débutant 2026", id: "m3QeXlytsjw", duree: "≈ 13 min (d'après le titre)", couvre: "installation, commandes essentielles, premier push" },
+  { titre: "Débuter avec Git et Github en 30 min", id: "hPfgekYUKgk", duree: "≈ 30 min (d'après le titre)", couvre: "les bases de Git et GitHub" },
+  { titre: "[5/??] Push/Pull/Clone - Git & GitHub pour Débutants - Tutoriel français 2018", id: "BTyxX53OWmw", couvre: "push, pull et clone (vidéo de 2018)" },
+]} />
+
+## Pour aller plus loin
+
+- [GitHub Docs : mettre en cache tes identifiants (Git Credential Manager)](https://docs.github.com/get-started/git-basics/caching-your-github-credentials-in-git)
+- [GitHub Docs : configurer les fins de ligne](https://docs.github.com/get-started/git-basics/configuring-git-to-handle-line-endings)
+- [Aide-mémoire Git du cours](/outils/aide-memoire/)
