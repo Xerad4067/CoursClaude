@@ -1,0 +1,8 @@
+Caisse 1 : A -> C
+Caisse 2 : A -> B
+Caisse 1 : C -> B
+Caisse 3 : A -> C
+Caisse 1 : B -> A
+Caisse 2 : B -> C
+Caisse 1 : A -> C
+Total : 7 déplacements

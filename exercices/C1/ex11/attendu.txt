@@ -1,0 +1,5 @@
+130 € : 2 x 50 €, 1 x 20 €, 1 x 10 €
+80 € : 1 x 50 €, 1 x 20 €, 1 x 10 €
+40 € : 2 x 20 €
+45 € : refusé (pas un multiple de 10)
+0 € : refusé (montant à zéro ou négatif)

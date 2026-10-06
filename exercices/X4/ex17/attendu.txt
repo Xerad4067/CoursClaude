@@ -1,0 +1,5 @@
+ABBA : palindrome
+TAXI : pas un palindrome
+RADAR : palindrome
+GARAGE : pas un palindrome
+A : palindrome

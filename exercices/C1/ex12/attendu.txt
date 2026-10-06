@@ -1,0 +1,26 @@
+=== Course de Sam ===
+Distance : 12 km
+Tarif : 28 €
+Remise fidélité : -2 €
+Pourboire (15 %) : 3 €
+Total : 29 €
+=== Course de Kim ===
+Distance : 5 km
+Tarif : 14 €
+Pourboire (0 %) : 0 €
+Total : 14 €
+=== Course de Alex ===
+Distance : 1 km
+Tarif : 6 €
+Pourboire (100 %) : 6 €
+Total : 12 €
+=== Course de Kim ===
+Distance : 20 km
+Tarif : 44 €
+Pourboire (10 %) : 4 €
+Total : 48 €
+=== Course de Sam ===
+Course refusée : distance invalide
+=== Course de Alex ===
+Course refusée : pourboire invalide
+Tests : 6/6 réussis

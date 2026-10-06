@@ -1,0 +1,5 @@
+=== Ticket ===
+pain x2 : 4 €
+eau x3 : 3 €
+lampe x1 : 15 €
+Total : 22 €

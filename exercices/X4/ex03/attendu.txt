@@ -1,0 +1,2 @@
+Bénéfice : 120 €, rentable : true
+Bénéfice : -60 €, rentable : false

@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "sumneko.lua",
+    "ms-python.python",
     "go-horse-studios.nanos-world",
     "MS-CEINTL.vscode-language-pack-fr",
     "streetsidesoftware.code-spell-checker",

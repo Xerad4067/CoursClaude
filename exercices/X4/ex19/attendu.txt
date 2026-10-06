@@ -1,0 +1,14 @@
+Sac à dos
+  - pain
+  - eau
+  Trousse
+    - bandage
+    - pince
+  Caisse à outils
+    - clé
+    - marteau
+    - tournevis
+    Boîte de vis
+      - vis
+      - écrou
+Total : 9 objets

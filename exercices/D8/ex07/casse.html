@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Accepter les règles</title>
+    <style>
+      /* Recette fournie (tu la comprendras plus tard) : le message est caché,
+         sauf quand la case « regles » est cochée. */
+      .merci { display: none; }
+      #regles:checked ~ .merci { display: block; }
+    </style>
+  </head>
+  <body>
+    <h1>Règles de Port-Soleil</h1>
+    <input id="regles" type="checkbox">
+    <label for="regle">J'ai lu les règles</label>
+    <p class="merci">Merci, tu peux candidater !</p>
+  </body>
+</html>

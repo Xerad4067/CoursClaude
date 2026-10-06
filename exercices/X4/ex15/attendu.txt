@@ -1,0 +1,4 @@
+3 colis : 6 ordres possibles
+5 colis : 120 ordres possibles
+10 colis : 3628800 ordres possibles
+0 colis : 1 ordre possible

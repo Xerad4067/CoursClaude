@@ -1,0 +1,3 @@
+Panier A : 3 article(s)
+Panier B : 0 article(s)
+Panier C : 4 article(s)

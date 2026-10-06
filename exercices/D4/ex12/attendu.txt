@@ -1,0 +1,7 @@
+Refusé : Sam : solde insuffisant (120 € disponibles, 500 € demandés)
+Refusé : Le montant doit être positif
+Sam : 120 €
+Kim : 300 €
+- dépôt de 50 €
+- retrait de 30 €
+2 opérations enregistrées

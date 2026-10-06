@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Candidature à Port-Soleil RP</title>
+  </head>
+  <body>
+    <h1>Candidature</h1>
+
+    <form>
+      <!-- for="pseudo" relie ce label à l'input dont l'id est « pseudo » -->
+      <p>
+        <label for="pseudo">Pseudo</label><br>
+        <input id="pseudo" name="pseudo" type="text">
+      </p>
+
+      <p>
+        <label for="age">Âge</label><br>
+        <input id="age" name="age" type="number" min="16" max="99">
+      </p>
+
+      <p>
+        <label for="metier">Métier souhaité</label><br>
+        <select id="metier" name="metier">
+          <option>Taxi</option>
+          <option>Médecin</option>
+          <option>Mécanicien</option>
+        </select>
+      </p>
+
+      <p>
+        <label for="motivation">Pourquoi toi ?</label><br>
+        <textarea id="motivation" name="motivation" rows="3"></textarea>
+      </p>
+
+      <p>
+        <input id="regles" name="regles" type="checkbox">
+        <label for="regles">J'ai lu les règles</label>
+      </p>
+
+      <!-- type="button" : le bouton ne fait rien tout seul (formulaire factice, rien n'est envoyé) -->
+      <button type="button">Envoyer ma candidature</button>
+    </form>
+  </body>
+</html>

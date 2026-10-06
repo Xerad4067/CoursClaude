@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Annonces du staff</title>
+    <style>
+      /* Sélecteur de balise : vise TOUS les h1 */
+      h1 { text-transform: uppercase; }
+
+      /* Sélecteur de classe (un point) : vise tout élément avec class="note-interne" */
+      .note-interne { display: none; }
+
+      /* Sélecteur d'id (un dièse) : vise l'unique élément avec id="urgent" */
+      #urgent { text-transform: uppercase; }
+    </style>
+  </head>
+  <body>
+    <h1>Annonces du staff</h1>
+    <p class="annonce">Redémarrage du serveur à 22 h.</p>
+    <p class="annonce">Nouveau métier : livreur.</p>
+    <p class="note-interne">Penser à vérifier la liste blanche.</p>
+    <p id="urgent">Maintenance imprévue ce soir !</p>
+  </body>
+</html>

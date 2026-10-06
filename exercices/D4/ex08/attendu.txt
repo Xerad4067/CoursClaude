@@ -1,0 +1,4 @@
+1300
+Refusé : L'argent ne peut pas être négatif
+1300
+Création refusée : L'argent ne peut pas être négatif

@@ -137,6 +137,11 @@ export function badges(p, manifeste) {
 	const exos = indexer(manifeste);
 	const parcours = (lettre) => manifeste.pages.filter((pg) => pg.parcours === lettre);
 	const fini = (lettre) => parcours(lettre).length > 0 && avancement(p, parcours(lettre)).pourcent === 100;
+	const moduleFini = (code) => {
+		const pages = manifeste.pages.filter((pg) => pg.module === code);
+		return pages.length > 0 && avancement(p, pages).pourcent === 100;
+	};
+	const nbEntrainement = Object.keys(p.exercices).filter((id) => /^X[A-Z]?\d+-ex/.test(id)).length;
 	const nbDebug = Object.keys(p.exercices).filter((id) => exos[id]?.type === 'debug').length;
 	const nbRouges = Object.keys(p.exercices).filter((id) => exos[id]?.niveau === 'rouge').length;
 	const quizParfait = Object.values(p.quiz).some((q) => q.score === q.total && q.total > 0);
@@ -156,6 +161,18 @@ export function badges(p, manifeste) {
 		{ icone: '🌈', nom: 'Retour gagnant', detail: 'Revenir après une pause de plusieurs jours (les pauses font partie du jeu)', obtenu: retour },
 		{ icone: '🅰️', nom: 'Parcours A terminé', detail: 'Tout cocher dans le parcours A', obtenu: fini('A') },
 		{ icone: '🌙', nom: 'Parcours B terminé', detail: 'Tout cocher dans le parcours B', obtenu: fini('B') },
+		{ icone: '🏋️', nom: 'À l\'entraînement', detail: 'Réussir 25 exercices de la salle d\'entraînement', obtenu: nbEntrainement >= 25 },
+		{ icone: '💪', nom: 'Rat de salle', detail: 'Réussir 100 exercices de la salle d\'entraînement', obtenu: nbEntrainement >= 100 },
+		{ icone: '🧭', nom: 'Penseur méthodique', detail: 'Terminer le parcours C', obtenu: fini('C') },
+		{ icone: '🌿', nom: 'Branche fusionnée', detail: 'Terminer le module C5 (branches et conflits)', obtenu: moduleFini('C5') },
+		{ icone: '🐍', nom: 'Premiers pas en Python', detail: 'Terminer le module D1', obtenu: moduleFini('D1') },
+		{ icone: '🧬', nom: 'Objets en poche', detail: 'Terminer le module D4 (POO)', obtenu: moduleFini('D4') },
+		{ icone: '🗃️', nom: 'Requêtes réussies', detail: 'Terminer le module D6 (SQL)', obtenu: moduleFini('D6') },
+		{ icone: '🌉', nom: 'Passerelle SLAM', detail: 'Terminer le parcours D', obtenu: fini('D') },
+		{ icone: '📜', nom: 'Scripteur Nanos', detail: 'Terminer le parcours E', obtenu: fini('E') },
+		{ icone: '🗺️', nom: 'Mappeur', detail: 'Terminer le parcours F', obtenu: fini('F') },
+		{ icone: '🏁', nom: 'Serveur RP livré', detail: 'Terminer le parcours G (projet fil rouge)', obtenu: fini('G') },
+		{ icone: '🎓', nom: 'Autonome', detail: 'Terminer le parcours H', obtenu: fini('H') },
 	];
 }
 

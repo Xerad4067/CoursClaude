@@ -1,0 +1,4 @@
+moto : 1 €
+voiture : 3 €
+camion : 8 €
+vélo : véhicule inconnu

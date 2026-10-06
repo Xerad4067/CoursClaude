@@ -1,0 +1,3 @@
+Bus 1 : 2 place(s) vide(s) sur 5
+Bus 2 : 0 place(s) vide(s) sur 2
+Bus 3 : 2 place(s) vide(s) sur 2

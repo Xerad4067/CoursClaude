@@ -1,0 +1,5 @@
+0 personne(s) -> 0 taxi(s)
+1 personne(s) -> 1 taxi(s)
+4 personne(s) -> 1 taxi(s)
+5 personne(s) -> 2 taxi(s)
+9 personne(s) -> 3 taxi(s)

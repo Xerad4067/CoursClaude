@@ -1,0 +1,10 @@
+ajouter pain 3
+ajouter lampe 1
+retirer pain 1
+retirer lampe 2
+retirer corde 1
+afficher
+retirer lampe 1
+afficher
+danser
+fin

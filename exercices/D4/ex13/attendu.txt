@@ -1,0 +1,16 @@
+> ajouter pain 3
+> ajouter lampe 1
+> retirer pain 1
+> retirer lampe 2
+Refusé : pas assez de lampe
+> retirer corde 1
+Refusé : pas assez de corde
+> afficher
+- lampe : 1
+- pain : 2
+> retirer lampe 1
+> afficher
+- pain : 2
+> danser
+Commande inconnue : danser
+> fin

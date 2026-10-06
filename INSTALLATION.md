@@ -31,6 +31,7 @@
 16. [Blender (optionnel)](#16-blender-optionnel) 🖥️
 17. [Discord (recommandé)](#17-discord-recommandé) 💻🖥️
 18. [Récapitulatif par machine](#18-récapitulatif-par-machine)
+19. [Python 3.13 et SQLite (cours de Python, parcours D)](#19-python-313-et-sqlite-cours-de-python-parcours-d) 💻🖥️
 
 ---
 
@@ -47,6 +48,7 @@
 | 7 | Extensions VS Code | **Tout de suite** | ✅ | ✅ |
 | 8 | Lua 5.4 | Avant le module A5 | ✅ | ✅ |
 | 9 | Node.js LTS | Avant de lancer le site en local | ✅ | utile |
+| 9 bis | Python 3.13 (section 19) | **Dès que ton cours de Python commence** (module D1) | ✅ | ✅ |
 | 10 | Dépôt + synchronisation | Module A4 | ✅ | ✅ |
 | 12 | Claude Code | Optionnel, quand tu veux | optionnel | optionnel |
 | 13-15 | Steam, Nanos World, serveur, Unreal | **Quand ton accès Nanos World est ouvert** (parcours E/F) | serveur seulement | ✅ |
@@ -356,6 +358,7 @@ Les identifiants ont été vérifiés sur le Visual Studio Marketplace. Installe
 Tu peux aussi les installer en ligne de commande (non testé sur Windows) :
 ```powershell
 code --install-extension sumneko.lua
+code --install-extension ms-python.python
 code --install-extension go-horse-studios.nanos-world
 code --install-extension MS-CEINTL.vscode-language-pack-fr
 code --install-extension streetsidesoftware.code-spell-checker
@@ -367,6 +370,7 @@ code --install-extension mhutchie.git-graph
 | Extension | Identifiant | Prio. | Vérifier qu'elle marche | Si elle ne marche pas |
 |---|---|---|---|---|
 | Lua (sumneko) | `sumneko.lua` | Essentielle | Dans un fichier `.lua`, tape `prin` : `print` est proposé | Vérifie que le fichier finit par `.lua` ; redémarre VS Code |
+| Python (Microsoft) | `ms-python.python` | Essentielle dès que tu fais du Python | Dans un fichier `.py`, un bouton ▶ « Run Python File » apparaît en haut à droite (intitulé anglais, non vu en français) | L'extension n'inclut **pas** Python lui-même : installe-le d'abord (section 19) puis choisis l'interpréteur avec `Ctrl+Maj+P` → **Python: Select Interpreter** |
 | nanos world Lua | `go-horse-studios.nanos-world` | Essentielle au parcours E | Dans un package, tape `Console.` : `Log` est proposé | Elle télécharge l'API au démarrage : il faut Internet |
 | French Language Pack | `MS-CEINTL.vscode-language-pack-fr` | Utile | Après redémarrage, les menus sont en français | `Ctrl+Maj+P` → **Configure Display Language** → `fr` |
 | Code Spell Checker + French | `streetsidesoftware.code-spell-checker` + `streetsidesoftware.code-spell-checker-french` | Utile | Une faute dans un commentaire est soulignée | Ajoute `"cSpell.language": "fr,en"` dans les réglages |
@@ -771,6 +775,7 @@ Astuce anti-distraction : coupe les notifications pendant tes séances (clic dro
 - [ ] Extensions VS Code installées, Settings Sync activé
 - [ ] Lua : `lua -v` affiche `Lua 5.4.6`
 - [ ] Node.js : `node --version` affiche `v24.x.x`
+- [ ] Python : `python --version` affiche `Python 3.13.x` (dès que ton cours de Python commence)
 - [ ] Dépôt `mon-apprentissage` cloné, premier `push`
 - [ ] Site du cours lancé avec `npm run dev`
 - [ ] (Optionnel) Serveur dédié Nanos World
@@ -781,3 +786,63 @@ Astuce anti-distraction : coupe les notifications pendant tes séances (clic dro
 - [ ] (Quand l'accès est ouvert) Steam + Nanos World
 - [ ] (Parcours F) Epic Games Launcher + Unreal Engine 5.7 + Windows SDK
 - [ ] (Optionnel) Blender, Discord
+
+---
+
+## 19. Python 3.13 et SQLite (cours de Python, parcours D)
+
+- **À quoi ça sert** : faire tourner tes programmes Python (ton cours de BTS, les modules D1 à D7 et la salle d'entraînement Python). Le module `sqlite3` fourni avec Python te permet aussi de faire du SQL **sans rien installer d'autre**.
+- **Priorité** : essentiel dès que tu fais du Python · **Coût** : gratuit (licence PSF) · **Source** : https://www.python.org/
+- Dans le navigateur, sans rien installer : le **Labo Python** du site (page Boîte à outils) permet d'essayer du Python n'importe où, mais il ne remplace pas une vraie installation.
+
+### 19.1 Choisir la méthode (honnêteté)
+La documentation officielle de Python pour Windows (dépôt `python/cpython`, fichier `Doc/using/windows.rst`, lu le 06/10/2026) recommande aujourd'hui le **Python Install Manager** (outil officiel qui installe et met à jour les versions de Python). L'installeur classique de python.org existe toujours et c'est celui que propose le paquet winget ci-dessous.
+
+| Méthode | Commande ou lien | Quand la choisir |
+|---|---|---|
+| **Installeur python.org via winget** (choisie par le cours : une commande, `python` fonctionne après réouverture du terminal) | `winget install -e --id Python.Python.3.13` | Cas général |
+| Python Install Manager (recommandé par la doc de Python) | `winget install -e --id Python.PythonInstallManager`, ou depuis le Microsoft Store, ou le fichier proposé sur python.org/downloads | Si tu préfères l'outil officiel et ses mises à jour |
+
+**Ne mélange pas les deux** sur la même machine : la documentation de Python signale que d'anciennes installations ou un PATH modifié peuvent empêcher les commandes `python` et `py` de fonctionner. Choisis-en une, et si ton école utilise une version précise (3.12, 3.13…), prends la même, ça évite des différences.
+
+Identifiants vérifiés dans le dépôt officiel des manifestes `microsoft/winget-pkgs` le 06/10/2026 : `Python.Python.3.13` (version 3.13.15, commandes `py`, `python`, `pythonw`, `pyw`) et `Python.PythonInstallManager` (version 26.3.240.0).
+
+### 19.2 Installation (non testée sur Windows)
+```powershell
+winget install -e --id Python.Python.3.13
+```
+Puis **ferme et rouvre le terminal** (le manifeste winget demande l'ajout de Python au PATH ; un terminal déjà ouvert ne le sait pas).
+
+### 19.3 Vérifier
+```powershell
+python --version
+py --version
+```
+Résultat attendu : `Python 3.13.x` (le dernier chiffre peut différer). Puis un vrai test :
+```powershell
+python -c "print('Bonjour depuis Python')"
+```
+Résultat attendu : `Bonjour depuis Python`.
+
+### 19.4 Erreurs fréquentes
+| Problème | Solution |
+|---|---|
+| `python` n'est pas reconnu | Ferme et rouvre le terminal. Essaie `py --version`. Si rien ne marche, vérifie avec `winget list --id Python.Python.3.13` |
+| Taper `python` ouvre le **Microsoft Store** | Windows a un « alias d'exécution d'application » : Démarrer → « Gérer les alias d'exécution d'application » (en anglais : « Manage app execution aliases », intitulé cité par la doc de Python, non vu en français), puis règle l'alias `python.exe` sur la version installée ou désactive celui du Store |
+| Deux versions de Python s'embrouillent | Utilise `py --list` (ou `py list` avec le Python Install Manager) pour voir ce qui est installé, et ne garde qu'une méthode d'installation |
+| `ModuleNotFoundError` sur un module de ton cours | Le module n'est pas installé : demande à ton prof lequel installer, puis `python -m pip install <nom>` (commande vérifiée dans la doc Python ; n'installe rien que tu ne connais pas) |
+
+### 19.5 Extension VS Code (voir section 7)
+L'extension **Python** de Microsoft est conseillée pour VS Code (coloration, exécution, débogage). Elle fait partie des extensions recommandées du dépôt (`.vscode/extensions.json`) : voir la section 7 pour son installation et sa vérification.
+
+### 19.6 SQL avec SQLite : rien à installer
+Python 3.12 et plus inclut une **interface en ligne de commande** pour SQLite :
+```powershell
+python -m sqlite3 boutique.db
+```
+Tu arrives sur une invite où tu tapes du SQL (le module D6 t'explique tout, pas à pas). Pour quitter : `.quit` (voir la page du cours). En option, un outil graphique : `winget install -e --id DBBrowserForSQLite.DBBrowserForSQLite` (identifiant vérifié ; non testé sur Windows).
+
+### 19.7 Désinstaller
+```powershell
+winget uninstall -e --id Python.Python.3.13
+```

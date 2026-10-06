@@ -7,12 +7,13 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 const parcoursInfos = [
 	{ l: 'A', titre: 'Installer et démarrer', duree: '6 h', ou: '💻 + 🖥️', lien: '/parcours-a/' },
 	{ l: 'B', titre: 'Lua et logique', duree: '24 h', ou: '🔀 les deux', lien: '/parcours-b/' },
-	{ l: 'C', titre: 'Penser en développeur + Git approfondi', duree: '16 h', ou: '🔀 les deux', vague: 2 },
-	{ l: 'D', titre: 'Passerelle SLAM (POO, SQL, Web)', duree: '18 h', ou: '🔀 les deux', vague: 2 },
-	{ l: 'E', titre: 'Scripts Nanos World', duree: '34 h', ou: '🖥️ (💻 pour écrire)', vague: 3 },
-	{ l: 'F', titre: 'Mapping (maisons, parcs, grottes)', duree: '28 h', ou: '🖥️ PC fixe', vague: 3 },
-	{ l: 'G', titre: 'Projet fil rouge : mini serveur RP', duree: '16 h', ou: '🖥️ PC fixe', vague: 4 },
-	{ l: 'H', titre: 'Autonomie et employabilité', duree: '6 h', ou: '🔀 les deux', vague: 4 },
+	{ l: 'C', titre: 'Penser en développeur + Git approfondi', duree: '16 h', ou: '🔀 les deux', lien: '/parcours-c/' },
+	{ l: 'D', titre: 'Passerelle SLAM (Python, POO, SQL, Web)', duree: '18 h', ou: '🔀 les deux', lien: '/parcours-d/' },
+	{ l: 'E', titre: 'Scripts Nanos World', duree: '34 h', ou: '🖥️ (💻 pour écrire)', lien: '/parcours-e/' },
+	{ l: 'F', titre: 'Mapping (maisons, parcs, grottes)', duree: '28 h', ou: '🖥️ PC fixe', lien: '/parcours-f/' },
+	{ l: 'G', titre: 'Projet fil rouge : mini serveur RP', duree: '16 h', ou: '🖥️ PC fixe', lien: '/parcours-g/' },
+	{ l: 'H', titre: 'Autonomie et employabilité', duree: '6 h', ou: '🔀 les deux', lien: '/parcours-h/' },
+	{ l: 'X', titre: "Salle d'entraînement (Lua et Python, optionnelle)", duree: 'à volonté', ou: '🔀 les deux', lien: '/entrainement/' },
 ];
 ---
 
@@ -47,10 +48,10 @@ const parcoursInfos = [
 			parcoursInfos.map((p) => (
 				<div class="carte carte-parcours" data-parcours={p.l}>
 					<h3>
-						Parcours {p.l} · {p.titre}
+						{p.l === 'X' ? p.titre : `Parcours ${p.l} · ${p.titre}`}
 					</h3>
 					<p class="discret">
-						≈ {p.duree} · {p.ou}
+						{p.l === 'X' ? p.duree : `≈ ${p.duree}`} · {p.ou}
 					</p>
 					{p.lien ? (
 						<>
@@ -60,7 +61,7 @@ const parcoursInfos = [
 							<p data-texte-parcours={p.l} class="discret">
 								0 %
 							</p>
-							<a href={base + p.lien}>Ouvrir le parcours {p.l}</a>
+							<a href={base + p.lien}>{p.l === 'X' ? "Ouvrir la salle d'entraînement" : `Ouvrir le parcours ${p.l}`}</a>
 						</>
 					) : (
 						<p class="discret">Rédaction prévue lors de la vague {p.vague} (voir le planning dans PLAN.md).</p>
