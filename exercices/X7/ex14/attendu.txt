@@ -1,0 +1,7 @@
+Sam_42 : valide
+Al : refusé (longueur incorrecte)
+Kim le taxi : refusé (caractère interdit)
+9lives : refusé (doit commencer par une lettre)
+Super_Long_Pseudo : refusé (longueur incorrecte)
+x-ray : refusé (caractère interdit)
+Alex_RP : valide

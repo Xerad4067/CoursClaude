@@ -1,0 +1,2 @@
+Cours de Python : revoir les chaînes
+TP à rendre vendredi

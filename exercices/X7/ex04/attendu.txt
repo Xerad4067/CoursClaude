@@ -1,0 +1,4 @@
+/AIDE : reconnue
+/Aide : reconnue
+/aide : reconnue
+/aid : inconnue

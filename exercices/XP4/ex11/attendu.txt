@@ -1,0 +1,4 @@
+Lignes dans le journal : 3
+- Serveur démarré
+- Sam s'est connecté
+- Kim s'est connectée

@@ -1,0 +1,6 @@
+pseudo | argent
+Nina | 9600
+Kim | 8200
+Eli | 7400
+Max | 5200
+Ines | 5100

@@ -1,0 +1,6 @@
+Combien de litres ? abc
+Ce n'est pas un nombre entier, recommence.
+Combien de litres ? -5
+Il faut un nombre positif, recommence.
+Combien de litres ? 32
+Plein de 32 litres validé

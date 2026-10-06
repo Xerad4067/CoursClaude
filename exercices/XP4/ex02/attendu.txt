@@ -1,0 +1,5 @@
+['/donner', 'Sam', '250']
+Commande : /donner
+Cible : Sam
+Montant doublé : 500
+['pain', 'eau', 'lampe']

@@ -1,0 +1,15 @@
+Aucune sauvegarde trouvée.
++ 2 pain
++ 3 eau
++ 1 pain
+- 1 eau
+Impossible : il n'y a que 0 lampe
+Inventaire :
+  eau x2
+  pain x3
+Sauvegarde faite.
+Inventaire :
+Sauvegarde chargée.
+Inventaire :
+  eau x2
+  pain x3

@@ -1,0 +1,6 @@
+> /give Sam_42 50
+give -> Sam_42 : 50 €
+> /give   Kim    7
+give -> Kim : 7 €
+> /give Sam
+commande invalide : /give Sam

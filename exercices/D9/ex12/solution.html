@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Candidatures</title>
+    <style>
+      li { cursor: pointer; }
+      /* La classe « accepte » est ajoutée ou retirée par le JavaScript */
+      .accepte { text-transform: uppercase; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>Candidatures</h1>
+    <label for="pseudo">Pseudo du candidat</label>
+    <input id="pseudo" type="text">
+    <button id="ajouter" type="button">Ajouter</button>
+    <p id="info"></p>
+    <p>Candidats : <span id="compteur">0</span></p>
+    <ul id="liste"></ul>
+
+    <script>
+      // L'ÉTAT : une liste d'objets { nom, accepte }
+      const candidats = [];
+
+      const champ = document.querySelector("#pseudo");
+      const info = document.querySelector("#info");
+      const compteur = document.querySelector("#compteur");
+      const liste = document.querySelector("#liste");
+
+      // afficher() reconstruit la liste à partir de l'état
+      function afficher() {
+        liste.textContent = "";                        // on vide la liste affichée
+        for (const candidat of candidats) {
+          const li = document.createElement("li");     // on crée un élément <li>
+          li.textContent = candidat.nom;
+          li.classList.toggle("accepte", candidat.accepte);   // classe présente si accepte vaut true
+          li.addEventListener("click", () => {
+            candidat.accepte = !candidat.accepte;      // ! inverse true/false
+            afficher();
+          });
+          liste.append(li);                            // on l'accroche dans la page
+        }
+        compteur.textContent = candidats.length;
+      }
+
+      document.querySelector("#ajouter").addEventListener("click", () => {
+        const nom = champ.value.trim();
+        if (nom === "") {
+          info.textContent = "Écris un pseudo d'abord.";
+          return;                                      // on s'arrête là
+        }
+        candidats.push({ nom: nom, accepte: false });
+        champ.value = "";                              // on vide le champ
+        info.textContent = "";
+        afficher();
+      });
+    </script>
+  </body>
+</html>

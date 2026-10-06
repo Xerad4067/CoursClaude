@@ -1,0 +1,4 @@
+Sam : 1500 euros
+Kim : 900 euros
+
+Nombre de caractères : 33

@@ -1,0 +1,5 @@
+Montant à retirer : 187
+Billets de 50 : 3
+Billets de 20 : 1
+Billets de 10 : 1
+Reste non distribuable : 7 €

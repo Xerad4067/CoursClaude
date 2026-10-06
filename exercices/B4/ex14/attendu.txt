@@ -1,0 +1,18 @@
+J'ai choisi un nombre entre 1 et 100. Tu as 7 essais.
+Ton nombre : 50
+C'est plus ! (essais restants : 6)
+Ton nombre : 90
+C'est moins ! (essais restants : 5)
+Ton nombre : abc
+Ce n'est pas un nombre, réessaie.
+Ton nombre : 70
+C'est plus ! (essais restants : 4)
+Ton nombre : 80
+C'est moins ! (essais restants : 3)
+Ton nombre : 75
+C'est plus ! (essais restants : 2)
+Ton nombre : 79
+C'est moins ! (essais restants : 1)
+Ton nombre : 76
+C'est plus ! (essais restants : 0)
+Perdu ! Le nombre secret était 77.

@@ -1,0 +1,4 @@
+Kim	taxi	nil
+30
+1	2
+Sam	nil

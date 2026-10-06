@@ -1,0 +1,5 @@
+Compte ouvert
+Pas de permis
+Métier : []
+Salaire : 1200
+Prime : 0

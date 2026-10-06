@@ -1,0 +1,3 @@
+Alex doit payer 6 €
+Kim doit payer 16 €
+Sam doit recevoir 24 €

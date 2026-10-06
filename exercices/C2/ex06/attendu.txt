@@ -1,0 +1,6 @@
+Âge du client 1 : 25
+Entrée acceptée
+Âge du client 2 : 17
+Entrée refusée
+Âge du client 3 : abc
+Ce n'est pas un nombre

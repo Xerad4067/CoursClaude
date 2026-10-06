@@ -1,0 +1,6 @@
+modele | prix | prix_ttc
+Camion Colosse | 52000 | 62400
+Camion Titan | 45000 | 54000
+Coupe Eclair | 38000 | 45600
+SUV Orion | 32000 | 38400
+Pickup Rhino | 24000 | 28800

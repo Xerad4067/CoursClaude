@@ -1,0 +1,2 @@
+Avant : AB, CD, AB, EF, CD, AB, GH
+Après : AB, CD, EF, GH

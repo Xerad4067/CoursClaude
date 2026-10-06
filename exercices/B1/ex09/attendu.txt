@@ -1,0 +1,4 @@
+plaque	string
+places	number
+estElectrique	boolean
+proprietaire	nil

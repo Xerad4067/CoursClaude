@@ -1,0 +1,5 @@
+taxi : de 4 à 7
+parc : de 33 à 36
+taxi : présent
+bus : absent
+parc : présent

@@ -1,0 +1,7 @@
+Péage de la vallée
+AB-123-CD (Voiture) : 6 €
+XY-987-ZT (Camion, 3 essieux) : 20 €
+MM-001-AA (Moto) : 2 €
+KM-456-LP (Voiture) : 6 €
+Recette : 34 €
+Refusé : peage() à définir dans la classe fille

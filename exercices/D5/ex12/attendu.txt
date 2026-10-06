@@ -1,0 +1,16 @@
+Type (voiture, moto, autre, fin) : voiture
+Plaque : AB-123-CD
+AB-123-CD : 6 €
+Type (voiture, moto, autre, fin) : moto
+Plaque : MM-001-AA
+MM-001-AA : 2 €
+Type (voiture, moto, autre, fin) : tracteur
+Type inconnu : tracteur
+Type (voiture, moto, autre, fin) : autre
+Plaque : ZZ-000-ZZ
+Erreur : peage() à définir dans la classe fille
+Type (voiture, moto, autre, fin) : voiture
+Plaque : KM-456-LP
+KM-456-LP : 6 €
+Type (voiture, moto, autre, fin) : fin
+Recette : 14 €

@@ -1,0 +1,4 @@
+Pas encore de liste : on repart de zéro.
+0
+['pain', 'eau', 'lampe']
+True

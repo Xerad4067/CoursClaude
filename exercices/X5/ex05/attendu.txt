@@ -1,0 +1,6 @@
+pain,corde,eau,lampe
+pain
+corde,eau,lampe
+4
+clé
+corde,eau,lampe

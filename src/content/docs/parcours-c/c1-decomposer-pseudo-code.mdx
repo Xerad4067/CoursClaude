@@ -1,0 +1,497 @@
+---
+title: "C1 · Décomposer un problème et écrire du pseudo-code"
+description: Transformer un énoncé en plan avant de coder : poser les bonnes questions, découper, écrire en pseudo-code, traduire en Lua et tester avec des cas.
+parcours: C
+module: C1
+duree: 2 h 30
+ou: les-deux
+prerequis: Parcours B jusqu'au module B5 (fonctions). Les tables (B6) servent dans quelques exercices.
+resultat: Une course de taxi (tarif, remise, pourboire) conçue d'abord en pseudo-code, codée en Lua puis vérifiée par une série de cas.
+objectifs:
+  - Reformuler un énoncé en entrées, sorties, exemples et cas limites
+  - Découper un problème en sous-problèmes qui deviennent des fonctions
+  - Écrire un algorithme en pseudo-code, puis le traduire ligne à ligne en Lua
+  - Tester un programme avec une série de cas choisis avant d'écrire le code
+  - Expliquer son code à voix haute pour y trouver une erreur
+sidebar:
+  order: 1
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+import Rappel from '../../../components/Rappel.astro';
+
+<TroisDurees
+  quinze="Étape 1 : les quatre questions à poser à un énoncé."
+  quarante="Étapes 1 à 3 et les exercices 1 à 3."
+  deuxh="Les 5 étapes et les exercices 1 à 9. Le mini-projet de la course de taxi se fait mieux dans une séance à part."
+/>
+
+<Rappel questions={[
+  { q: "Quelle est la différence entre `print` et `return` dans une fonction ?", r: "`print` écrit à l'écran, et la valeur est ensuite perdue. `return` renvoie la valeur à celui qui a appelé la fonction : il peut la ranger dans une variable, la comparer, la réutiliser.", de: "B5" },
+  { q: "Que valent `17 // 5` et `17 % 5` ?", r: "`3` (la division entière) et `2` (le reste de la division).", de: "B2" },
+  { q: "Quelles sont les seules valeurs fausses en Lua ?", r: "`false` et `nil`. Tout le reste est vrai, y compris `0` et la chaîne vide.", de: "B3" },
+  { q: "Où écrire `local total = 0` pour un accumulateur, et pourquoi ?", r: "Avant la boucle. Écrit dans la boucle, il serait remis à 0 à chaque tour et le total final serait faux.", de: "B4" },
+]} />
+
+**Pourquoi c'est utile ?** Un serveur roleplay est fait de règles : « le taxi coûte tant », « la remise s'applique si… », « le pourboire se calcule sur… ». Avant d'écrire la moindre ligne de Lua, un développeur transforme ces règles en **plan**. Les débutants qui sautent cette étape passent des heures à corriger un code construit sur un énoncé mal compris. Cette méthode te servira pour un script de serveur comme pour un exercice d'algorithmique en BTS.
+
+## Étape 1 · Comprendre l'énoncé (20 min)
+
+<Encadre type="analogie">
+Imagine un client qui te dit : « Je voudrais un truc pour louer des scooters. » Si tu pars coder tout de suite, tu vas te tromper. Un bon artisan **pose des questions** : pour combien de temps ? à quel prix ? et si le client revient trop tard ? Un énoncé, c'est ce client : il ne dit jamais tout.
+</Encadre>
+
+Avant de coder, pose **quatre questions** à l'énoncé. Prenons celui-ci :
+
+> *Le scooter du parc se loue 3 € de départ, plus 2 € par heure. Affiche le prix d'une location.*
+
+| Question | Réponse pour le scooter |
+|---|---|
+| **Entrées** : qu'est-ce qui entre dans le programme ? | La durée de la location, en heures (un nombre entier). |
+| **Sorties** : qu'est-ce qui doit sortir ? | Le prix, en euros (un nombre entier). |
+| **Exemples** : que donne la règle sur des cas simples, **calculés à la main** ? | 1 h donne 5 €. 3 h donnent 9 €. 10 h donnent 23 €. |
+| **Cas limites** : qu'est-ce qui pourrait sortir de l'ordinaire ? | 0 heure ? une durée négative ? 1,5 heure ? un texte tapé par le joueur ? |
+
+Les **cas limites** (*edge cases*) sont les valeurs aux frontières ou bizarres : zéro, négatif, vide, énorme, pile sur le seuil. C'est là que se cachent presque tous les bugs.
+
+L'énoncé ne dit pas quoi faire pour 0 heure. Deux solutions : **demander** au client, ou **décider** toi-même et l'écrire. Ici, on décide : *« une durée de moins d'une heure est refusée »*. Ce qui compte, c'est que la décision soit écrite quelque part, pas qu'elle reste dans ta tête.
+
+<Encadre type="retenir">
+Les **exemples calculés à la main** sont tes futurs tests. Écris-les **avant** le code : quand le programme les retrouve, tu as la preuve qu'il marche. Si tu les écris après, tu risques de recopier ce que le programme répond, même quand il se trompe.
+</Encadre>
+
+<FinEtape id="C1-e1" titre="Comprendre l'énoncé" victoire="tu as rempli la fiche des quatre questions pour un énoncé, avec trois exemples calculés à la main." prochaine="découper un problème en petits morceaux (étape 2)." />
+
+## Étape 2 · Décomposer en sous-problèmes (20 min)
+
+<Encadre type="analogie">
+Pour **déménager**, tu ne penses pas « déménager » : tu penses « emballer la cuisine », « louer un camion », « porter les cartons », « nettoyer l'appartement ». Chaque tâche est assez petite pour être faite sans réfléchir. Un gros problème se résout en le découpant jusqu'à ce que chaque morceau soit simple.
+</Encadre>
+
+Un problème : *« À la fermeture du bar, paie les employés avec l'argent de la caisse, puis affiche qui a touché combien. »* On le découpe en un **arbre** :
+
+```text
+Payer les employés du bar
+├── Calculer le salaire d'un employé        (heures × taux horaire)
+├── Additionner les salaires de tout le monde  (le total)
+├── Vérifier que la caisse peut payer       (caisse ≥ total ?)
+└── Afficher le récapitulatif               (qui touche combien)
+```
+
+Règles pour bien découper :
+
+1. Chaque morceau se dit en **une phrase qui commence par un verbe** (calculer, vérifier, afficher).
+2. Chaque morceau a ses propres **entrées** et sa propre **sortie** (le salaire d'un employé : un employé entre, un nombre sort).
+3. Si tu ne sais pas résoudre un morceau en quelques minutes, **découpe-le encore**.
+4. **Un sous-problème devient une fonction** (module B5). Le programme principal ne fait plus qu'assembler.
+
+```lua title="c1/bar.lua"
+local employes = {
+  { nom = "Sam", heures = 6, taux = 12 },
+  { nom = "Kim", heures = 8, taux = 11 },
+}
+
+-- Sous-problème 1 : le salaire d'un employé.
+local function salaire(employe)
+  return employe.heures * employe.taux
+end
+
+-- Sous-problème 2 : la somme de tous les salaires.
+local function totalSalaires(liste)
+  local total = 0
+  for _, e in ipairs(liste) do
+    total = total + salaire(e)
+  end
+  return total
+end
+
+-- Sous-problème 4 : le récapitulatif.
+local function afficherRecap(liste)
+  for _, e in ipairs(liste) do
+    print(e.nom .. " touche " .. salaire(e) .. " €")
+  end
+end
+
+-- Le problème de départ : il assemble les morceaux.
+local caisse = 200
+local total = totalSalaires(employes)
+if caisse >= total then                 -- sous-problème 3 : la caisse peut-elle payer ?
+  afficherRecap(employes)
+  print("Total : " .. total .. " €")
+else
+  print("Caisse insuffisante")
+end
+```
+
+```text
+Sam touche 72 €
+Kim touche 88 €
+Total : 160 €
+```
+
+Lis le code de bas en haut : la dernière partie se lit comme l'arbre. Tu comprends le programme **sans lire** le détail des fonctions.
+
+<Encadre type="piege">
+Piège classique : une seule grosse fonction qui fait tout (calculer, vérifier, afficher). Elle marche le premier jour, puis personne (toi y compris) n'ose plus y toucher. Une fonction = **une** tâche.
+</Encadre>
+
+<FinEtape id="C1-e2" titre="Décomposer" victoire="tu as dessiné l'arbre d'un problème et reconnu les fonctions qu'il contient." prochaine="écrire le plan en pseudo-code (étape 3)." />
+
+## Étape 3 · Le pseudo-code (20 min)
+
+Le **pseudo-code** (*pseudocode*) est un plan écrit **en français**, avec quelques mots-clés fixes, sans les règles strictes d'un vrai langage. L'ordinateur ne le comprend pas : il est fait pour **toi** (et pour ceux qui te relisent). Tu peux l'écrire sur papier, dans un fichier texte ou en commentaire.
+
+Dans ce cours, on utilise ces mots :
+
+| Pseudo-code | Sens | En Lua |
+|---|---|---|
+| `ENTRÉE : a, b` | ce que reçoit le programme | les paramètres de la fonction |
+| `x ← valeur` | ranger une valeur dans `x` | `x = valeur` |
+| `AFFICHER …` | écrire à l'écran | `print(…)` |
+| `SI … ALORS … SINON … FIN SI` | choisir | `if … then … else … end` |
+| `POUR chaque x DANS liste FAIRE` | parcourir | `for _, x in ipairs(liste) do` |
+| `POUR i DE 1 À n FAIRE` | compter | `for i = 1, n do` |
+| `TANT QUE … FAIRE` | répéter tant que | `while … do` |
+| `RENVOYER x` | donner le résultat | `return x` |
+
+<Encadre type="astuce">
+Il n'existe pas **un** pseudo-code officiel : chaque livre et chaque professeur a ses habitudes (d'autres écrivent « Début », « Fin », « Lire », « Écrire »). Si on t'en propose un autre en cours, change les mots : **les idées sont les mêmes**. Ce qui compte : c'est lisible, et chaque ligne peut se traduire.
+</Encadre>
+
+Voici le scooter, en pseudo-code :
+
+```text
+FONCTION prixLocation(heures)
+    SI heures < 1 ALORS
+        RENVOYER rien        (location refusée)
+    FIN SI
+    RENVOYER 3 + 2 × heures
+FIN FONCTION
+```
+
+**Teste ton pseudo-code à la main** avec tes exemples, avant de coder. Pour `heures = 3` : « 3 est-il inférieur à 1 ? Non. Je renvoie 3 + 2 × 3 = 9 » : c'est bien l'exemple de l'étape 1. Pour `heures = 0` : « 0 est inférieur à 1 ? Oui. Je renvoie rien » : c'est bien la décision prise pour le cas limite. Si le résultat à la main est faux, tu as trouvé une erreur de **plan** : elle te coûte 10 secondes ici, 10 minutes dans le code.
+
+<FinEtape id="C1-e3" titre="Le pseudo-code" victoire="tu as écrit un pseudo-code et tu l'as vérifié à la main sur tes exemples." prochaine="traduire le pseudo-code en Lua et le tester (étape 4)." />
+
+## Étape 4 · Traduire en Lua et tester avec des cas (25 min)
+
+La traduction se fait **ligne à ligne**, avec le tableau de l'étape 3. Astuce : **garde le pseudo-code en commentaire** au-dessus de la fonction : il explique le code, et si tu te trompes, tu vois tout de suite où.
+
+```lua title="c1/location.lua"
+-- FONCTION prixLocation(heures)
+--   SI heures < 1 ALORS RENVOYER rien (location refusée)
+--   RENVOYER 3 + 2 × heures
+local PRIX_DEPART = 3
+local PRIX_HEURE = 2
+
+local function prixLocation(heures)
+  if heures < 1 then
+    return nil                        -- refusée
+  end
+  return PRIX_DEPART + PRIX_HEURE * heures
+end
+
+-- Un petit outil d'essai : compare le résultat obtenu et le résultat attendu.
+local function verifier(nom, obtenu, attendu)
+  if obtenu == attendu then
+    print("OK     " .. nom)
+  else
+    print("ÉCHEC  " .. nom .. " : obtenu " .. tostring(obtenu) .. ", attendu " .. tostring(attendu))
+  end
+end
+
+verifier("1 heure", prixLocation(1), 5)
+verifier("3 heures", prixLocation(3), 9)
+verifier("10 heures", prixLocation(10), 23)
+verifier("0 heure (cas limite)", prixLocation(0), nil)
+verifier("-2 heures (cas limite)", prixLocation(-2), nil)
+```
+
+```text
+OK     1 heure
+OK     3 heures
+OK     10 heures
+OK     0 heure (cas limite)
+OK     -2 heures (cas limite)
+```
+
+Ligne par ligne :
+
+- les nombres 3 et 2 sont rangés dans des **constantes** (noms en majuscules) : si le tarif change, tu modifies une seule ligne ;
+- `return nil` traduit « RENVOYER rien » ;
+- `verifier` reçoit un **nom de cas**, le résultat **obtenu** et le résultat **attendu** (calculé à la main), et affiche `OK` ou `ÉCHEC`. Les cinq appels du bas sont ta **série de cas** : trois exemples et deux cas limites.
+
+Pour voir ce que donne un cas qui échoue, change `heures < 1` en `heures <= 1` : le programme affiche `ÉCHEC  1 heure : obtenu nil, attendu 5`. Le test a attrapé une faute sur la frontière exacte, celle qu'on aurait oubliée en essayant seulement « 3 heures ».
+
+<Encadre type="retenir">
+Méthode complète : **1.** les quatre questions → **2.** l'arbre des sous-problèmes → **3.** le pseudo-code, vérifié à la main → **4.** le code, avec le pseudo-code en commentaire → **5.** la série de cas. Au module C3, tu transformeras `verifier` en un vrai mini-cadre de test.
+</Encadre>
+
+<FinEtape id="C1-e4" titre="Traduire et tester" victoire="ton programme passe une série de cas écrits avant le code, et tu as vu un test échouer." prochaine="l'étape 5 : expliquer ton code à voix haute." />
+
+## Étape 5 · Le canard en plastique (15 min)
+
+Quand ton code ne fait pas ce que tu veux, essaie la **méthode du canard en plastique** (*rubber duck debugging*) : pose un objet devant toi (un canard, une peluche, une tasse, un ami patient), puis **explique-lui ton code à voix haute, ligne par ligne**, en disant ce que **chaque ligne fait vraiment**. Dès que tu dis une phrase qui ne correspond pas au code ou à l'énoncé, c'est là qu'est le bug. Ça marche parce qu'à voix haute, tu ne peux plus **survoler** : tu lis ce qui est écrit, pas ce que tu crois avoir écrit.
+
+Un exemple. Ce code doit donner 150 pour 10 heures à 15 € de l'heure, mais il affiche 120 :
+
+```lua title="c1/canard.lua"
+local TAUX = 12
+
+-- Salaire = nombre d'heures × taux horaire.
+local function salaire(heures, taux)
+  return heures * TAUX
+end
+
+print(salaire(10, 15))    --> 120 alors qu'on attendait 150
+```
+
+Le dialogue avec le canard : « La fonction `salaire` reçoit des heures et un taux. Elle renvoie… les heures multipliées par… `TAUX`. Attends : `TAUX` en majuscules, c'est la constante de la ligne 1, qui vaut 12. Le **paramètre** `taux`, celui qu'on m'a donné (15), je ne l'utilise nulle part ! » Correction : `return heures * taux`. Tu l'as trouvé **sans** message d'erreur et sans rien afficher.
+
+<Encadre type="astuce">
+Le canard sert aussi **avant de demander de l'aide** à une IA ou sur Discord : pour formuler la question (« je voulais… », « j'obtiens… », « j'ai déjà essayé… »), tu dois expliquer le problème clairement, et une fois que c'est fait, tu trouves souvent la réponse tout seul. Garde le modèle de prompt de la page [Une IA comme tuteur](/outils/ia-tuteur/).
+</Encadre>
+
+<FinEtape id="C1-e5" titre="Le canard en plastique" victoire="tu as trouvé une erreur rien qu'en expliquant ton code à voix haute." prochaine="les exercices : commence par le 1 (le parking du parc)." />
+
+## Erreurs fréquentes
+
+| Symptôme / message | Cause | Solution |
+|---|---|---|
+| `attempt to divide by zero` | Une division entière `//` par zéro : liste vide, compteur à 0 | Teste le cas limite **avant** de diviser (exercice 7) |
+| Le résultat est faux **seulement** pile sur la valeur seuil | `>` à la place de `>=` (ou l'inverse) | Relis le pseudo-code mot à mot, teste la valeur pile (exercice 4) |
+| `attempt to concatenate a nil value (global 'nouveauSolde')` | Une variable est utilisée **avant** d'être calculée : les étapes ne sont pas dans l'ordre du pseudo-code | Remets les lignes dans l'ordre du plan (exercice 2) |
+| `attempt to perform arithmetic on a nil value (local 'heures')` | La fonction est appelée **sans argument** : `prixLocation()` | Vérifie l'appel : un argument par paramètre |
+| `attempt to compare nil with number` | Même cause : `heures` vaut `nil` dans `heures < 1` | Idem, ou teste `nil` avant de comparer |
+| Un cas de nuit n'est jamais reconnu | `and` au lieu de `or` pour une plage qui passe minuit | Dessine la frise des heures (exercice 10) |
+
+## Exercices
+
+<Exercice id="C1-ex01" titre="Le parking du parc : les quatre questions" niveau="vert" dossier="C1/ex01" fichier="parking.lua">
+Le parking du parc facture **2 € la première heure**, puis **1 € par heure supplémentaire**, avec un **plafond de 8 € par jour**. Quelqu'un qui reste 0 heure (ou moins) ne paie rien.
+
+**Avant de coder**, note sur papier l'entrée, la sortie, et le prix de 0 h, 1 h, 3 h, 7 h et 12 h **calculé à la main**. Puis écris `prixParking(heures)` et affiche chaque cas sous la forme `3 h -> 4 €`. Compare avec tes réponses à la main.
+
+<div slot="indice1">L'entrée est un nombre d'heures, la sortie un nombre d'euros. Calcule 3 h à la main : 2 + 1 + 1.</div>
+<div slot="indice2">Prix sans plafond : `2 + (heures - 1) * 1`. Le plafond veut dire « jamais plus que 8 » : une fonction de `math` (vue en B5) fait ça.</div>
+<div slot="indice3">`math.min(prix, 8)`, et un `if heures <= 0 then return 0 end` au tout début.</div>
+<div slot="solution">Tes exemples calculés à la main sont ton **test** : le programme doit les retrouver. 0 h est un **cas limite** (l'énoncé le tranche : 0 €), et 7 h tombe **pile** sur le plafond (2 + 6 = 8) : à partir de là, le prix ne bouge plus. Les nombres 2, 1 et 8 sont rangés dans des constantes pour qu'un changement de tarif se fasse à un seul endroit.</div>
+</Exercice>
+
+<Exercice id="C1-ex02" titre="Remettre les étapes dans l'ordre : le distributeur" niveau="vert" dossier="C1/ex02" fichier="distributeur.lua">
+Voici le pseudo-code d'un retrait, **mélangé** :
+
+```text
+a. AFFICHER « Retrait de » montant « € : nouveau solde » nouveauSolde « € »
+b. SI montant est plus grand que solde ALORS
+c.     AFFICHER « Refusé : solde insuffisant »
+d. SINON
+e.     nouveauSolde ← solde − montant
+f. ENTRÉE : solde, montant
+g. FIN SI
+```
+
+Écris les lettres dans le bon ordre, puis traduis en Lua : une fonction `retirer(solde, montant)` qui affiche le message et **renvoie le solde** (nouveau, ou inchangé en cas de refus). Pars d'un solde de 100 et retire 30, puis 100, puis 70.
+
+<div slot="indice1">Une entrée vient toujours en premier. Un `SI` finit toujours par son `FIN SI`.</div>
+<div slot="indice2">Dans le `SINON`, il faut calculer le nouveau solde (e) **avant** de l'afficher (a).</div>
+<div slot="indice3">Ordre : f, b, c, d, e, a, g. En Lua : `if montant > solde then … else … end`, avec un `return` dans chaque branche.</div>
+<div slot="solution">Si tu affiches avant de calculer, Lua s'arrête avec `attempt to concatenate a nil value` : l'ordre des étapes fait partie du plan. Le dernier retrait (70 sur un solde de 70) est un **cas limite** : il est accepté, car on ne refuse que si le montant est **strictement plus grand** que le solde.</div>
+</Exercice>
+
+<Exercice id="C1-ex03" titre="Du pseudo-code à Lua : le péage" niveau="vert" dossier="C1/ex03" fichier="peage.lua">
+Traduis ce pseudo-code en une fonction `prixPeage(vehicule)`, puis affiche le résultat pour `moto`, `voiture`, `camion` et `vélo` (un véhicule inconnu affiche `vélo : véhicule inconnu`).
+
+```text
+ENTRÉE : vehicule (un texte)
+SI vehicule vaut « moto » ALORS prix ← 1
+SINON SI vehicule vaut « voiture » ALORS prix ← 3
+SINON SI vehicule vaut « camion » ALORS prix ← 8
+SINON prix ← rien (véhicule inconnu)
+FIN SI
+SORTIE : prix
+```
+
+<div slot="indice1">Un `SI … SINON SI … SINON` en pseudo-code devient `if … elseif … else … end` en Lua (module B3).</div>
+<div slot="indice2">« vaut » se traduit par `==`. « rien » se traduit par `nil`.</div>
+<div slot="indice3">À l'affichage, teste `if prix == nil then` pour écrire `véhicule inconnu`.</div>
+<div slot="solution">Chaque ligne du pseudo-code a donné **une** ligne de Lua : c'est le signe d'un bon pseudo-code. Garde-le en commentaire au-dessus de la fonction, comme dans la solution.</div>
+</Exercice>
+
+<Exercice id="C1-ex04" titre="Débogage : la traduction infidèle" niveau="jaune" type="debug" dossier="C1/ex04" fichier="achat.lua">
+Le programme refuse l'achat d'un joueur qui a **exactement** la somme (40 € pour un article à 40 €), alors que le pseudo-code (dans le fichier) l'accepte. Aucun message d'erreur : le programme tourne, mais il se trompe. Trouve la ligne.
+
+<div slot="indice1">Lance le programme et regarde la deuxième ligne affichée.</div>
+<div slot="indice2">Compare avec le pseudo-code : `≥` veut dire « plus grand **ou égal** ».</div>
+<div slot="indice3">Dans la condition du `if`, remplace `>` par `>=`.</div>
+<div slot="solution">C'est une erreur de **traduction** : le plan était juste, le code ne le respecte pas. Elle ne se voit qu'avec la valeur **pile** sur la frontière, d'où l'importance de tester les cas limites (40 € pour 40 €), pas seulement des cas confortables (50 € pour 40 €).</div>
+</Exercice>
+
+<Exercice id="C1-ex05" titre="Lecture : combien de taxis ?" niveau="jaune" type="lecture" dossier="C1/ex05" fichier="taxis.lua">
+Lis ce code **sans l'exécuter**. Prédis les cinq lignes affichées, puis écris en **une phrase** ce que fait `nombreDeTaxis`. Vérifie ensuite en le lançant.
+
+<div slot="indice1">Déroule le `while` sur papier pour 5 personnes : `restantes` vaut 5, puis 1, puis -3.</div>
+<div slot="indice2">Pour 0 personne, la condition `restantes > 0` est fausse dès le départ : aucun tour de boucle.</div>
+<div slot="indice3">Résultats : 0, 1, 1, 2, 3 taxis. La fonction calcule le nombre de taxis de 4 places nécessaires, arrondi **vers le haut**.</div>
+<div slot="solution">Les cas limites se découvrent aussi **en lisant** : 0 personne donne 0 taxi, et 4 personnes donnent 1 taxi (pas 2), car la boucle s'arrête quand `restantes` atteint 0. `restantes` devient même négatif (-3 pour 5 personnes), et c'est sans danger. Autre écriture possible, sans boucle : `(personnes + 3) // 4`. Tu pourras vérifier qu'elle donne les mêmes résultats.</div>
+</Exercice>
+
+<Exercice id="C1-ex06" titre="Décomposer : le ticket de caisse" niveau="jaune" dossier="C1/ex06" fichier="ticket.lua">
+Voici le panier d'un client :
+
+```lua
+local panier = {
+  { nom = "pain",  prix = 2,  quantite = 2 },
+  { nom = "eau",   prix = 1,  quantite = 3 },
+  { nom = "lampe", prix = 15, quantite = 1 },
+}
+```
+
+Affiche le ticket attendu. **D'abord** l'arbre des sous-problèmes sur papier, **ensuite** une fonction par sous-problème.
+
+<div slot="indice1">Quatre petites tâches : le total d'une ligne, le total du panier, l'affichage d'une ligne, l'affichage du ticket.</div>
+<div slot="indice2">`totalLigne(ligne)` renvoie `prix * quantite`. `totalPanier` additionne les `totalLigne` avec un accumulateur (B4).</div>
+<div slot="indice3">`afficherTicket` ne fait qu'**assembler** : un titre, une boucle `ipairs` qui appelle `afficherLigne`, puis la ligne `Total`.</div>
+<div slot="solution">Vois comme `afficherTicket` est court : il se lit comme l'arbre. Si demain le client veut un ticket avec une remise, tu ne modifies que `totalPanier`, sans toucher à l'affichage d'une ligne.</div>
+</Exercice>
+
+<Exercice id="C1-ex07" titre="Débogage : le cas limite oublié" niveau="jaune" type="debug" dossier="C1/ex07" fichier="moyenne.lua">
+La concession veut le **prix moyen** de ses véhicules (arrondi vers le bas) et le message `aucun véhicule en vente` quand la liste est vide. Ce programme plante sur la deuxième concession :
+
+```text
+Concession du port : prix moyen 25000 €
+lua: moyenne.lua:8: attempt to divide by zero
+stack traceback:
+	moyenne.lua:8: in local 'prixMoyen'
+	moyenne.lua:17: in main chunk
+	[C]: in ?
+```
+
+Corrige-le pour obtenir le résultat attendu.
+
+<div slot="indice1">Le message dit « diviser par zéro ». Quelle est la valeur de `#prix` pour la concession vide ?</div>
+<div slot="indice2">Une moyenne de zéro élément n'existe pas : décide quoi faire **avant** de diviser.</div>
+<div slot="indice3">Au début de `prixMoyen` : `if #prix == 0 then return nil end`. Le code d'affichage sait déjà gérer `nil`.</div>
+<div slot="solution">Le cas « liste vide » n'était dans aucun exemple : c'est exactement le genre de cas limite que la question « et si c'est vide ? » aurait fait apparaître **à l'étape 1**. La fonction renvoie `nil` pour dire « pas de moyenne », et c'est à celui qui l'appelle de réagir.</div>
+</Exercice>
+
+<Exercice id="C1-ex08" titre="Deviner la règle à partir d'exemples : la livraison" niveau="jaune" dossier="C1/ex08" fichier="livraison.lua">
+Un livreur te donne seulement des **exemples** de ses prix :
+
+| Distance | 1 km | 2 km | 3 km | 4 km | 6 km |
+|---|---|---|---|---|---|
+| Prix | 5 € | 5 € | 8 € | 11 € | 17 € |
+
+Devine la règle et écris-la en une phrase. **Prédis** le prix pour 10 km et 20 km. Puis programme `prixLivraison(km)` et affiche les sept cas (les cinq exemples, 10 km et 20 km) comme attendu : tes deux prédictions doivent être confirmées.
+
+<div slot="indice1">Regarde comment le prix change quand la distance augmente de 1 km, de 3 km à 4 km par exemple.</div>
+<div slot="indice2">Entre 1 km et 2 km, le prix **ne bouge pas** : une partie de la distance est comprise dans le prix de base.</div>
+<div slot="indice3">5 € jusqu'à 2 km, puis 3 € par kilomètre au-delà de 2 km : `5 + (km - 2) * 3`.</div>
+<div slot="solution">Dans la vraie vie, un client donne souvent des exemples plutôt qu'une règle : retrouver la règle (et la faire confirmer) fait partie du métier. Tes prédictions (29 € et 59 €) ont servi de test : si le programme les avait contredites, soit ta règle, soit ton code, était faux.</div>
+</Exercice>
+
+<Exercice id="C1-ex09" titre="Débogage : le canard en plastique" niveau="jaune" type="debug" dossier="C1/ex09" fichier="parc.lua">
+Ce programme affiche `Le plus cher : Scooter (3000 €)` et `Valeur totale du parc : 123000 €`. On attend `Camion` et `126000 €`. Il y a **deux** bugs. Pas de message d'erreur : utilise le **canard** (étape 5). Lis à voix haute chaque commentaire, puis la ligne de code qui est juste dessous.
+
+<div slot="indice1">Dis en une phrase ce que raconte le commentaire au-dessus de `plusCher`, puis ce que fait réellement le `if`.</div>
+<div slot="indice2">« Le plus cher » veut dire un prix **plus grand** : quel symbole de comparaison dit ça ? Pour le total, compte combien de tours fait la boucle avec 4 véhicules.</div>
+<div slot="indice3">`>` à la place de `<`, et `for i = 1, #liste do` à la place de `#liste - 1`.</div>
+<div slot="solution">Dans les deux cas, **le commentaire disait vrai et le code mentait**. Le premier bug est un symbole de comparaison inversé, le second une erreur « de un » (*off-by-one*) : la boucle oublie le dernier véhicule. Quand le commentaire et le code se contredisent, un des deux est faux : à toi de trancher avec l'énoncé.</div>
+</Exercice>
+
+<Exercice id="C1-ex10" titre="Les plages horaires qui passent minuit" niveau="rouge" dossier="C1/ex10" fichier="nuit.lua">
+Un taxi ajoute un **supplément de nuit de 3 €** si le départ a lieu **entre 22 h (inclus) et 6 h (exclu)**. L'heure est un entier de 0 à 23. Écris `estDeNuit(heure)` et `prixCourse(prixBase, heure)`, puis affiche, pour une course de base à 14 €, les départs à 12, 21, 22, 23, 0, 5 et 6 h, comme attendu (l'heure est écrite sur 2 caractères avec `%2d`).
+
+Avant de coder, note sur papier les **cas limites** à vérifier.
+
+<div slot="indice1">Dessine une frise de 0 h à 23 h et colorie en rouge les heures de nuit : combien de morceaux rouges obtiens-tu ?</div>
+<div slot="indice2">Deux morceaux : le petit matin et le soir. Il faut donc « soir **ou** petit matin ».</div>
+<div slot="indice3">`heure >= 22 or heure < 6`. Avec `and`, aucune heure ne peut être à la fois supérieure à 22 et inférieure à 6.</div>
+<div slot="solution">Le piège des plages qui **passent minuit** : une plage « de 22 h à 6 h » n'est pas un seul intervalle. Les cas limites à vérifier sont les **frontières** : 21 h (pas de nuit), 22 h (nuit, borne incluse), 23 h, 0 h, 5 h (nuit) et 6 h (borne exclue, donc plus de nuit).</div>
+</Exercice>
+
+<Exercice id="C1-ex11" titre="Rendre la monnaie en billets" niveau="rouge" dossier="C1/ex11" fichier="billets.lua">
+Le distributeur ne donne que des billets de **50, 20 et 10 €**, avec le **moins de billets possible**. Il refuse un montant à zéro ou négatif, ou qui n'est pas un multiple de 10. Écris une fonction `repartir(montant)` qui renvoie le détail (`2 x 50 €, 1 x 20 €, 1 x 10 €`) ou `nil` et la raison du refus. Affiche le résultat pour 130, 80, 40, 45 et 0.
+
+Commence par décomposer, sur papier, en trois morceaux.
+
+<div slot="indice1">Trois morceaux : valider le montant, répartir les billets du plus grand au plus petit, assembler le texte.</div>
+<div slot="indice2">`reste // valeur` donne le nombre de billets de cette valeur, `reste % valeur` ce qu'il reste à distribuer (B2). Une liste `{ 50, 20, 10 }` parcourue avec `ipairs` garde l'ordre (B6).</div>
+<div slot="indice3">Dans la boucle, n'ajoute un morceau de texte que si le nombre de billets est supérieur à 0. Colle ensuite les morceaux avec `table.concat(morceaux, ", ")`.</div>
+<div slot="solution">La fonction ne mélange pas les rôles : elle **calcule** et renvoie un texte (ou un refus), et c'est la boucle du bas qui **affiche**. Tester 45 et 0 est indispensable : ce sont les cas limites que l'énoncé interdit. L'ordre de la liste `BILLETS` compte (du plus grand au plus petit) : c'est ce qui donne le minimum de billets.</div>
+</Exercice>
+
+<Exercice id="C1-ex12" titre="Mini-projet : la course de taxi" niveau="rouge" type="projet" dossier="C1/ex12" fichier="taxi.lua">
+Un client monte dans ton taxi. Les règles :
+
+- **Tarif** : 4 € de prise en charge + 2 € par kilomètre.
+- **Remise de fidélité** : 10 % du tarif, **arrondie à l'euro inférieur**, pour un client qui a déjà fait **au moins 5 courses**.
+- **Pourboire** : un pourcentage choisi par le client (de 0 à 100), calculé sur le prix **après remise**, arrondi à l'euro inférieur.
+- Une distance à 0 ou négative, ou un pourboire hors de 0 à 100 : course **refusée**, avec la raison.
+- Le **total** est le prix après remise plus le pourboire.
+
+Rejoue ces six cas (client, kilomètres, courses déjà faites, pourboire) : Sam 12 km, 7 courses, 15 % ; Kim 5 km, 0 course, 0 % ; Alex 1 km, 5 courses, 100 % ; Kim 20 km, 4 courses, 10 % ; Sam 0 km, 3 courses, 10 % ; Alex 8 km, 10 courses, 150 %.
+
+**Ta méthode, dans l'ordre :** (1) la fiche des quatre questions, (2) l'arbre des sous-problèmes, (3) le pseudo-code, (4) le code, (5) les totaux calculés **à la main avant** de regarder le résultat attendu, (6) une relecture à voix haute.
+
+<div slot="validation">Le programme affiche exactement le résultat attendu, y compris la ligne `Tests : 6/6 réussis`. Tu peux montrer ta fiche, ton arbre et ton pseudo-code, écrits **avant** le code. La remise n'apparaît pas sur le reçu d'Alex (client fidèle, mais 10 % de 6 € arrondi à l'euro inférieur font 0 €).</div>
+<div slot="indice1">Commence par les cas limites : distance 0, pourboire 150 %, fidélité **pile** à 5 courses, remise arrondie à 0 €.</div>
+<div slot="indice2">Cinq petites fonctions : `tarifDeBase`, `remiseFidelite`, `calculerPourboire`, `calculerCourse` (qui assemble) et `afficherRecu`. La partie principale ne fait que parcourir les cas.</div>
+<div slot="indice3">`calculerCourse` renvoie soit une table `{ tarif, remise, pourboire, total }`, soit `nil` et la raison (comme `repartir` à l'exercice 11). `//` fait les arrondis à l'euro inférieur : `tarif * 10 // 100`.</div>
+<div slot="solution">Tu viens d'appliquer toute la méthode du module : **comprendre → découper → pseudo-code → coder → tester → expliquer**. Les cas de test sont écrits **avant** (réponses calculées à la main) et le programme les vérifie lui-même. Ce même plan servira pour la boutique et les métiers de ton serveur roleplay. Observe aussi la remise d'Alex : 10 % de 6 € font 0,6 €, arrondi à 0 €, et ce cas aurait été oublié sans la question « et pile sur le seuil ? ».</div>
+</Exercice>
+
+## Quiz du module C1
+
+<Quiz id="C1-quiz" questions={[
+  { q: "Quelles sont les quatre questions à poser à un énoncé avant de coder ?", choix: ["Quel langage, quel éditeur, quelle machine, quelle version", "Entrées, sorties, exemples, cas limites", "Variables, boucles, conditions, fonctions", "Début, milieu, fin, test"], ok: 1, pourquoi: "Entrées, sorties, exemples calculés à la main et cas limites : c'est la fiche de l'étape 1." },
+  { q: "Pourquoi calculer des exemples **à la main** avant d'écrire le code ?", choix: ["Pour s'entraîner au calcul mental", "Parce que ce sont tes futurs tests : le programme doit les retrouver", "Parce que Lua ne sait pas calculer", "Ce n'est pas utile"], ok: 1, pourquoi: "Calculés avant, ils ne dépendent pas de ce que fait ton code, donc ils peuvent le contredire." },
+  { q: "Un « cas limite » est…", choix: ["Une erreur de syntaxe", "Une valeur aux frontières ou inhabituelle (0, vide, négatif, pile sur le seuil)", "Un test qui échoue toujours", "Un cas qui ne peut pas arriver"], ok: 1, pourquoi: "Les bugs se cachent surtout sur les frontières et les valeurs bizarres." },
+  { q: "Quand décomposer un problème est-il terminé ?", choix: ["Quand l'arbre a exactement trois niveaux", "Quand chaque morceau est assez simple pour être résolu sans réfléchir", "Quand le code est écrit", "Jamais"], ok: 1, pourquoi: "Si tu ne sais pas résoudre un morceau, tu le découpes encore." },
+  { q: "En pratique, un sous-problème devient…", choix: ["Un commentaire", "Une fonction", "Une variable globale", "Un fichier à part"], ok: 1, pourquoi: "Une fonction = une tâche, avec ses entrées et sa sortie." },
+  { q: "Le pseudo-code est…", choix: ["Un langage que Lua sait exécuter", "Un plan écrit en français, avec des mots-clés fixes, pour toi et tes relecteurs", "Du code Lua avec des fautes", "Réservé aux professionnels"], ok: 1, pourquoi: "L'ordinateur ne le lit pas : il sert à penser et à communiquer." },
+  { q: "`SI argent ≥ prix ALORS …` se traduit par :", choix: ["`if argent > prix then`", "`if argent >= prix then`", "`if argent == prix then`", "`if argent =< prix then`"], ok: 1, pourquoi: "`≥` veut dire « plus grand ou égal » : `>=` en Lua. `=<` n'existe pas." },
+  { q: "Pour une plage horaire de 22 h à 6 h, la bonne condition est…", choix: ["`heure >= 22 and heure < 6`", "`heure >= 22 or heure < 6`", "`heure > 22 and heure > 6`", "`heure == 22 or heure == 6`"], ok: 1, pourquoi: "La plage passe minuit : c'est le soir OU le petit matin. Avec `and`, aucune heure ne convient." },
+  { q: "La méthode du canard en plastique consiste à…", choix: ["Supprimer le code qui ne marche pas", "Expliquer son code à voix haute, ligne par ligne, à un objet ou une personne", "Demander la solution à une IA", "Relancer le programme plusieurs fois"], ok: 1, pourquoi: "À voix haute, on lit ce qui est écrit au lieu de ce qu'on croit avoir écrit." },
+  { q: "Ton programme tourne sans erreur mais donne un mauvais résultat pile sur un seuil. Premier réflexe ?", choix: ["Réinstaller Lua", "Relire le pseudo-code et tester la valeur exacte du seuil", "Ajouter des `print` partout au hasard", "Supprimer le seuil"], ok: 1, pourquoi: "C'est souvent un `>` à la place d'un `>=` : le test sur la frontière le révèle." },
+]} />
+
+## Récapitulatif
+
+- Avant de coder, pose **quatre questions** à l'énoncé : entrées, sorties, exemples calculés à la main, cas limites. Ce que l'énoncé ne dit pas, tu le **décides** et tu l'écris (ou tu demandes).
+- **Décompose** en sous-problèmes d'une phrase chacun, avec leurs entrées et leur sortie : chacun devient une **fonction**.
+- Le **pseudo-code** est un plan en français, vérifié **à la main** sur tes exemples avant de coder.
+- Traduis **ligne à ligne** et garde le pseudo-code en commentaire.
+- Écris tes cas de test **avant** le code, y compris les cas limites ; le programme doit les retrouver.
+- Si le code ne fait pas ce qu'il devrait, **explique-le à voix haute** (le canard en plastique).
+
+## Je suis bloqué, que faire ?
+
+1. **Relis l'énoncé** et recopie ta fiche des quatre questions : une entrée ou une règle manque-t-elle ?
+2. **Teste ton plan à la main** avec un exemple simple, ligne par ligne. Si c'est faux à la main, ce n'est pas un problème de Lua.
+3. **Découpe encore** : le morceau qui te bloque contient sûrement deux problèmes.
+4. **Cherche** dans le manuel Lua (liens plus bas) ou le glossaire : [les mots du cours](/outils/glossaire/).
+5. **Demande à une IA des indices**, pas la solution. Prompt modèle :
+
+```text
+Je suis débutant en Lua 5.4. Voici mon énoncé : [énoncé].
+Voici ma fiche (entrées, sorties, exemples, cas limites) : [fiche].
+Voici mon pseudo-code : [pseudo-code]. Je suis bloqué à : [où].
+Ne me donne PAS le code. Pose-moi une question qui me fait avancer,
+ou signale-moi un cas limite que j'ai oublié.
+```
+
+6. **Demande sur Discord** (voir le [Plan B](/outils/plan-b-nanos-world/)) ou à ton professeur, avec la même fiche : une question bien posée reçoit une réponse plus vite.
+
+<Videos recherche="décomposer un problème pseudo-code algorithme débutant" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : structures de contrôle (if, while, repeat)](https://www.lua.org/manual/5.4/manual.html#3.3.4)
+- [Manuel Lua 5.4 : définitions de fonctions](https://www.lua.org/manual/5.4/manual.html#3.4.11)
+- [Manuel Lua 5.4 : priorité des opérateurs](https://www.lua.org/manual/5.4/manual.html#3.4.8)

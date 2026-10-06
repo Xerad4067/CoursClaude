@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Bienvenue en direct</title>
+  </head>
+  <body>
+    <h1>Bienvenue en direct</h1>
+    <label for="pseudo">Ton pseudo</label>
+    <input id="pseudo" type="text">
+    <p id="accueil">Bienvenue, voyageur !</p>
+
+    <script>
+      const champ = document.querySelector("#pseudo");
+      const accueil = document.querySelector("#accueil");
+
+      // L'événement « input » se déclenche à CHAQUE modification du champ
+      champ.addEventListener("input", () => {
+        // champ.value : le texte actuellement tapé ; trim() retire les espaces autour
+        const pseudo = champ.value.trim();
+        if (pseudo === "") {
+          accueil.textContent = "Bienvenue, voyageur !";
+        } else {
+          accueil.textContent = `Bienvenue, ${pseudo} !`;
+        }
+      });
+    </script>
+  </body>
+</html>

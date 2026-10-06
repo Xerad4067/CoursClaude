@@ -1,0 +1,5 @@
+casque : acheté, il reste 40 €
+moto : refusé (il te manque 860 €)
+lampe : refusé (rupture de stock)
+corde : acheté, il reste 15 €
+Solde final : 15 €

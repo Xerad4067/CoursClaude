@@ -1,0 +1,8 @@
+Quantité à acheter : abc
+Refusé : « abc » n'est pas un nombre entier
+Quantité à acheter : -2
+Refusé : la quantité doit être au moins 1
+Quantité à acheter : 0
+Refusé : la quantité doit être au moins 1
+Quantité à acheter : 5
+Quantité acceptée : 5

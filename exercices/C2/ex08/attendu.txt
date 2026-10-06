@@ -1,0 +1,2 @@
+Parc après tri : Sultan (45000 €), Tracteur (25000 €), Scooter (3000 €)
+Valeur totale : 73000 €

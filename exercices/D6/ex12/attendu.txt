@@ -1,0 +1,3 @@
+ville | nb_confirmes | argent_total
+Mont-Rocheux | 4 | 19100
+Val-Verdoyant | 3 | 18700

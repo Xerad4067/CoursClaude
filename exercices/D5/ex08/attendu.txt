@@ -1,0 +1,6 @@
+Sam ramasse 2 pain
+Sam ramasse 1 lampe
+Kim ramasse 1 pain
+2
+1
+0

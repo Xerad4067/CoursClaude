@@ -1,0 +1,8 @@
+Kim
+true
+null
+undefined
+camion
+undefined
+2
+undefined

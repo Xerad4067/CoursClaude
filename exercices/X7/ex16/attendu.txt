@@ -1,0 +1,4 @@
+AB-123-CD : valide
+ZZ-999-AA : valide
+ab-123-cd : refusée
+AB-12-CD : refusée

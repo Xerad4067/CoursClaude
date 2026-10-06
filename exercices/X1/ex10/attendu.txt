@@ -1,0 +1,4 @@
+Plus basse : -8
+Plus haute : 4
+Amplitude : 12
+Distance à zéro de la plus basse : 8

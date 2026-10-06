@@ -1,0 +1,4 @@
+pseudo | argent
+Oscar | 600
+Jade | 120
+Theo | 0

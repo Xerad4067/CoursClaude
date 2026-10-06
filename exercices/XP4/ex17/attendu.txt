@@ -1,0 +1,7 @@
+Premier lancement : {}
+--- le serveur redémarre ---
+Après redémarrage : {'pain': 3, 'épée': 1}
+{
+  "pain": 3,
+  "épée": 1
+}

@@ -1,0 +1,4 @@
+pseudo | metier | argent
+Kim | médecin | 8200
+Lou | policier | 4800
+Mia | pompier | 4300

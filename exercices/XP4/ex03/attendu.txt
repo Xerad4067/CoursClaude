@@ -1,0 +1,3 @@
+Dans ton sac : pain, eau, lampe, corde
+pain-eau-lampe-corde
+PYTHON

@@ -18,6 +18,9 @@
     "@astrojs/starlight": "^0.42.5",
     "@fontsource/roboto": "^5.3.0",
     "@fontsource/roboto-mono": "^5.3.0",
-    "astro": "^7.3.5"
+    "astro": "^7.3.5",
+    "pyodide": "^314.0.7",
+    "sql.js": "^1.14.2",
+    "wasmoon": "^1.16.0"
   }
 }

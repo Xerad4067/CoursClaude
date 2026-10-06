@@ -1,0 +1,14 @@
+=== Journal ===
+[001] INFO   Compte ouvert : Sam (200 €)
+[002] INFO   Compte ouvert : Kim (50 €)
+[003] INFO   Dépôt : Sam +100 € (solde 300 €)
+[004] INFO   Retrait : Kim -50 € (solde 0 €)
+[005] WARN   Retrait refusé : Kim -10 € (solde 0 €)
+[006] INFO   Retrait : Sam -120 € (solde 180 €)
+[007] INFO   Dépôt : Kim +120 € (solde 120 €)
+[008] INFO   Virement : Sam -> Kim 120 €
+[009] ERREUR compte inconnu : Zoe
+[010] ERREUR compte inconnu : Max
+=== Soldes finaux ===
+Kim : 120 €
+Sam : 180 €

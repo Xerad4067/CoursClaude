@@ -1,0 +1,11 @@
+pseudo | ville | niveau
+Eli | Mont-Rocheux | 6
+Ines | Mont-Rocheux | 7
+Kim | Port-Azur | 7
+Lou | Port-Azur | 6
+Mia | Port-Azur | 5
+Oscar | Port-Azur | 2
+Paul | Mont-Rocheux | 6
+Ravi | Port-Azur | 4
+Sam | Port-Azur | 3
+Tom | Port-Azur | 4

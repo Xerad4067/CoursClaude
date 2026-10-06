@@ -1,0 +1,8 @@
+<Sam> salut tout le monde
+Kim donne 50 € à Sam
+[MP] Sam -> Kim : merci beaucoup
+<Alex> ce jeu est ***, quel *****
+Commandes : /give, /msg, /aide
+Commandes : /give, /msg, /aide
+Commande inconnue : /teleport
+Usage : /give pseudo montant

@@ -1,0 +1,18 @@
+Nom du personnage : Sam Rivera
+Métier : chauffeur de taxi
+Argent : 1500
+=== Fiche du personnage ===
+Nom : Sam Rivera
+Âge : 24
+Métier : chauffeur de taxi
+Argent : 1500 €
+Permis de conduire : True
+Situation : à l'aise
+
+=== Supérette du parc ===
+Pain x2 : 2.40 €
+Eau x3 : 2.40 €
+--------------------
+TOTAL : 4.80 €
+dont TVA (20 %) : 0.80 €
+Sam Rivera paie et garde 1495.20 €

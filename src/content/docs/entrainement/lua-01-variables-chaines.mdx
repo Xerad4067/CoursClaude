@@ -1,0 +1,341 @@
+---
+title: "X1 · Variables, nombres et chaînes"
+description: 20 exercices courts et testés pour maîtriser les variables, les nombres et le texte en Lua.
+parcours: X
+module: X1
+duree: 3 h
+ou: les-deux
+prerequis: Modules B1 et B2 (variables, types, opérateurs, chaînes).
+resultat: Une fiche de paie mise en forme par Lua, et 20 exercices réussis.
+objectifs:
+  - Choisir le bon opérateur (division, division entière, reste, puissance) et prévoir si le résultat est un entier ou un décimal
+  - Convertir entre texte et nombre avec tonumber et tostring
+  - Découper, transformer et mettre en forme du texte avec string.sub, string.upper et string.format
+  - Reconnaître et corriger les bugs classiques : nil, priorités, décimaux approchés
+sidebar:
+  order: 1
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Relis la fiche « L'essentiel en 10 lignes », puis fais les exercices 1 à 3."
+  quarante="Toute la série 1 (6 exercices) : tu n'as besoin d'aucun indice si tu as bien lu la fiche."
+  deuxh="Séries 1 et 2 (14 exercices). Les défis de la série 3 et le quiz à la séance suivante."
+/>
+
+**Pourquoi c'est utile ?** Sur un serveur roleplay, chaque HUD, chaque ticket, chaque fiche de paie et chaque nom de joueur passe par des variables, des calculs et du texte. Si ces bases sont solides, tout le reste du cours devient plus facile. Ici, tu **répètes** : beaucoup de petits exercices, un seul concept à la fois.
+
+## L'essentiel en 10 lignes
+
+Ce n'est pas un cours (il est dans [B1](/parcours-b/b1-variables-types/) et [B2](/parcours-b/b2-operateurs-chaines/)) : c'est ta **fiche mémo**, à garder sous les yeux pendant les exercices.
+
+1. **Variable** : `local nom = valeur`. Plusieurs d'un coup : `local a, b = 1, 2`. Échange : `a, b = b, a` (la droite est calculée avant de ranger).
+2. **Types** : `number` (entier `42` ou décimal `3.5`), `string`, `boolean`, `nil`. `type(x)` donne le type en texte, `math.type(x)` précise `integer` ou `float`.
+3. **Calculs** : `+ - * / // % ^`. `/` et `^` donnent **toujours un décimal** (`7 / 2` vaut `3.5`, `2 ^ 2` vaut `4.0`). `//` est la division entière (arrondie vers le bas), `%` le reste.
+4. **Priorités** : `^`, puis `* / // %`, puis `+ -`, puis `..`. Un doute ? Des parenthèses.
+5. **Maths** : `math.floor` (arrondi vers le bas), `math.ceil` (vers le haut), `math.max`, `math.min`, `math.abs`, `math.sqrt`.
+6. **Texte** : `..` colle, `#` donne la longueur **en octets** (un `é` compte pour 2). Fonctions : `string.upper`, `lower`, `sub(texte, début, fin)`, `rep(texte, n)`, `reverse`, `len`.
+7. **Conversions** : `tonumber("12")` donne `12` (ou `nil` si impossible, et la virgule décimale ne marche pas : `"12,5"`), `tostring(12)` donne `"12"`. Un booléen ne se colle pas avec `..` : passe par `tostring`.
+8. **Mise en forme** : `string.format` avec `%s` (texte), `%d` (entier), `%.2f` (2 décimales), `%5.2f` (largeur 5), `%05d` (zéros devant), `%-8s` (texte aligné à gauche sur 8 caractères).
+9. **`nil`** : une variable déclarée sans valeur contient `nil`. Calculer avec `nil` provoque une erreur.
+10. **Décimaux** : `0.1 + 0.2` n'est pas exactement `0.3`. Ne compare pas deux décimaux avec `==` : utilise une tolérance ou `%.2f` pour l'affichage.
+
+```lua title="x1/essentiel.lua"
+local a, b = 3, 8
+a, b = b, a                                  -- échange
+print(a, b)                                  --> 8  3
+print(7 / 2, 7 // 2, 7 % 2, 2 ^ 3)           --> 3.5  3  1  8.0
+print(math.floor(4.7), math.ceil(4.2), math.max(3, 9), math.abs(-5), math.sqrt(16))   --> 4  5  9  5  4.0
+local nom = "Sam"
+print("Bonjour " .. nom .. ", " .. #nom .. " lettres")      --> Bonjour Sam, 3 lettres
+print(string.upper("taxi"), string.sub("garagiste", 1, 4), string.rep("=", 5))   --> TAXI  gara  =====
+print(string.format("%s a %d pièces (%.2f €), n°%05d", nom, 5, 3.5, 42))   --> Sam a 5 pièces (3.50 €), n°00042
+print(tonumber("12") + 1, tonumber("abc"), tostring(12) .. "!")   --> 13  nil  12!
+```
+
+<Encadre type="astuce" titre="Mode d'emploi de la salle d'entraînement">
+Pour chaque exercice : crée un fichier (le nom est indiqué sur le bloc de code), écris ta solution, lance `lua nom-du-fichier.lua` et compare avec le **résultat attendu**. Ouvre les indices **un par un**, dans l'ordre, et seulement si tu es coincé depuis plus de 5 minutes. La solution est à la fin : regarde-la pour comparer, pas pour copier.
+</Encadre>
+
+## Exercices
+
+Trois séries, de plus en plus difficiles. Chaque série finit par une mini-victoire à cocher.
+
+### Série 1 · 🟢 Échauffement
+
+Environ 30 minutes. Une idée par exercice, un résultat visible tout de suite. Essaie sans indice.
+
+<Exercice id="X1-ex01" titre="Les stats de départ" niveau="vert" dossier="X1/ex01" fichier="stats.lua">
+Crée les trois variables `force`, `agilite` et `endurance` **en une seule ligne** (valeurs 12, 9 et 14), puis affiche leur total au format attendu.
+
+<div slot="indice1">Lua sait déclarer plusieurs variables dans la même ligne.</div>
+<div slot="indice2">Mets les noms à gauche du `=`, séparés par des virgules, et les valeurs à droite, dans le même ordre.</div>
+<div slot="indice3">`local force, agilite, endurance = 12, 9, 14`, puis une addition, et `..` pour coller le nombre au texte.</div>
+<div slot="solution">Chaque variable reçoit la valeur de même rang. C'est pratique pour une petite fiche ; au-delà de quelques variables, une par ligne reste plus lisible.</div>
+</Exercice>
+
+<Exercice id="X1-ex02" titre="Le terrain carré" niveau="vert" dossier="X1/ex02" fichier="terrain.lua">
+Un terrain carré mesure 12 m de côté. Calcule son aire avec l'opérateur `^` (puissance) et affiche `Aire : ` suivi du résultat. Oui, il y a un `.0` à la fin : c'est normal, et c'est le but de l'exercice.
+
+<div slot="indice1">L'aire d'un carré, c'est le côté multiplié par lui-même, donc le côté à la puissance 2.</div>
+<div slot="indice2">La puissance s'écrit `^` : `3 ^ 2` vaut `9.0`.</div>
+<div slot="indice3">`local aire = cote ^ 2`, puis `print("Aire : " .. aire)`.</div>
+<div slot="solution">`^` donne **toujours un décimal** (*float*), même avec deux entiers : `144.0`. Si tu veux un entier, écris `cote * cote`.</div>
+</Exercice>
+
+<Exercice id="X1-ex03" titre="Lettres et chiffres" niveau="vert" dossier="X1/ex03" fichier="mesures.lua">
+Avec `ville = "Port-Lune"` et `habitants = 48250`, affiche le nombre de caractères du nom de la ville, puis le nombre de chiffres du nombre d'habitants, au format attendu.
+
+<div slot="indice1">`#` donne la longueur d'un texte.</div>
+<div slot="indice2">Un nombre n'est pas un texte : `#habitants` provoquerait une erreur. Il faut d'abord le convertir en texte.</div>
+<div slot="indice3">`#tostring(habitants)`.</div>
+<div slot="solution">`tostring` transforme une valeur en texte et `#` mesure ce texte. Le tiret de `Port-Lune` compte comme un caractère.</div>
+</Exercice>
+
+<Exercice id="X1-ex04" titre="Le radar" niveau="vert" dossier="X1/ex04" fichier="radar.lua">
+Un radar a lu la vitesse sous forme de **texte** : `"87"`. La limite est de 50 km/h. Convertis le texte en nombre, calcule l'excès de vitesse et affiche la phrase attendue.
+
+<div slot="indice1">Le calcul doit se faire sur un nombre, pas sur du texte.</div>
+<div slot="indice2">`tonumber` transforme un texte en nombre.</div>
+<div slot="indice3">`tonumber(lecture) - limite`, puis `..` pour construire la phrase.</div>
+<div slot="solution">Lua aurait converti `"87"` tout seul dans `"87" - 50`, mais compter là-dessus est risqué (voir l'exercice 18). Convertir toi-même rend ton intention claire, et `tonumber` renvoie `nil` si le texte n'est pas un nombre : tu pourras donc refuser une saisie invalide.</div>
+</Exercice>
+
+<Exercice id="X1-ex05" titre="Lecture : coller, compter, retourner" niveau="vert" type="lecture" dossier="X1/ex05" fichier="lecture.lua">
+Sans l'exécuter, écris les 6 lignes que ce programme affiche. Puis lance-le pour vérifier.
+
+<div slot="indice1">`..` colle deux textes ; `#` donne une longueur (un nombre).</div>
+<div slot="indice2">Dans `#mot .. "!"`, le `#` s'applique d'abord à `mot`, puis le nombre obtenu est collé au texte `!`.</div>
+<div slot="indice3">`string.reverse` retourne le texte, `string.len` équivaut à `#`, et `"5" .. 5` colle deux valeurs : ce n'est pas une addition.</div>
+<div slot="solution">`"5" .. 5` donne le **texte** `55`, pas le nombre 10. Et `#mot .. "!"` donne `5!` : le nombre 5 est converti en texte au moment du collage.</div>
+</Exercice>
+
+<Exercice id="X1-ex06" titre="Débogage : la ligne de tirets" niveau="vert" type="debug" dossier="X1/ex06" fichier="ligne.lua">
+Ce programme doit afficher `MENU DU JOUR`, puis une ligne de 12 tirets. Il plante à la deuxième ligne :
+
+```text
+lua: ligne.lua:4: bad argument #2 to 'rep' (number expected, got string)
+```
+
+Lis le message et corrige.
+
+<div slot="indice1">Le message parle de l'argument numéro 2 de `rep`.</div>
+<div slot="indice2">`string.rep` attend d'abord le texte à répéter, puis le nombre de répétitions.</div>
+<div slot="indice3">Les deux arguments sont dans le mauvais ordre : `string.rep("-", 12)`.</div>
+<div slot="solution">Quand une fonction se plaint de `bad argument #N`, compte ses arguments : le N-ième ne convient pas. Ici, le 2e (`"-"`) était un texte alors que `rep` attendait un nombre.</div>
+</Exercice>
+
+<FinEtape id="X1-e1" titre="Série 1 terminée" victoire="tu as réussi 6 exercices d'échauffement, idéalement sans ouvrir un seul indice." prochaine="faire une pause de 5 minutes, puis attaquer la série 2 avec l'exercice 7 (les sacs de pièces)." />
+
+### Série 2 · 🟡 Application
+
+Environ 1 h. Chaque exercice demande de choisir la bonne fonction ou le bon opérateur. Les indices sont là pour t'aider, pas pour te juger.
+
+<Exercice id="X1-ex07" titre="Les sacs de pièces" niveau="jaune" dossier="X1/ex07" fichier="sacs.lua">
+Sam a 237 pièces. Un sac peut en contenir 50. Affiche le nombre de sacs **pleins**, puis le nombre de pièces **restantes**, au format attendu.
+
+<div slot="indice1">Deux questions : « combien de fois 50 dans 237 ? » et « qu'est-ce qui reste ? ».</div>
+<div slot="indice2">La division entière s'écrit `//`, le reste de la division s'écrit `%`.</div>
+<div slot="indice3">`237 // 50` vaut 4 et `237 % 50` vaut 37 : mets 237 et 50 dans des variables.</div>
+<div slot="solution">`//` et `%` vont toujours ensemble : `pieces` est égal à `(pieces // parSac) * parSac + pieces % parSac`. Tu les retrouveras pour répartir un butin, découper en pages ou convertir des unités.</div>
+</Exercice>
+
+<Exercice id="X1-ex08" titre="Combien de voyages ?" niveau="jaune" dossier="X1/ex08" fichier="voyages.lua">
+Un camion de déménagement transporte 10 caisses par voyage, et il y a 47 caisses. Affiche le nombre de voyages **complets**, puis le nombre de voyages **nécessaires** (le dernier peut être incomplet).
+
+<div slot="indice1">Divise 47 par 10 : tu obtiens un décimal. Il faut l'arrondir, mais pas dans le même sens pour les deux questions.</div>
+<div slot="indice2">`math.floor` arrondit vers le bas, `math.ceil` vers le haut.</div>
+<div slot="indice3">`math.floor(47 / 10)` donne 4 et `math.ceil(47 / 10)` donne 5.</div>
+<div slot="solution">`floor` (« plancher ») descend, `ceil` (« plafond ») monte. Pour des voyages nécessaires, c'est toujours `ceil` : un voyage entamé est un voyage à faire. Note : `47 // 10` donne le même résultat que `math.floor(47 / 10)`.</div>
+</Exercice>
+
+<Exercice id="X1-ex09" titre="Numéros de ticket" niveau="jaune" dossier="X1/ex09" fichier="tickets.lua">
+Le parking numérote ses tickets sur 5 chiffres, avec des zéros devant. Avec `a = 7`, `b = 123` et `c = 4567`, affiche les trois numéros au format attendu avec `string.format`.
+
+<div slot="indice1">Un seul modèle de texte suffit, utilisé trois fois.</div>
+<div slot="indice2">Dans `string.format`, `%d` affiche un entier. Ajoute un `0` et une largeur pour compléter avec des zéros.</div>
+<div slot="indice3">`string.format("TICKET-%05d", a)`.</div>
+<div slot="solution">`%05d` se lit : `d` pour entier, `5` pour la largeur minimale, `0` pour compléter avec des zéros à gauche. Sans le `0`, ce seraient des espaces. Un nombre plus long que la largeur n'est jamais coupé.</div>
+</Exercice>
+
+<Exercice id="X1-ex10" titre="Les relevés de la grotte" niveau="jaune" dossier="X1/ex10" fichier="grotte.lua">
+Quatre relevés de température dans la grotte : -3, 4, -8 et 2. Affiche la température la plus basse, la plus haute, l'amplitude (l'écart entre les deux) et la valeur absolue de la plus basse.
+
+<div slot="indice1">La bibliothèque `math` contient de quoi trouver un minimum et un maximum.</div>
+<div slot="indice2">`math.min` et `math.max` acceptent plusieurs valeurs d'un coup ; `math.abs` enlève le signe.</div>
+<div slot="indice3">L'amplitude, c'est `plusHaute - plusBasse`. Attention : soustraire un nombre négatif revient à l'ajouter.</div>
+<div slot="solution">On range les résultats dans des variables (`plusBasse`, `plusHaute`) au lieu d'appeler `math.min` plusieurs fois : le code est plus court et plus lisible. Ici `4 - (-8)` vaut 12.</div>
+</Exercice>
+
+<Exercice id="X1-ex11" titre="Rotation sur le podium" niveau="jaune" dossier="X1/ex11" fichier="podium.lua">
+Après une course : `premier = "Alex"`, `deuxieme = "Kim"`, `troisieme = "Sam"`. Le jury décale tout : le 2e passe 1er, le 3e passe 2e et l'ancien 1er devient 3e. Fais cette rotation **en une seule ligne**, sans variable temporaire, puis affiche le podium.
+
+<div slot="indice1">Souviens-toi de l'échange de deux valeurs en une ligne : `a, b = b, a`.</div>
+<div slot="indice2">Ça marche aussi avec trois variables : Lua calcule toute la partie droite avant de ranger quoi que ce soit.</div>
+<div slot="indice3">`premier, deuxieme, troisieme = deuxieme, troisieme, premier`.</div>
+<div slot="solution">Avec trois lignes séparées (`premier = deuxieme`, etc.), l'ancien premier serait écrasé avant d'avoir été copié. L'affectation multiple évite ce piège.</div>
+</Exercice>
+
+<Exercice id="X1-ex12" titre="Débogage : la prime oubliée" niveau="jaune" type="debug" dossier="X1/ex12" fichier="salaire.lua">
+Ce programme doit afficher le total du mois (salaire + prime), mais il plante. Ce mois-ci, il n'y a pas encore de prime.
+
+```text
+lua: salaire.lua:4: attempt to perform arithmetic on a nil value (local 'prime')
+```
+
+Lis le message et corrige.
+
+<div slot="indice1">Le message parle de `nil` et de la variable `prime`.</div>
+<div slot="indice2">`local prime` sans valeur crée une variable qui contient `nil` (rien) : impossible de l'additionner.</div>
+<div slot="indice3">Donne-lui une valeur de départ : `0`.</div>
+<div slot="solution">Une variable déclarée sans valeur vaut `nil`. Pour un montant, « pas encore de prime » se dit `0`, pas « rien ». Règle à retenir : **initialise tes variables numériques**.</div>
+</Exercice>
+
+<Exercice id="X1-ex13" titre="La carte d'identité" niveau="jaune" dossier="X1/ex13" fichier="identite.lua">
+Le nom `"dupont"` est écrit en minuscules et le prénom `"ALEX"` en majuscules. Affiche `DUPONT Alex` (nom en majuscules, prénom avec seulement la première lettre en majuscule), puis les initiales `A.D.`.
+
+<div slot="indice1">Découpe le prénom en deux morceaux : la première lettre, et tout le reste.</div>
+<div slot="indice2">`string.sub(texte, 1, 1)` donne la première lettre, `string.sub(texte, 2)` donne tout depuis la 2e lettre. Ajoute `string.upper` et `string.lower`.</div>
+<div slot="indice3">`string.upper(string.sub(prenom, 1, 1)) .. string.lower(string.sub(prenom, 2))`.</div>
+<div slot="solution">Sans 3e argument, `string.sub` va jusqu'à la fin du texte. Garder `premiere` dans une variable sert deux fois (prénom, puis initiales). Rappel : les fonctions `string` ne gèrent pas les accents, d'où des exemples sans lettres accentuées.</div>
+</Exercice>
+
+<Exercice id="X1-ex14" titre="Lecture : entiers et décimaux" niveau="jaune" type="lecture" dossier="X1/ex14" fichier="lecture.lua">
+Sans l'exécuter, écris les 7 lignes affichées. Pense à la différence entre entier et décimal, et à ce que `print` montre d'un nombre comme `0.1 + 0.2`.
+
+<div slot="indice1">Dès qu'un des deux nombres est décimal (comme `2.0`), le résultat est décimal : il s'affiche avec `.0`.</div>
+<div slot="indice2">`//` sur deux entiers donne un entier, mais `7.0 // 2` donne un décimal.</div>
+<div slot="indice3">`print` n'affiche que 14 chiffres significatifs : `0.1 + 0.2` s'affiche `0.3`, mais la valeur stockée est un tout petit peu plus grande, donc `a == 0.3` est faux.</div>
+<div slot="solution">Retiens : ne compare jamais deux décimaux calculés avec `==`. Compare avec une tolérance (`math.abs(a - b) < 0.000001`) ou travaille en centimes avec des entiers.</div>
+</Exercice>
+
+<FinEtape id="X1-e2" titre="Série 2 terminée" victoire="tu as réussi 8 exercices d'application en choisissant toi-même la bonne fonction, avec le moins d'indices possible." prochaine="faire une vraie pause, puis commencer les défis avec l'exercice 15 (le mot miroir)." />
+
+### Série 3 · 🔴 Défis
+
+Environ 1 h. Chaque défi combine deux ou trois idées déjà vues. Prends ton temps : un défi réussi avec un indice compte aussi.
+
+<Exercice id="X1-ex15" titre="Le mot miroir" niveau="rouge" dossier="X1/ex15" fichier="miroir.lua">
+Un **palindrome** est un mot identique à l'endroit et à l'envers (`radar`, `kayak`). Teste `"Kayak"` puis `"Taxi"` sans tenir compte des majuscules, et affiche `Kayak : true` puis `Taxi : false`.
+
+<div slot="indice1">Mets d'abord le mot en minuscules pour que `K` et `k` soient égaux.</div>
+<div slot="indice2">`string.reverse` retourne le mot ; compare ensuite le mot et son reflet avec `==`.</div>
+<div slot="indice3">Un booléen ne se colle pas avec `..` : passe par `tostring(...)`.</div>
+<div slot="solution">On compare le mot avec son reflet. Le `tostring` est indispensable : `"Kayak : " .. true` donnerait l'erreur `attempt to concatenate a boolean value`.</div>
+</Exercice>
+
+<Exercice id="X1-ex16" titre="Distance entre deux joueurs" niveau="rouge" dossier="X1/ex16" fichier="distance.lua">
+Un joueur est en (10, 20), un autre en (25, 60). Calcule la distance à vol d'oiseau avec le théorème de Pythagore (racine carrée de dx² + dy²) et affiche-la avec 2 décimales.
+
+<div slot="indice1">Calcule d'abord l'écart horizontal `dx` et l'écart vertical `dy`.</div>
+<div slot="indice2">`math.sqrt` donne la racine carrée ; pour élever au carré, utilise `^ 2`.</div>
+<div slot="indice3">`math.sqrt(dx ^ 2 + dy ^ 2)`, affiché avec `string.format("%.2f", ...)`.</div>
+<div slot="solution">Ici `dx` vaut 15 et `dy` vaut 40, donc la racine de 1825, soit 42.7200187… ; `%.2f` arrondit à 42.72. Dans un jeu, la même formule permet de savoir si deux joueurs sont assez proches pour se parler.</div>
+</Exercice>
+
+<Exercice id="X1-ex17" titre="Le chrono du circuit" niveau="rouge" dossier="X1/ex17" fichier="chrono.lua">
+Le tour de circuit a duré 7384 secondes. Affiche la durée sous la forme `02:03:04` (heures, minutes, secondes, chacune sur 2 chiffres) avec `//`, `%` et `string.format`.
+
+<div slot="indice1">Commence par les heures : combien de fois 3600 secondes dans 7384 ?</div>
+<div slot="indice2">Après les heures complètes, il reste `7384 % 3600` secondes : refais le même raisonnement avec 60.</div>
+<div slot="indice3">`string.format("%02d:%02d:%02d", heures, minutes, secondes)`.</div>
+<div slot="solution">C'est la même mécanique que les sacs de pièces (exercice 7), appliquée deux fois : d'abord secondes vers heures et reste, puis le reste vers minutes et secondes.</div>
+</Exercice>
+
+<Exercice id="X1-ex18" titre="Lecture : Lua convertit tout seul" niveau="rouge" type="lecture" dossier="X1/ex18" fichier="lecture.lua">
+Sans l'exécuter, écris les 8 lignes affichées. Lua convertit parfois texte et nombres tout seul : à toi de deviner quand.
+
+<div slot="indice1">Dans un **calcul** (`+`, `*`, `^`), un texte qui ressemble à un nombre est converti en nombre.</div>
+<div slot="indice2">Avec `..`, c'est l'inverse : tout devient du texte. Et `==` ne convertit rien : `10` et `"10"` sont deux valeurs différentes.</div>
+<div slot="indice3">Les priorités : `+` passe avant `..`. Donc `"5" + "5" .. "5"` se lit `("5" + "5") .. "5"`, c'est-à-dire `10 .. "5"`.</div>
+<div slot="solution">Ligne 5 : `é` compte pour 2 octets (UTF-8), donc 6. Ligne 8 : on additionne d'abord (10), puis on colle un `5` : le texte `105`. Compter sur ces conversions automatiques rend le code fragile : convertis toi-même avec `tonumber` et `tostring`.</div>
+</Exercice>
+
+<Exercice id="X1-ex19" titre="Débogage : la moyenne qui ment" niveau="rouge" type="debug" dossier="X1/ex19" fichier="moyenne.lua">
+Les notes de Sam sont 12, 15 et 18 : sa moyenne devrait être `15.0`. Le programme n'affiche **aucune erreur**, mais le résultat est faux. Trouve pourquoi et corrige.
+
+<div slot="indice1">Refais le calcul à la main, dans l'ordre où Lua l'exécute : quelle opération passe en premier ?</div>
+<div slot="indice2">La division passe avant l'addition, comme en maths.</div>
+<div slot="indice3">Il faut additionner les trois notes **avant** de diviser : ajoute des parenthèses.</div>
+<div slot="solution">Lua a calculé `12 + 15 + (18 / 3)`, soit `33.0`. C'est un bug **silencieux** : aucune erreur, juste une mauvaise réponse. Réflexe : dès qu'un calcul mélange `+` et `/`, mets des parenthèses, puis teste avec des nombres simples dont tu connais le résultat.</div>
+</Exercice>
+
+<Exercice id="X1-ex20" titre="Mini-projet : la fiche de paie du taxi" niveau="rouge" type="projet" dossier="X1/ex20" fichier="fiche-paie.lua">
+Crée la fiche de paie de Sam (métier : taxi). Salaire brut : 2150 €, cotisations : 22 % du brut, prime : 85.50 €. Le net vaut brut − cotisations + prime. Affiche la fiche exactement comme ci-dessous : libellés alignés à gauche, montants alignés à droite avec 2 décimales.
+
+<div slot="validation">Aucune valeur n'est écrite en dur dans les `print`. Si tu changes `brut` ou `prime`, la fiche se met à jour et les colonnes restent alignées.</div>
+<div slot="indice1">Une variable par donnée, puis les calculs (`cotisations`, `net`). L'affichage vient en dernier.</div>
+<div slot="indice2">`%-12s` aligne un texte à gauche sur 12 caractères ; `%9.2f` aligne un décimal à droite sur 9 caractères avec 2 décimales. `string.rep` fabrique les traits.</div>
+<div slot="indice3">`string.format("%-13s: %9.2f €", "Brut", brut)` pour chaque ligne, et `string.rep("=", 26)` pour le trait.</div>
+<div slot="solution">Garde les libellés **sans accents** dans les colonnes alignées : `string.format` compte des octets et un `é` en occupe 2, ce qui décale la ligne d'un cran. Avec les fonctions (module B5), tu pourras écrire une seule fois la ligne de format et la réutiliser.</div>
+</Exercice>
+
+<FinEtape id="X1-e3" titre="Série 3 terminée" victoire="tu as réussi 6 défis qui combinent plusieurs notions, dont un mini-projet complet." prochaine="faire le quiz ci-dessous, puis passer à X2 (conditions et logique booléenne)." />
+
+## Erreurs fréquentes
+
+Les messages ci-dessous ont été copiés d'exécutions réelles (Lua 5.4.6).
+
+| Message ou symptôme | Cause | Solution |
+|---|---|---|
+| `attempt to concatenate a nil value (global 'nmo')` | Faute de frappe dans le nom d'une variable | Compare les noms lettre par lettre |
+| `attempt to perform arithmetic on a nil value (local 'prime')` | Variable déclarée sans valeur (donc `nil`) | Donne-lui une valeur de départ (`0`) |
+| `attempt to concatenate a boolean value` | `..` avec `true` ou `false` | `tostring(valeur)` |
+| `attempt to add a 'string' with a 'number'` | `+` utilisé pour coller du texte non numérique | Utilise `..` |
+| `bad argument #2 to 'format' (number has no integer representation)` | `%d` avec un décimal comme `70 / 3` | `%.2f`, ou `math.floor`, ou `//` |
+| `bad argument #2 to 'rep' (number expected, got string)` | Arguments dans le mauvais ordre | `string.rep(texte, nombre)` |
+| `attempt to get length of a number value (local 'argent')` | `#` appliqué à un nombre | `#tostring(argent)` |
+| `attempt to perform arithmetic on a nil value (local 'prix')` après `tonumber("12,50")` | Virgule décimale : Lua attend un point | Écris `12.50` |
+| Résultat faux sans aucune erreur (`33.0` au lieu de `15.0`) | Priorité des opérateurs | Des parenthèses |
+| Colonnes décalées avec un libellé accentué | `string.format` compte des octets, `é` en fait 2 | Libellés sans accents dans les colonnes alignées |
+
+## Quiz du module X1
+
+<Quiz id="X1-quiz" questions={[
+  { q: "Que renvoie `math.type(7 // 2)` ?", choix: ["`float`", "`string`", "`integer`", "`nil`"], ok: 2, pourquoi: "`//` appliqué à deux entiers donne un entier. `7.0 // 2` donnerait un décimal (`3.0`)." },
+  { q: "Qu'affiche `print(2 ^ 2)` ?", choix: ["`4`", "`4.0`", "`22`", "Une erreur"], ok: 1, pourquoi: "`^` donne toujours un décimal (*float*)." },
+  { q: "Que vaut `math.ceil(4.2)` ?", choix: ["`4`", "`4.2`", "`4.5`", "`5`"], ok: 3, pourquoi: "`ceil` arrondit vers le haut ; `floor` vers le bas." },
+  { q: "Après `local a, b = 1, 2` puis `a, b = b, a + b`, que valent `a` et `b` ?", choix: ["`a` vaut 2 et `b` vaut 3", "`a` vaut 2 et `b` vaut 4", "`a` vaut 1 et `b` vaut 3", "`a` vaut 3 et `b` vaut 3"], ok: 0, pourquoi: "Toute la partie droite est calculée avec les anciennes valeurs (2 et 1 + 2) avant d'être rangée." },
+  { q: "Que vaut `#\"héros\"` ?", choix: ["`5`", "`6`", "`7`", "Une erreur"], ok: 1, pourquoi: "`#` compte des octets : le `é` en occupe 2 (UTF-8)." },
+  { q: "Que vaut `\"5\" + \"5\"` ?", choix: ["`\"55\"`", "Une erreur", "`10`", "`nil`"], ok: 2, pourquoi: "Dans un calcul, Lua convertit les textes qui ressemblent à des nombres. Pour coller, il faut `..`." },
+  { q: "Quel marqueur de `string.format` affiche `42` sous la forme `00042` ?", choix: ["`%05d`", "`%5d`", "`%.5f`", "`%d5`"], ok: 0, pourquoi: "`0` complète avec des zéros, `5` est la largeur, `d` l'entier." },
+  { q: "Pourquoi `0.1 + 0.2 == 0.3` vaut-il `false` ?", choix: ["`==` ne fonctionne pas avec les décimaux", "Lua fait une erreur de calcul", "`0.3` est un texte", "Les décimaux sont stockés de façon approchée"], ok: 3, pourquoi: "En binaire, `0.1` et `0.2` ne sont pas exacts. Compare avec une tolérance ou affiche avec `%.2f`." },
+  { q: "Que renvoie `tonumber(\"12,5\")` ?", choix: ["`12.5`", "`12`", "`nil`", "`125`"], ok: 2, pourquoi: "Lua attend un point comme séparateur décimal : la virgule rend la conversion impossible." },
+  { q: "Après `local prime`, que donne `1800 + prime` ?", choix: ["`1800`", "Une erreur : calcul avec `nil`", "`0`", "`nil`"], ok: 1, pourquoi: "`prime` vaut `nil` : `attempt to perform arithmetic on a nil value (local 'prime')`." },
+]} />
+
+## Récapitulatif
+
+- Une variable se crée avec `local`, plusieurs d'un coup avec `local a, b = 1, 2`, et on échange avec `a, b = b, a`.
+- `/` et `^` donnent toujours un décimal ; `//` et `%` donnent le quotient entier et le reste.
+- `math.floor` arrondit vers le bas, `math.ceil` vers le haut ; `max`, `min`, `abs`, `sqrt` complètent la boîte à outils.
+- `..` colle, `#` mesure en octets, `tostring` et `tonumber` convertissent (et `tonumber` renvoie `nil` si c'est impossible).
+- `string.format` met en forme : `%s`, `%d`, `%.2f`, `%05d`, `%-12s`.
+- Une variable sans valeur vaut `nil` : initialise-la avant de calculer.
+- Les décimaux sont approchés : pas de `==` entre deux décimaux calculés.
+- Un bug silencieux (mauvaise priorité) se repère en refaisant le calcul à la main avec des nombres simples.
+
+## Je suis bloqué, que faire ?
+
+1. **Relis le message d'erreur** : il donne le fichier, la ligne et la nature du problème. Cherche-le dans le tableau « Erreurs fréquentes ».
+2. **Affiche tes variables** avec `print(variable, type(variable))` avant la ligne qui pose problème.
+3. **Simplifie** : remplace tes variables par des petits nombres dont tu connais le résultat.
+4. **Compare** ta sortie au résultat attendu, ligne par ligne : la première ligne différente est ton point de départ.
+5. **Demande des indices à une IA**, pas la solution. Le prompt modèle est dans [Une IA comme tuteur](/outils/ia-tuteur/) ; ajoute « je suis sur l'exercice X1-ex09 » et colle ton code et le message exact.
+
+Si le problème vient de l'installation (la commande `lua` n'est pas reconnue, par exemple), va voir le [Dépannage](/outils/depannage/).
+
+<Videos recherche="Lua variables nombres chaînes de caractères tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : valeurs et types (en anglais)](https://www.lua.org/manual/5.4/manual.html#2.1)
+- [Manuel Lua 5.4 : expressions et opérateurs](https://www.lua.org/manual/5.4/manual.html#3.4)
+- [Manuel Lua 5.4 : la bibliothèque string](https://www.lua.org/manual/5.4/manual.html#6.4)
+- [Manuel Lua 5.4 : fonctions mathématiques](https://www.lua.org/manual/5.4/manual.html#6.7)

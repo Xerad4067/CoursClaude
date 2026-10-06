@@ -1,0 +1,8 @@
+/ajouter pain 3
+/ajouter eau 12
+/retirer pain 1
+/retirer lampe 1
+/ajouter lampe abc
+/donner Kim 5
+/liste
+/quitter

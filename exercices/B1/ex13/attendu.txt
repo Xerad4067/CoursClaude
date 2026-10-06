@@ -1,0 +1,3 @@
+Avant :	moto	taxi	camion
+Après 1 :	taxi	camion	moto
+Après 2 :	camion	moto	taxi

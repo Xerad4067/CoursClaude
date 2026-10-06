@@ -1,0 +1,344 @@
+---
+title: "X10 · Objets, métatables et héritage"
+description: Dix-huit exercices courts pour muscler les classes Lua, les métaméthodes, l'héritage, l'encapsulation et la composition.
+parcours: X
+module: X10
+duree: 2 h 30
+ou: les-deux
+prerequis: Modules B7 et B8 (closures, méthodes, métatables).
+resultat: Une petite concession de véhicules (classes, héritage, tri, refus des prix invalides) écrite par toi.
+objectifs:
+  - Écrire une classe avec constructeur, méthodes, `__index` et `__tostring`
+  - Donner un sens à `==`, `<`, `+`, `#` et à l'appel `objet(...)` avec les métaméthodes
+  - Faire hériter une classe d'une autre et appeler la méthode de la classe mère
+  - Protéger une donnée avec `__newindex` ou une closure
+  - Choisir entre héritage et composition
+sidebar:
+  order: 10
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="La fiche « L'essentiel en 10 lignes » et les exercices 1 à 3."
+  quarante="Toute la série 🟢 (6 exercices)."
+  deuxh="Les séries 🟢 et 🟡, puis un défi 🔴 de ton choix."
+/>
+
+**Pourquoi c'est utile ?** Les classes de Nanos World (`Player`, `Character`, `Vehicle`…) s'utilisent comme des objets (`player:GetName()`), et le jeu te laisse même **hériter** de ses classes (`Prop.Inherit("MaClasse")`, une fonction que la doc marque comme expérimentale). En BTS SIO option SLAM, classes, héritage et encapsulation sont au cœur de la programmation orientée objet (parcours D) : ici, tu les muscles en Lua, par petites séries.
+
+## L'essentiel en 10 lignes
+
+Ce n'est pas un cours, c'est ta **fiche mémo**. Pour comprendre en détail, relis [B7](/parcours-b/b7-modules-closures/) et [B8](/parcours-b/b8-objets-erreurs/).
+
+1. **Méthode** : `function obj:m() … end`. L'appel `obj:m()` passe `obj` en premier paramètre caché, nommé `self`.
+2. **Classe** : une table `Classe` avec `Classe.__index = Classe`. Le **constructeur** fabrique l'objet avec `setmetatable({}, Classe)` (ici on l'appelle `nouveau` ; beaucoup de code en anglais l'appelle `new`).
+3. **Lecture** : une clé absente de l'objet est cherchée dans la classe (grâce à `__index`). **Écriture** : toujours dans l'objet.
+4. **Métaméthodes** : des clés spéciales de la classe (deux `_` devant) que Lua appelle tout seul : `__tostring` (pour `print` et `tostring`), `__eq` (`==`), `__lt` (`<`, donc aussi `table.sort`), `__add` (`+`), `__len` (`#`), `__call` (`objet(...)`), `__newindex` (écrire une clé absente).
+5. `__eq`, `__lt` et `__add` reçoivent les **deux** opérandes `(a, b)` ; `__add` doit **renvoyer** un nouvel objet. `rawequal(a, b)` compare sans passer par `__eq`.
+6. **Héritage** : `Fille = setmetatable({}, { __index = Mere })` puis `Fille.__index = Fille`. Si la fille n'a pas la clé, Lua cherche dans la mère.
+7. **Redéfinir** : une méthode de la fille cache celle de la mère. Pour utiliser quand même celle de la mère : `Mere.methode(self, …)`.
+8. Les métaméthodes **ne s'héritent pas** : recopie-les (`Fille.__tostring = Mere.__tostring`) ou redéfinis-les.
+9. **Encapsulation** : une variable `local` captée par des closures, ou une table vide + `__index` + un `__newindex` qui refuse l'écriture.
+10. **Composition** : un objet qui **contient** d'autres objets (« a un »), plutôt que d'en hériter (« est un »).
+
+```lua title="x10/fiche-classe.lua"
+local Joueur = {}
+Joueur.__index = Joueur                        -- « cherche dans Joueur ce que l'objet n'a pas »
+
+function Joueur.nouveau(nom)                   -- constructeur
+  return setmetatable({ nom = nom, argent = 0 }, Joueur)
+end
+
+function Joueur:gagner(somme)                  -- méthode : self = l'objet
+  self.argent = self.argent + somme
+end
+
+function Joueur:__tostring()                   -- appelée par print(joueur)
+  return self.nom .. " : " .. self.argent .. " €"
+end
+
+local sam = Joueur.nouveau("Sam")
+sam:gagner(30)
+print(sam)                                     --> Sam : 30 €
+```
+
+```lua title="x10/fiche-operateurs.lua"
+local Position = {}
+Position.__index = Position
+
+function Position.nouvelle(x, y)
+  return setmetatable({ x = x, y = y }, Position)
+end
+
+function Position.__eq(a, b)                   -- pour ==
+  return a.x == b.x and a.y == b.y
+end
+
+function Position.__add(a, b)                  -- pour + : renvoie un NOUVEL objet
+  return Position.nouvelle(a.x + b.x, a.y + b.y)
+end
+
+local p = Position.nouvelle(1, 2) + Position.nouvelle(3, 4)
+print(p.x, p.y, p == Position.nouvelle(4, 6))  --> 4   6   true
+```
+
+```lua title="x10/fiche-heritage.lua"
+local Vehicule = {}
+Vehicule.__index = Vehicule
+
+function Vehicule:decrire()
+  return self.nom
+end
+
+local Camion = setmetatable({}, { __index = Vehicule })   -- Camion hérite de Vehicule
+Camion.__index = Camion
+
+function Camion:decrire()                                  -- redéfinition
+  return Vehicule.decrire(self) .. " (camion)"             -- appel de la méthode de la mère
+end
+
+local c = setmetatable({ nom = "Citerne" }, Camion)
+print(c:decrire())                                         --> Citerne (camion)
+```
+
+<Encadre type="astuce" titre="Comment utiliser cette salle d'entraînement">
+Pour chaque exercice : lis l'énoncé, **essaie seul 5 minutes**, puis ouvre l'indice 1, seulement si tu bloques. L'indice 3 est presque la solution : garde-le pour la fin. Pour vérifier, compare ton affichage avec le **résultat attendu**, caractère par caractère.
+</Encadre>
+
+## Exercices
+
+### Série 1 · 🟢 Échauffement
+
+<Exercice id="X10-ex01" titre="La porte du garage" niveau="vert" dossier="X10/ex01" fichier="porte.lua">
+Crée la table `porte = { ouverte = false }` et ses trois méthodes : `porte:ouvrir()`, `porte:fermer()` et `porte:etat()` (qui **renvoie** le texte `ouverte` ou `fermée`). Affiche l'état, ouvre la porte, affiche l'état, ferme-la, affiche l'état.
+
+<div slot="indice1">Une méthode se définit avec `function porte:nom() … end`.</div>
+<div slot="indice2">Dans la méthode, la porte s'appelle `self` : `self.ouverte = true`.</div>
+<div slot="indice3">`etat` fait `if self.ouverte then return "ouverte" end`, puis `return "fermée"`.</div>
+<div slot="solution">Le `:` ajoute le paramètre caché `self`, c'est-à-dire la table devant le `:` au moment de l'appel. Trois méthodes, une seule table : pas besoin de métatable tant qu'il n'y a qu'**un** objet.</div>
+</Exercice>
+
+<Exercice id="X10-ex02" titre="Deux joueurs, deux états" niveau="vert" dossier="X10/ex02" fichier="joueur.lua">
+Écris la classe `Joueur` : un constructeur `Joueur.nouveau(nom, argent)` (100 € si `argent` n'est pas donné) et une méthode `gagner(somme)`. Crée Sam (500 €) et Kim (sans argent précisé), donne 50 € à Sam seulement, puis affiche les deux joueurs.
+
+<div slot="indice1">Le plan : `Joueur.__index = Joueur`, puis `setmetatable({}, Joueur)` dans le constructeur.</div>
+<div slot="indice2">Pour une valeur par défaut : `argent or 100` (voir B3).</div>
+<div slot="indice3">`function Joueur:gagner(somme) self.argent = self.argent + somme end`.</div>
+<div slot="solution">Chaque objet a **son** `argent`, mais tous partagent la même méthode `gagner` (elle n'existe qu'une fois, dans `Joueur`). C'est pour cela que Kim n'est pas touchée quand Sam gagne de l'argent.</div>
+</Exercice>
+
+<Exercice id="X10-ex03" titre="La maison qui se présente" niveau="vert" dossier="X10/ex03" fichier="maison.lua">
+La classe `Maison` est donnée. Ajoute-lui `__tostring` pour que `print(maison)` affiche `Maison de Sam (4 pièces)`. Affiche ensuite `Visite : ` suivi du texte de la maison, en collant avec `..`.
+
+<div slot="indice1">`__tostring` est une méthode comme les autres, mais Lua l'appelle tout seul quand tu fais `print(objet)`.</div>
+<div slot="indice2">`function Maison:__tostring() return … end` : elle doit **renvoyer** un texte, pas l'afficher.</div>
+<div slot="indice3">Pour coller l'objet avec `..`, passe par `tostring(maison)`.</div>
+<div slot="solution">Sans `__tostring`, `print(maison)` affiche une adresse du genre `table: 0x…`. Et `..` n'appelle **pas** `__tostring` : `"Visite : " .. maison` provoque `attempt to concatenate a table value (local 'maison')`. D'où `tostring(maison)`.</div>
+</Exercice>
+
+<Exercice id="X10-ex04" titre="Débogage : le véhicule qui ne roule pas" niveau="vert" type="debug" dossier="X10/ex04" fichier="vehicule.lua">
+Ce programme plante avec `attempt to call a nil value (method 'rouler')`. La méthode `rouler` existe pourtant. Trouve la ligne qui manque et corrige : il doit afficher `Taxi roule 12 km`.
+
+<div slot="indice1">La méthode est bien définie dans `Vehicule`. Pourquoi `taxi` ne la trouve-t-il pas ?</div>
+<div slot="indice2">Quand une clé manque, `taxi` consulte sa métatable, mais seulement si elle contient la clé spéciale `__index`.</div>
+<div slot="indice3">Ajoute `Vehicule.__index = Vehicule` juste après `local Vehicule = {}`.</div>
+<div slot="solution">`setmetatable({}, Vehicule)` dit **où** regarder ; `__index` dit **comment** (« dans `Vehicule` »). Sans `__index`, la métatable est là mais ne sert à rien. Réflexe : message avec `nil` et `method 'xxx'` → vérifie le nom de la méthode **et** la ligne `Classe.__index = Classe`.</div>
+</Exercice>
+
+<Exercice id="X10-ex05" titre="Lecture : les roues du camion" niveau="vert" type="lecture" dossier="X10/ex05" fichier="roues.lua">
+Prédis les quatre lignes affichées par ce programme, puis ouvre la solution pour comparer.
+
+<div slot="indice1">`voiture.roues` n'existe pas dans l'objet `voiture` : Lua regarde alors dans la classe.</div>
+<div slot="indice2">`camion.roues = 6` écrit dans l'objet `camion`, jamais dans la classe.</div>
+<div slot="indice3">`rawget(voiture, "roues")` lit **seulement** dans l'objet, sans consulter la classe.</div>
+<div slot="solution">En **lecture**, Lua regarde l'objet puis la classe ; en **écriture**, il écrit toujours dans l'objet. La classe garde donc ses 4 roues, le camion a ses 6 roues à lui, et la voiture n'a aucune clé `roues` personnelle (`nil` avec `rawget`).</div>
+</Exercice>
+
+<Exercice id="X10-ex06" titre="Deux positions, une même place" niveau="vert" dossier="X10/ex06" fichier="position.lua">
+La classe `Position` est donnée. Ajoute `__eq` pour que deux positions de mêmes coordonnées soient égales avec `==`. Teste `p1 == p2` (mêmes coordonnées), `p1 == p3` (autres coordonnées) et `rawequal(p1, p2)`.
+
+<div slot="indice1">Sans `__eq`, `==` compare l'**identité** des tables (voir B6), pas leur contenu.</div>
+<div slot="indice2">`function Position.__eq(a, b) … end` reçoit les deux objets et renvoie `true` ou `false`.</div>
+<div slot="indice3">Compare `a.x == b.x and a.y == b.y`.</div>
+<div slot="solution">`__eq` n'est appelée que pour deux tables **différentes**. `rawequal(p1, p2)` pose l'ancienne question : « est-ce exactement la même table ? », donc `false`.</div>
+</Exercice>
+
+<FinEtape id="X10-e1" titre="Série 1 : échauffement objets" victoire="tu as réussi 6 exercices sans indice : méthodes, classe, `__tostring`, `__index` et `__eq`." prochaine="faire l'exercice X10-ex07 (trier un garage avec `__lt`)." />
+
+### Série 2 · 🟡 Application
+
+<Exercice id="X10-ex07" titre="Trier un garage" niveau="jaune" dossier="X10/ex07" fichier="garage.lua">
+Le garage (une liste de véhicules avec un prix) est donné. Ajoute `__lt` pour comparer les véhicules par prix, affiche `garage[3] < garage[1]`, puis trie le garage avec `table.sort(garage)` **sans** fonction de comparaison. Affiche les noms séparés par des virgules.
+
+<div slot="indice1">`a < b` appelle `__lt(a, b)`, qui doit renvoyer `true` si `a` passe avant `b`.</div>
+<div slot="indice2">`function Vehicule.__lt(a, b) return a.prix < b.prix end`.</div>
+<div slot="indice3">`table.sort(garage)` utilise `<`, donc `__lt`. Pour les noms : une liste `noms`, puis `table.concat(noms, ", ")`.</div>
+<div slot="solution">Une fois `__lt` écrite, `table.sort` sait comparer tes objets comme des nombres. Sans elle : `attempt to compare two table values`.</div>
+</Exercice>
+
+<Exercice id="X10-ex08" titre="Additionner des durées" niveau="jaune" dossier="X10/ex08" fichier="duree.lua">
+La classe `Duree` (heures et minutes) est donnée. Écris `__add` pour que `trajet + livraison` donne un **nouvel** objet `Duree` : 1h45 + 0h50 = 2h35. Affiche les deux durées, puis leur somme.
+
+<div slot="indice1">`a + b` appelle `__add(a, b)`.</div>
+<div slot="indice2">Additionne les minutes totales des deux objets : `a.minutes + b.minutes`.</div>
+<div slot="indice3">`return Duree.nouvelle(total // 60, total % 60)`.</div>
+<div slot="solution">`//` et `%` redécoupent les minutes en heures et en reste (voir B2). `__add` **renvoie** un nouvel objet : `trajet` et `livraison` ne sont pas modifiés, c'est pourquoi on les voit encore à 1h45 et 0h50.</div>
+</Exercice>
+
+<Exercice id="X10-ex09" titre="Compter les objets du sac" niveau="jaune" dossier="X10/ex09" fichier="sac.lua">
+Le `Sac` range ses objets dans `self.objets`. Sans rien faire, `#sac` vaudrait 0 (la table `sac` est vide : tout est dans `sac.objets`). Écris `__len` pour que `#sac` donne le nombre d'objets. Ajoute trois objets, affiche `#sac`, ajoute-en un quatrième, affiche `#sac`.
+
+<div slot="indice1">`#sac` appelle `__len(sac)`.</div>
+<div slot="indice2">`function Sac:__len() … end` doit renvoyer un nombre.</div>
+<div slot="indice3">Le nombre d'objets est `#self.objets` (le `#` ordinaire d'une liste).</div>
+<div slot="solution">`__len` donne à `#` le sens que **toi** tu veux. Ici, elle délègue à la liste interne : l'extérieur écrit `#sac`, sans connaître `objets`.</div>
+</Exercice>
+
+<Exercice id="X10-ex10" titre="Un tarif qui s'appelle comme une fonction" niveau="jaune" dossier="X10/ex10" fichier="tarif.lua">
+La classe `Tarif` (prix de base et prix au kilomètre) est donnée. Écris `__call` pour calculer un prix en écrivant simplement `taxi(10)` : 3 + 2 × 10 = 23. Teste un taxi (3 €, 2 € par km) à 10 km puis 0 km, et une limousine (10 €, 5 € par km) à 4 km.
+
+<div slot="indice1">Quand tu écris `taxi(10)`, Lua appelle la clé `__call` de la classe de `taxi`.</div>
+<div slot="indice2">Le premier paramètre de `__call` est l'objet lui-même (`self`), puis viennent tes arguments.</div>
+<div slot="indice3">`function Tarif:__call(km) return self.base + self.prixKm * km end`.</div>
+<div slot="solution">`taxi` est une **table**, mais `__call` la rend appelable. Pratique pour un objet qui n'a qu'une action principale. Sans `__call` : `attempt to call a table value (local 'taxi')`.</div>
+</Exercice>
+
+<Exercice id="X10-ex11" titre="Un livret d'épargne" niveau="jaune" dossier="X10/ex11" fichier="epargne.lua">
+La classe `Compte` est donnée. Crée `CompteEpargne` qui en **hérite** (`setmetatable({}, { __index = Compte })`), avec un constructeur à trois paramètres (titulaire, solde, taux en %) et une méthode `ajouterInterets()` : solde + solde × taux ÷ 100 (division entière). Sam : 1000 € à 5 %, il dépose 200 € puis on ajoute les intérêts : affiche son solde. Affiche enfin `courant.ajouterInterets` pour un simple `Compte`.
+
+<div slot="indice1">La fille cherche d'abord dans `CompteEpargne`, puis dans `Compte` : ce sont deux `__index` à la suite.</div>
+<div slot="indice2">`local CompteEpargne = setmetatable({}, { __index = Compte })`, puis `CompteEpargne.__index = CompteEpargne`.</div>
+<div slot="indice3">`livret:deposer(200)` marche sans que tu écrives `deposer` dans `CompteEpargne`.</div>
+<div slot="solution">1000 + 200 = 1200, intérêts : 1200 × 5 // 100 = 60, soit 1260. Et un `Compte` simple ne connaît pas `ajouterInterets` : l'héritage va dans **un seul sens** (la fille connaît sa mère, pas l'inverse), donc `nil`.</div>
+</Exercice>
+
+<Exercice id="X10-ex12" titre="Lecture : qui klaxonne ?" niveau="jaune" type="lecture" dossier="X10/ex12" fichier="klaxon.lua">
+Deux méthodes portent le même nom, `klaxonner`. Prédis les quatre lignes affichées, puis ouvre la solution pour comparer.
+
+<div slot="indice1">Pour `poidsLourd`, Lua cherche d'abord dans `Camion`, puis dans `Vehicule`.</div>
+<div slot="indice2">`demarrer` n'existe que dans la mère : elle répond quand même.</div>
+<div slot="indice3">`Vehicule.klaxonner(poidsLourd)` appelle **directement** la version de la mère, avec `poidsLourd` comme `self`.</div>
+<div slot="solution">La version **la plus proche** gagne : celle de `Camion` cache celle de `Vehicule` (redéfinition). On peut toujours atteindre la version cachée en l'appelant par le nom de la classe mère, en passant `self` à la main.</div>
+</Exercice>
+
+<Exercice id="X10-ex13" titre="Un camion qui réutilise sa mère" niveau="jaune" dossier="X10/ex13" fichier="camion.lua">
+`Vehicule` est donné. Crée `Camion`, qui en hérite. Son constructeur `Camion.nouveau(nom, vitesse, charge)` **appelle** `Vehicule.nouveau` au lieu de tout recopier, puis ajoute `charge`. Redéfinis `decrire` pour qu'elle réutilise la version de la mère et ajoute `, charge 12 t`.
+
+<div slot="indice1">Fabrique la base de l'objet avec `Vehicule.nouveau(nom, vitesse)`.</div>
+<div slot="indice2">Change ensuite sa classe : `setmetatable(c, Camion)` renvoie `c`.</div>
+<div slot="indice3">Dans `Camion:decrire`, appelle `Vehicule.decrire(self)` (avec un point, et `self` en argument).</div>
+<div slot="solution">`Vehicule.decrire(self)` appelle la fonction de la mère « à la main ». Écrire `self:decrire()` à la place ferait une boucle infinie : la méthode s'appellerait elle-même jusqu'à l'erreur de pile.</div>
+</Exercice>
+
+<FinEtape id="X10-e2" titre="Série 2 : application objets" victoire="tu as réussi 7 exercices sans indice : `__lt`, `__add`, `__len`, `__call`, héritage et appel de la mère." prochaine="essayer l'exercice X10-ex14 (une table en lecture seule avec `__newindex`)." />
+
+### Série 3 · 🔴 Défis
+
+<Exercice id="X10-ex14" titre="Des tarifs qu'on ne peut pas tricher" niveau="rouge" dossier="X10/ex14" fichier="tarifs.lua">
+Écris `lectureSeule(donnees)` : elle renvoie une table **vide** dont la métatable a `__index = donnees` (on peut lire) et un `__newindex` qui lève l'erreur `modification interdite : base` (niveau 0, avec le nom de la clé). Teste avec `{ base = 3, prixKm = 2 }` : lis `tarifs.base`, tente `tarifs.base = 99` dans un `pcall`, relis `tarifs.base`.
+
+<div slot="indice1">La table renvoyée est vide : toute écriture vise une clé absente, donc `__newindex` se déclenche.</div>
+<div slot="indice2">`__newindex` reçoit trois paramètres `(table, cle, valeur)` ; ici, seule la clé t'intéresse.</div>
+<div slot="indice3">`error("modification interdite : " .. cle, 0)`. Pour le test : `pcall(function() tarifs.base = 99 end)`.</div>
+<div slot="solution">La vraie table `donnees` est cachée dans la métatable : l'extérieur ne voit qu'une table vide qui sait **lire** mais pas **écrire**. Sans le `__newindex`, `tarifs.base = 99` créerait simplement une clé dans la table vide, et la triche passerait.</div>
+</Exercice>
+
+<Exercice id="X10-ex15" titre="Tricher : classe contre closure" niveau="rouge" dossier="X10/ex15" fichier="comptes.lua">
+Le code de départ montre un compte « classe » : un joueur malin écrit `a.solde = 999999` et ça marche. Écris la version **closure** `creerCompte(soldeInitial)` (le solde est une variable `local`, avec les fonctions `deposer` et `voirSolde`), puis tente la même triche dessus : le solde réel doit rester à 100.
+
+<div slot="indice1">Souviens-toi de la caisse protégée de B7 : une variable `local` dans la fonction, et des fonctions qui l'emportent avec elles.</div>
+<div slot="indice2">`creerCompte` renvoie une table qui contient seulement des **fonctions**, jamais le solde.</div>
+<div slot="indice3">`b.solde = 999999` ajoute un champ inutile à la table renvoyée, mais `voirSolde` lit la variable locale, restée à 100. Appelle-la avec un point : `b.voirSolde()`.</div>
+<div slot="solution">Dans la version classe, le solde est un champ de l'objet : n'importe qui peut le réécrire. Dans la version closure, il n'existe que dans le « sac à dos » des fonctions, inatteignable de l'extérieur. Prix à payer : pas de `self`, donc on appelle avec `.` et chaque objet porte ses propres fonctions.</div>
+</Exercice>
+
+<Exercice id="X10-ex16" titre="Une voiture a un moteur" niveau="rouge" dossier="X10/ex16" fichier="voitures.lua">
+`Moteur` est donné. Crée `Voiture`, qui **contient** un moteur (`self.moteur`) au lieu d'en hériter : `Voiture:demarrer()` délègue à `self.moteur:demarrer()`, et `Voiture:rapport()` renvoie `Berline (110 ch) : moteur arrêté` (puis `tourne` après le démarrage). Crée deux voitures : démarrer la première ne doit pas changer la seconde.
+
+<div slot="indice1">Dans le constructeur de `Voiture`, crée le moteur : `Moteur.nouveau(puissance)`.</div>
+<div slot="indice2">Chaque voiture fabrique **son** moteur : c'est ce qui les rend indépendantes.</div>
+<div slot="indice3">`self.moteur:etat()` donne `arrêté` ou `tourne`.</div>
+<div slot="solution">Hériter, c'est « **est un** » (un camion est un véhicule) ; composer, c'est « **a un** » (une voiture a un moteur). Une voiture n'est pas un moteur : ici, l'héritage serait un mauvais choix. Règle pratique : en cas de doute, préfère la composition.</div>
+</Exercice>
+
+<Exercice id="X10-ex17" titre="Débogage : le camion sans fiche" niveau="rouge" type="debug" dossier="X10/ex17" fichier="camion.lua">
+Le taxi s'affiche bien (`Taxi (120 km/h)`), mais le camion affiche `table: 0x…` au lieu de `Citerne (80 km/h)`. Pourtant `Camion` hérite de `Vehicule`, qui possède un `__tostring`. Corrige le programme.
+
+<div slot="indice1">`print(camion)` demande `__tostring` à la **métatable** du camion : c'est `Camion`.</div>
+<div slot="indice2">Lua cherche ces clés spéciales directement dans la métatable, sans suivre son `__index`.</div>
+<div slot="indice3">Recopie la métaméthode : `Camion.__tostring = Vehicule.__tostring`.</div>
+<div slot="solution">Le manuel Lua le dit : les métaméthodes sont cherchées par **accès brut** dans la métatable. Elles ne profitent donc pas de l'héritage par `__index`. On les recopie (comme ici) ou on les redéfinit. Même piège pour `__eq`, `__lt`, `__add`, `__len`…</div>
+</Exercice>
+
+<Exercice id="X10-ex18" titre="Mini-projet : la concession" niveau="rouge" type="projet" dossier="X10/ex18" fichier="concession.lua">
+Une `Concession` vend des `Vehicule` et des `Camion` (qui héritent de `Vehicule`). `Vehicule.nouveau(nom, prix)` refuse un prix négatif ou nul avec `error` (niveau 0). Chaque véhicule a un `__tostring` (le camion ajoute sa charge), une comparaison `__lt` par prix ; la concession a un `__len`, une méthode `ajouter` et une méthode `plusCher()`. Crée les cinq véhicules ci-dessous **avec `pcall`** (un refus est affiché sans tout arrêter), trie le stock par prix et affiche le résultat attendu.
+
+- Berline, 22000 € · Citerne (camion), 45000 €, charge 12 t · Scooter, 3000 €
+- Épave, 0 € · Pick-up (camion), 30000 €, charge 2 t
+
+<div slot="validation">Le refus de l'Épave est affiché sans arrêter le programme ; la liste est triée par prix croissant, camions compris ; `#concession` donne 4 ; le `__tostring` du camion montre la charge.</div>
+<div slot="indice1">Avance dans l'ordre : `Vehicule` (avec l'erreur), puis `Camion`, puis `Concession`. Teste chaque morceau avant de passer au suivant.</div>
+<div slot="indice2">N'oublie pas que les métaméthodes ne s'héritent pas : `Camion.__lt = Vehicule.__lt`, et un `__tostring` propre au camion.</div>
+<div slot="indice3">Pour créer sans planter : `pcall(Vehicule.nouveau, "Épave", 0)`. En cas d'échec, le second résultat est le message d'erreur. `plusCher` parcourt le stock avec `<`.</div>
+<div slot="solution">Tu as réuni les briques de la page : constructeur qui valide, héritage, métaméthodes recopiées ou redéfinies, `__len`, `__lt`, `pcall`. C'est la structure d'un vrai catalogue de véhicules pour ton serveur roleplay (parcours G).</div>
+</Exercice>
+
+<FinEtape id="X10-e3" titre="Série 3 : défis objets" victoire="tu as réussi 5 défis sans indice : `__newindex`, closures, composition, métaméthodes non héritées et projet complet." prochaine="faire le quiz, puis refaire sans regarder l'exercice qui t'a le plus résisté." />
+
+## Erreurs fréquentes
+
+| Message ou symptôme | Cause | Solution |
+|---|---|---|
+| `attempt to call a nil value (method 'rouler')` | `Classe.__index = Classe` oublié, ou nom de méthode mal écrit | Ajoute la ligne `__index`, compare les noms lettre par lettre |
+| `attempt to index a nil value (local 'self')` | Méthode définie avec `:` mais appelée avec `.` et sans argument (`Classe.decrire()`) | Appelle avec `:` : `objet:decrire()` |
+| `attempt to concatenate a table value (local 'maison')` | `..` avec un objet : `..` n'utilise pas `__tostring` | `tostring(maison)`, et définis `__tostring` |
+| `attempt to compare two table values` | `<` ou `table.sort` sur des objets sans `__lt` | Écris `Classe.__lt` |
+| `attempt to perform arithmetic on a table value (local 'a')` | `+` sur des objets sans `__add` | Écris `Classe.__add` |
+| `attempt to call a table value (local 'taxi')` | Un objet appelé comme une fonction, sans `__call` | Écris `Classe.__call` ou appelle une vraie méthode |
+| `table: 0x…` à l'écran | `__tostring` absent, ou défini dans la mère mais pas recopié dans la fille | `Fille.__tostring = Mere.__tostring` |
+
+## Quiz du module X10
+
+<Quiz id="X10-quiz" questions={[
+  { q: "Que fait `Classe.__index = Classe` ?", choix: ["Elle compte les objets créés", "Les clés absentes d'un objet sont cherchées dans `Classe`", "Elle copie `Classe` dans chaque objet", "Elle interdit d'ajouter des clés"], ok: 1, pourquoi: "C'est le mécanisme qui partage les méthodes entre tous les objets de la classe." },
+  { q: "`taxi:rouler(5)` équivaut à…", choix: ["`taxi.rouler(5)`", "`rouler(taxi, 5)`", "`taxi.rouler(taxi, 5)`", "`taxi[rouler](5)`"], ok: 2, pourquoi: "Le `:` passe l'objet comme premier argument, nommé `self`." },
+  { q: "Si la classe n'a pas de `__tostring`, que donne `print(objet)` ?", choix: ["Le contenu de l'objet", "Une erreur", "`nil`", "Une adresse du type `table: 0x…`"], ok: 3, pourquoi: "Sans `__tostring`, Lua affiche seulement le type et l'adresse de la table." },
+  { q: "Quelle métaméthode permet à `table.sort(liste)` de trier des objets sans fonction de comparaison ?", choix: ["`__sort`", "`__eq`", "`__lt`", "`__len`"], ok: 2, pourquoi: "`table.sort` compare avec `<`, donc avec `__lt`." },
+  { q: "Que doit faire `__add(a, b)` ?", choix: ["Renvoyer le résultat, souvent un nouvel objet", "Modifier `a` puis renvoyer `nil`", "Afficher la somme", "Lever une erreur"], ok: 0, pourquoi: "Un opérateur est une expression : il doit renvoyer une valeur, sans modifier ses opérandes." },
+  { q: "À quoi sert `__eq` ?", choix: ["À copier un objet", "À trier des objets", "À supprimer un objet", "À décider si deux objets différents comptent comme égaux avec `==`"], ok: 3, pourquoi: "Sans `__eq`, `==` ne compare que l'identité des tables." },
+  { q: "Comment appeler la méthode de la classe mère depuis une méthode redéfinie ?", choix: ["`self:methode()`", "`Mere.methode(self, ...)`", "`super()`", "`Mere:methode()` sans argument"], ok: 1, pourquoi: "`self:methode()` rappellerait la méthode redéfinie elle-même : boucle infinie." },
+  { q: "Le camion hérite de `Vehicule`, qui définit `__tostring`, mais `print(camion)` affiche `table: 0x…`. Pourquoi ?", choix: ["Les métaméthodes ne passent pas par `__index` : il faut les recopier dans la fille", "`print` ne marche pas avec l'héritage", "Il manque `setmetatable`", "`__tostring` doit être écrit en majuscules"], ok: 0, pourquoi: "Lua cherche les métaméthodes par accès brut dans la métatable." },
+  { q: "Quelle technique rend une donnée vraiment inaccessible de l'extérieur ?", choix: ["Un champ nommé `_solde`", "Un commentaire `-- privé`", "Un `__tostring`", "Une variable `local` captée par des closures"], ok: 3, pourquoi: "Seules les fonctions créées dans la portée de la variable peuvent la lire ou la modifier." },
+  { q: "Une `Voiture` qui contient un `Moteur` dans `self.moteur`, c'est…", choix: ["De l'héritage", "Une métatable", "De la composition (« a un »)", "Une erreur de conception"], ok: 2, pourquoi: "Une voiture a un moteur, elle n'est pas un moteur : on compose." },
+]} />
+
+## Récapitulatif
+
+- Méthode : `function obj:m() … end` ; `obj:m()` passe `obj` comme `self`.
+- Classe : `Classe.__index = Classe` et `setmetatable({}, Classe)` dans le constructeur.
+- Lecture : l'objet puis la classe ; écriture : toujours l'objet.
+- Métaméthodes : `__tostring`, `__eq`, `__lt`, `__add`, `__len`, `__call`, `__newindex` donnent un sens aux outils de base du langage.
+- Héritage : `setmetatable(Fille, { __index = Mere })` ; la méthode de la mère se rappelle avec `Mere.methode(self, …)`.
+- Les métaméthodes ne s'héritent pas : on les recopie ou on les redéfinit.
+- Protéger une donnée : closure, ou table vide avec `__index` et `__newindex`.
+- Hériter = « est un », composer = « a un » : en cas de doute, compose.
+
+## Je suis bloqué, que faire ?
+
+Vérifie dans l'ordre : (1) `Classe.__index = Classe` est écrit **avant** la création des objets ; (2) `setmetatable` est bien appelé dans le constructeur ; (3) `:` à la définition **et** à l'appel ; (4) pour une métaméthode, son nom commence par **deux** `_` et elle est dans la classe de l'objet, pas dans la mère. Affiche `getmetatable(objet) == Classe` pour vérifier le lien.
+
+Pour demander de l'aide à une IA **sans qu'elle fasse l'exercice à ta place**, essaie : « Je m'entraîne aux classes en Lua. Voici mon code et le message d'erreur. Ne me donne pas la solution : pose-moi une question ou donne-moi un indice. » (voir [l'IA comme tuteur](/outils/ia-tuteur/)).
+
+<Videos recherche="Lua métatables programmation orientée objet tutoriel" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : métatables et métaméthodes](https://www.lua.org/manual/5.4/manual.html#2.4)
+- [Manuel Lua 5.4 : définition de fonctions et méthodes avec `:`](https://www.lua.org/manual/5.4/manual.html#3.4.11)
+- [Doc Nanos World : hériter des classes (fonction expérimentale)](https://docs.nanos-world.com/docs/core-concepts/scripting/inheriting-classes)

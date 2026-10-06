@@ -1,0 +1,8 @@
+Essai 1
+  ça a marché
+  fin du calcul
+5.0
+Essai 2
+  erreur : division par zéro
+  fin du calcul
+None

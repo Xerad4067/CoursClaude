@@ -1,17 +1,18 @@
 ---
 title: "B5 · Fonctions et portée"
-description: Créer des fonctions avec paramètres et valeurs de retour, comprendre local et la portée des variables.
+description: Créer des fonctions avec paramètres et valeurs de retour, comprendre local et la portée des variables, et apprendre à jouer l'ordinateur pas à pas.
 parcours: B
 module: B5
-duree: 3 h
+duree: 5 h
 ou: les-deux
 prerequis: Modules B1 à B4.
-resultat: Un calculateur de salaire réutilisable pour plusieurs employés.
+resultat: Un péage d'autoroute construit pas à pas, puis un calculateur de salaire réutilisable pour plusieurs employés.
 objectifs:
   - Définir et appeler une fonction avec des paramètres
   - Renvoyer une ou plusieurs valeurs avec return
   - Expliquer la portée d'une variable locale (bloc, fonction, fichier)
   - Donner une valeur par défaut à un paramètre
+  - Jouer l'ordinateur pour prévoir ce qu'affiche un programme (trace d'exécution)
 sidebar:
   order: 5
 ---
@@ -25,11 +26,11 @@ import Videos from '../../../components/Videos.astro';
 
 <TroisDurees
   quinze="Étape 1 : ta première fonction."
-  quarante="Étapes 1 et 2 et exercices 1 à 3."
-  deuxh="Tout le module jusqu'au calculateur de salaire."
+  quarante="Étapes 1 et 2, puis les exercices 1 à 3 (les 🟢)."
+  deuxh="Étapes 1 à 5 : tu construis le péage « On code ensemble ». Les 14 exercices (environ 3 h) se font à d'autres séances."
 />
 
-**Pourquoi c'est utile ?** Dans Nanos World, presque tout ton code sera des **fonctions** appelées quand quelque chose arrive (un joueur se connecte, un véhicule explose). Et une fonction bien nommée rend ton code lisible : `verserSalaire(joueur)` se comprend tout seul.
+**Pourquoi c'est utile ?** Dans Nanos World, presque tout ton code sera des **fonctions** appelées quand quelque chose arrive (un joueur se connecte, un véhicule explose). Une fonction bien nommée rend ton code lisible : `verserSalaire(joueur)` se comprend tout seul. Et au BTS SIO option SLAM, les fonctions sont la base de tout : les « méthodes » de la programmation orientée objet sont des fonctions rangées dans des objets.
 
 ## Étape 1 · Définir et appeler (20 min)
 
@@ -46,7 +47,25 @@ saluer("Sam")                          -- appel : "Sam" est l'argument
 saluer("Kim")
 ```
 
+Ligne par ligne :
+
+1. `local function saluer(nom)` : tu **définis** une fonction nommée `saluer`. Entre parenthèses, la liste des **paramètres** : des noms de variables qui recevront les valeurs au moment de l'appel.
+2. Le corps de la fonction (ici un `print`) s'exécute **à chaque appel**, jamais à la définition.
+3. `end` ferme la fonction.
+4. `saluer("Sam")` : tu **appelles** la fonction. `"Sam"` est l'**argument** : la valeur que reçoit `nom` pour cet appel-là.
+
+| Mot | Où ? | Exemple |
+|---|---|---|
+| **Définition** | Une seule fois, au-dessus | `local function saluer(nom) … end` |
+| **Paramètre** | Dans la définition : le nom de la « case » | `nom` |
+| **Appel** | Chaque fois que tu veux exécuter la fonction | `saluer("Sam")` |
+| **Argument** | Dans l'appel : la valeur donnée | `"Sam"` |
+
 La fonction doit être **définie avant** d'être appelée : Lua lit le fichier de haut en bas.
+
+<Encadre type="piege" titre="⚠️ Définir ne veut pas dire exécuter">
+Si tu écris la définition de `saluer` mais que tu ne l'appelles jamais, **rien ne s'affiche** : la recette est dans le classeur, personne ne l'a cuisinée. Et les **parenthèses** font l'appel : `saluer("Sam")` exécute la fonction, alors que `saluer` tout seul n'est que son nom (Lua signale d'ailleurs une erreur de syntaxe si tu l'écris seul sur une ligne). Une fonction sans paramètre s'appelle quand même avec des parenthèses vides : `afficherRegles()`.
+</Encadre>
 
 <FinEtape id="B5-e1" titre="Définir et appeler" victoire="tu as écrit une fonction et tu l'as appelée deux fois." prochaine="renvoyer un résultat avec return (étape 2)." />
 
@@ -61,7 +80,53 @@ local gain = salaireJour(7, 12)        -- on récupère la réponse
 print(gain)                            --> 84
 ```
 
-Différence clé : `print` **affiche** (pour toi), `return` **renvoie** (pour le programme, qui peut réutiliser la valeur). Une fonction peut renvoyer **plusieurs** valeurs : `return quotient, reste`.
+Différence clé : `print` **affiche** (pour toi), `return` **renvoie** (pour le programme, qui peut réutiliser la valeur). Pense à un distributeur de boissons : `print` serait la lumière qui s'allume, `return` la canette qui tombe dans le bac, que tu peux emporter et utiliser ailleurs.
+
+### `return` termine la fonction
+
+Dès que Lua rencontre `return`, la fonction est **finie** : ce qui est écrit après n'est jamais exécuté. Pour cette raison, `return` doit être la **dernière instruction de son bloc** (Lua refuse du code juste après, voir le tableau des erreurs). On s'en sert pour sortir tôt :
+
+```lua title="b5/sortie-tot.lua"
+local function peutAcheter(argent, prix)
+  if argent < prix then
+    return false          -- on sort tout de suite : la ligne suivante n'est pas lue
+  end
+  return true
+end
+print(peutAcheter(50, 80))     --> false
+print(peutAcheter(100, 80))    --> true
+```
+
+### Plusieurs valeurs de retour
+
+Une fonction peut renvoyer **plusieurs** valeurs : `return quotient, reste`. Tu les récupères dans le même ordre avec `local a, b = f()`. Lua est tolérant :
+
+```lua title="b5/plusieurs.lua"
+local function trois() return 1, 2, 3 end
+
+local a, b = trois()                 -- a = 1, b = 2 (le 3 est ignoré)
+local x, y, z, w = trois()           -- w n'a pas de valeur : il vaut nil
+print(a, b)                          --> 1   2
+print(x, y, z, w)                    --> 1   2   3   nil
+```
+
+### Refuser avec une raison : `return nil, "message"`
+
+Quand une fonction ne peut pas faire son travail, une convention très répandue en Lua : elle renvoie **`nil` suivi d'un message** qui explique pourquoi. Celui qui l'appelle teste le premier résultat :
+
+```lua title="b5/refus.lua"
+local function diviser(a, b)
+  if b == 0 then
+    return nil, "division par zéro"     -- échec : nil + la raison
+  end
+  return a // b
+end
+
+local resultat, raison = diviser(10, 0)
+if resultat == nil then
+  print("Impossible : " .. raison)       --> Impossible : division par zéro
+end
+```
 
 <FinEtape id="B5-e2" titre="return" victoire="tes fonctions calculent et renvoient des résultats réutilisables." prochaine="comprendre la portée des variables (étape 3)." />
 
@@ -82,9 +147,54 @@ print(argent)                 --> 70
 print(reste)                  --> nil : reste n'existe plus ici
 ```
 
+<Encadre type="analogie">
+Le fichier est une **grande salle** ; chaque fonction ouvre une **petite pièce** à l'intérieur. De la petite pièce, tu vois ce qui est dans la grande salle (à condition que ce soit posé **avant** que la pièce soit construite). De la grande salle, tu ne vois rien de ce qui se passe dans la petite pièce, et ce qu'elle contient est jeté quand tu en sors.
+</Encadre>
+
+### 🔍 Trace d'exécution : `payer(30)` pas à pas
+
+Pour comprendre un programme, **joue l'ordinateur** : exécute les lignes une par une, avec un crayon, et note la valeur de chaque variable. Voici la trace du programme ci-dessus (une ligne du tableau par instruction exécutée).
+
+| N° | Instruction exécutée | `argent` | `prix` | `reste` | Ce qui se passe |
+|---|---|---|---|---|---|
+| 1 | `local argent = 100` | 100 | – | – | `argent` est créée dans la grande salle |
+| 2 | `local function payer(prix) … end` | 100 | – | – | la fonction est **rangée**, pas exécutée |
+| 3 | `payer(30)` (l'appel) | 100 | 30 | – | une petite pièce s'ouvre : `prix` reçoit 30 |
+| 4 | `local reste = argent - prix` | 100 | 30 | 70 | `reste` est créée **dans** la petite pièce |
+| 5 | `argent = reste` | **70** | 30 | 70 | la fonction modifie `argent`, qui existe en dehors |
+| 6 | fin de `payer` | 70 | – | – | la petite pièce se ferme : `prix` et `reste` disparaissent |
+| 7 | `print(argent)` | 70 | – | – | affiche `70` |
+| 8 | `print(reste)` | 70 | – | – | `reste` n'existe pas ici : Lua cherche une **globale** `reste`, il n'y en a pas, donc `nil` |
+
+Garde cette méthode : quand un programme ne fait pas ce que tu crois, refais **cette trace** sur papier avant de toucher au code. Dans 8 cas sur 10, tu trouves l'erreur sans rien exécuter.
+
+### Deux variables du même nom : la plus proche gagne
+
+```lua title="b5/cache.lua"
+local x = 1
+local function modifier()
+  local x = 2                  -- une AUTRE variable, qui cache celle du fichier
+  print("dedans :", x)
+end
+modifier()
+print("dehors :", x)
+```
+
+Résultat : `dedans : 2` puis `dehors : 1`. Le `x` de la fonction **cache** celui du fichier sans le modifier. C'est pour ça qu'on évite de réutiliser les mêmes noms.
+
 <Encadre type="retenir" titre="📌 Toujours local">
 Sans `local`, une variable est **globale** : visible partout, modifiable par n'importe quel fichier. Sur un serveur avec plusieurs packages, c'est la source de bugs incompréhensibles (deux scripts qui utilisent la même variable `argent`). Règle : **`local` partout**, sauf raison précise.
 </Encadre>
+
+Le piège est qu'un `local` **oublié ne provoque aucune erreur** : Lua crée tranquillement une globale.
+
+```lua title="b5/oubli-local.lua"
+local function gagner()
+  argent = 50                  -- oups : pas de local, donc une globale !
+end
+gagner()
+print(argent)                  --> 50 : la variable a « fuité » hors de la fonction
+```
 
 <FinEtape id="B5-e3" titre="La portée" victoire="tu sais où une variable existe et pourquoi on écrit local." prochaine="paramètres par défaut et bonnes fonctions (étape 4)." />
 
@@ -101,20 +211,203 @@ print(appliquerRemise(200))       --> 180
 print(appliquerRemise(200, 25))   --> 150
 ```
 
-Une bonne fonction : **un nom avec un verbe** (`calculerSalaire`, `afficherFiche`), **une seule tâche**, **courte** (moins de 20 lignes), et elle **renvoie** plutôt qu'elle n'affiche quand c'est un calcul.
+Comment ça marche : `pourcentage or 10` vaut `pourcentage` s'il existe, et `10` s'il vaut `nil`. Un paramètre est une **variable locale** de la fonction : on peut donc lui affecter une nouvelle valeur, comme ci-dessus, sans rien changer à l'extérieur.
 
-<FinEtape id="B5-e4" titre="Bonnes fonctions" victoire="tu écris des fonctions claires, avec des valeurs par défaut." prochaine="les exercices, puis le calculateur de salaire." />
+Une fonction peut aussi **en appeler une autre**. C'est la façon normale de construire un programme : de petites fonctions simples, assemblées.
+
+```lua title="b5/assembler.lua"
+local function taxe(prix)
+  return prix * 20 // 100
+end
+
+local function prixTTC(prix)
+  return prix + taxe(prix)        -- prixTTC utilise taxe
+end
+print(prixTTC(100))               --> 120
+```
+
+Une bonne fonction : **un nom avec un verbe** (`calculerSalaire`, `afficherFiche`), **une seule tâche**, **courte** (moins de 20 lignes), et elle **renvoie** plutôt qu'elle n'affiche quand c'est un calcul. Une valeur qui ne change **jamais** (le taux de taxe, le nombre d'heures normales) se range dans une **constante**, écrite en MAJUSCULES : `local TAUX_TAXE = 20`.
+
+<FinEtape id="B5-e4" titre="Bonnes fonctions" victoire="tu écris des fonctions claires, avec des valeurs par défaut." prochaine="« On code ensemble » : le péage de l'autoroute (étape 5)." />
+
+## Étape 5 · 🛠️ On code ensemble : le péage de l'autoroute (25 min)
+
+On construit **ensemble** un petit programme complet, en cinq morceaux. Règles du jeu :
+
+- crée le fichier `b5/peage.lua` et **tape** chaque morceau toi-même (pas de copier-coller) ;
+- après chaque morceau, lance `lua peage.lua` et **compare** avec « Tu dois voir » ;
+- à chaque nouveau morceau, **efface les lignes de test** (les `print` et appels d'essai) du morceau précédent : tu ne gardes que les fonctions.
+
+Le programme : un péage fait payer les véhicules selon leur type et la distance ; certains conducteurs sont abonnés et ont une remise ; un véhicule inconnu est refusé.
+
+### Morceau 1 · Le tarif au kilomètre
+
+```lua title="b5/peage.lua"
+local function tarifAuKm(vehicule)
+  if vehicule == "moto" then
+    return 1
+  elseif vehicule == "voiture" then
+    return 2
+  elseif vehicule == "camion" then
+    return 5
+  end
+  return nil                      -- véhicule inconnu : pas de tarif
+end
+
+print(tarifAuKm("voiture"))       -- lignes de test
+print(tarifAuKm("camion"))
+print(tarifAuKm("tracteur"))
+```
+
+```text title="Tu dois voir"
+2
+5
+nil
+```
+
+Pourquoi ce morceau : il ne fait **qu'une chose** (donner un prix au kilomètre) et il **renvoie** sa réponse. Le `return nil` final dit clairement « je ne connais pas ce véhicule ». Si tu vois `2` puis `5` puis `nil`, passe au morceau suivant.
+
+### Morceau 2 · Le coût d'un trajet (une fonction qui en appelle une autre)
+
+Ajoute cette fonction **sous** `tarifAuKm`, et remplace les lignes de test par les deux dernières lignes :
+
+```lua title="b5/peage.lua (à ajouter)"
+local function coutTrajet(vehicule, km)
+  local tarif = tarifAuKm(vehicule)   -- une fonction qui en appelle une autre
+  if tarif == nil then
+    return nil                        -- pas de tarif : pas de coût
+  end
+  return tarif * km
+end
+
+print(coutTrajet("voiture", 12))      -- lignes de test
+print(coutTrajet("tracteur", 12))
+```
+
+```text title="Tu dois voir"
+24
+nil
+```
+
+`coutTrajet` ne sait pas **comment** on trouve le tarif : elle demande à `tarifAuKm`. Si les prix changent, tu ne modifies qu'une seule fonction.
+
+### Morceau 3 · La remise des abonnés (paramètre par défaut)
+
+Remplace `coutTrajet` par cette version, qui accepte un troisième paramètre **facultatif** :
+
+```lua title="b5/peage.lua (à remplacer)"
+local function coutTrajet(vehicule, km, remise)
+  local tarif = tarifAuKm(vehicule)
+  if tarif == nil then
+    return nil
+  end
+  remise = remise or 0                -- pas de remise si on n'en donne pas
+  local cout = tarif * km
+  return cout - cout * remise // 100
+end
+
+print(coutTrajet("voiture", 12))      -- lignes de test
+print(coutTrajet("voiture", 12, 20))
+```
+
+```text title="Tu dois voir"
+24
+20
+```
+
+Vérifie le deuxième résultat à la main : `24 - 24 * 20 // 100` = `24 - 480 // 100` = `24 - 4` = `20`. Les anciens appels (sans remise) marchent toujours : c'est l'intérêt d'une valeur par défaut.
+
+### Morceau 4 · Le ticket (afficher **et** renvoyer)
+
+```lua title="b5/peage.lua (à ajouter)"
+local function afficherTicket(vehicule, km, remise)
+  local cout = coutTrajet(vehicule, km, remise)
+  if cout == nil then
+    print("Ticket refusé : véhicule inconnu (" .. vehicule .. ")")
+    return 0                          -- un refus ne rapporte rien
+  end
+  print(vehicule .. ", " .. km .. " km : " .. cout .. " €")
+  return cout
+end
+
+afficherTicket("moto", 30)            -- lignes de test
+afficherTicket("voiture", 12, 20)
+afficherTicket("tracteur", 5)
+```
+
+```text title="Tu dois voir"
+moto, 30 km : 30 €
+voiture, 12 km : 20 €
+Ticket refusé : véhicule inconnu (tracteur)
+```
+
+`afficherTicket` fait deux choses : elle **affiche** pour le conducteur et elle **renvoie** le montant pour le programme (on va s'en servir au morceau 5). Voici ce qui se passe pour `afficherTicket("voiture", 12, 20)` :
+
+```text title="Trace d'exécution : la pile des appels"
+afficherTicket("voiture", 12, 20)
+ └─ coutTrajet("voiture", 12, 20)
+     └─ tarifAuKm("voiture")                 renvoie 2
+     tarif = 2 ; cout = 2 * 12 = 24
+     renvoie 24 - 24 * 20 // 100 = 20
+ cout = 20 : affiche « voiture, 12 km : 20 € », renvoie 20
+```
+
+Chaque appel attend la réponse de celui qu'il a appelé, puis continue. On lit la trace de haut en bas à l'aller, de bas en haut au retour.
+
+### Morceau 5 · La recette de la journée
+
+Supprime les lignes de test et ajoute **à la fin** du fichier :
+
+```lua title="b5/peage.lua (à ajouter)"
+print("=== Péage de l'autoroute ===")
+local recette = afficherTicket("moto", 30)
+  + afficherTicket("voiture", 12, 20)
+  + afficherTicket("camion", 40)
+  + afficherTicket("tracteur", 5)
+print("Recette de la journée : " .. recette .. " €")
+```
+
+```text title="Tu dois voir"
+=== Péage de l'autoroute ===
+moto, 30 km : 30 €
+voiture, 12 km : 20 €
+camion, 40 km : 200 €
+Ticket refusé : véhicule inconnu (tracteur)
+Recette de la journée : 250 €
+```
+
+Calcul de contrôle : `30 + 20 + 200 + 0 = 250`. Parce que `afficherTicket` **renvoie** un nombre, on peut additionner ses résultats ; si elle ne faisait qu'afficher, il faudrait tout recalculer ailleurs.
+
+<Encadre type="astuce" titre="💡 Va plus loin, seul">
+Ajoute le véhicule `"bus"` à 4 € le kilomètre, puis un ticket pour 25 km. Seule la fonction `tarifAuKm` doit changer. Si c'est le cas, ton découpage en fonctions est bon.
+</Encadre>
+
+<FinEtape id="B5-e5" titre="On code ensemble : le péage" victoire="ton péage affiche quatre tickets et une recette de 250 €." prochaine="les exercices de la série 1, jusqu'au calculateur de salaire (B5-ex08)." />
 
 ## Erreurs fréquentes
+
+Les messages ci-dessous sont **copiés d'exécutions réelles** (Lua 5.4). Devant chacun, Lua ajoute le nom du fichier et le numéro de ligne, par exemple `peage.lua:4:`.
 
 | Message | Cause | Solution |
 |---|---|---|
 | `attempt to call a nil value (global 'calculerTaxe')` | Fonction appelée avant sa définition, ou nom mal écrit | Définis la fonction plus haut dans le fichier |
+| `syntax error near 'print'` | Appel **sans parenthèses** : `saluer` au lieu de `saluer("Sam")` | Ajoute les parenthèses (et les arguments) |
 | La fonction affiche mais `print(f())` affiche `nil` | Pas de `return` | Ajoute `return valeur` |
+| `attempt to concatenate a nil value` | Tu colles avec `..` le résultat d'une fonction qui ne renvoie rien (`return` oublié) | Ajoute `return` dans la fonction |
 | `attempt to perform arithmetic on a nil value (local 'taux')` | Argument oublié à l'appel | Passe tous les arguments, ou donne une valeur par défaut |
+| `attempt to concatenate a nil value (local 'nom')` | `saluer()` appelée sans son argument | Passe l'argument, ou écris `nom = nom or "inconnu"` |
+| `attempt to compare number with nil` | `if age >= 18` alors que `age` n'a pas été donné à l'appel | Vérifie le nombre d'arguments de l'appel |
+| `'end' expected (to close 'function' at line 1) near 'print'` | Du code écrit **après** un `return`, dans le même bloc | `return` doit être la dernière ligne de son bloc : place-le en dernier, ou dans un `if` |
+| `'end' expected (to close 'function' at line 1) near <eof>` | Un `end` manque quelque part (`<eof>` = fin du fichier) | Compte les `function`, `if`, `for` et leurs `end` ; aide-toi de l'indentation |
+| `')' expected (to close '(' at line 2) near <eof>` | Une parenthèse n'est pas fermée | Relis la ligne indiquée entre parenthèses dans le message |
 | Variable « qui disparaît » | Créée avec `local` dans un bloc | Déclare-la avant le bloc |
+| Une variable a une valeur qui vient « d'ailleurs » | `local` oublié : une globale partagée | Écris `local` devant chaque nouvelle variable |
 
 ## Exercices
+
+Quatorze exercices en deux séries. La **série 1** (ex01 à ex08) suit les étapes et se termine par le mini-projet. La **série 2** (ex09 à ex14) est un deuxième tour : on repart d'un échauffement et on remonte jusqu'aux défis. Fais-les dans l'ordre ; ouvre les indices **un par un**.
+
+### Série 1 · Le parcours principal
 
 <Exercice id="B5-ex01" titre="Fonction de bienvenue" niveau="vert" dossier="B5/ex01" fichier="saluer.lua">
 Écris une fonction `saluer(nom)` et appelle-la pour Sam puis pour Kim.
@@ -153,7 +446,7 @@ Ce programme plante avec `attempt to call a nil value`. Corrige-le sans changer 
 </Exercice>
 
 <Exercice id="B5-ex05" titre="Lecture : la portée" niveau="jaune" type="lecture" dossier="B5/ex05" fichier="portee.lua">
-Prédis les quatre lignes affichées.
+Prédis les quatre lignes affichées. Aide-toi d'une trace sur papier : une colonne par variable.
 
 <div slot="indice1">Le `local x = 2` dans la fonction crée une **autre** variable `x`.</div>
 <div slot="indice2">`incrementer` modifie la variable `compteur` créée avant elle.</div>
@@ -189,31 +482,116 @@ Prédis les quatre lignes affichées.
 <div slot="solution">Deux fonctions, deux rôles : l'une **calcule**, l'autre **affiche**. C'est ce découpage que tu retrouveras pour verser les salaires par minuterie sur ton serveur.</div>
 </Exercice>
 
+### Série 2 · Deuxième tour : muscle tes fonctions
+
+<Exercice id="B5-ex09" titre="La clôture du parc" niveau="vert" dossier="B5/ex09" fichier="cloture.lua">
+Écris `perimetre(largeur, longueur)` qui **renvoie** `2 * (largeur + longueur)`. Utilise-la pour le petit parc (12 m sur 7 m) puis pour le grand parc (20 m sur 15 m) : affiche chaque périmètre et le coût de la clôture à 8 € le mètre.
+
+<div slot="indice1">Une fonction à deux paramètres : `local function perimetre(largeur, longueur)`.</div>
+<div slot="indice2">Elle renvoie, elle n'affiche pas : `return 2 * (largeur + longueur)`.</div>
+<div slot="indice3">Appelle-la deux fois, range chaque résultat dans une variable (`local petit = perimetre(12, 7)`), puis multiplie par 8 pour le coût.</div>
+<div slot="solution">Une seule définition, deux appels : si la formule change (clôture double, par exemple), tu ne corriges qu'un endroit. Le prix du mètre est dans une **constante** (`PRIX_PAR_METRE`, en majuscules) : on la change à un seul endroit aussi.</div>
+</Exercice>
+
+<Exercice id="B5-ex10" titre="Le contrôle du permis" niveau="jaune" dossier="B5/ex10" fichier="permis.lua">
+Écris `estMajeur(age)` qui renvoie `true` ou `false` (sans `if` : une comparaison est déjà un booléen), puis `peutConduire(age, aLePermis)` qui s'appuie sur `estMajeur`. Une troisième fonction, `afficherVerdict(nom, age, aLePermis)`, affiche « peut prendre le volant » ou « doit rester piéton ».
+
+<div slot="indice1">`return age >= 18` : tu n'as pas besoin d'écrire un `if`.</div>
+<div slot="indice2">`peutConduire` combine `estMajeur(age)` et `aLePermis` avec `and`.</div>
+<div slot="indice3">Dans `afficherVerdict` : `if peutConduire(age, aLePermis) then … else … end`.</div>
+<div slot="solution">Une fonction qui renvoie un booléen se lit comme une phrase dans un `if` (« si peut conduire… »). On commence son nom par `est` ou `peut`. Écrire `if age >= 18 then return true else return false end` marche aussi, mais `return age >= 18` dit la même chose en une ligne.</div>
+</Exercice>
+
+<Exercice id="B5-ex11" titre="Débogage : la facture muette" niveau="jaune" type="debug" dossier="B5/ex11" fichier="facture.lua">
+Ce programme plante avec `attempt to concatenate a nil value`. Répare-le pour qu'il affiche les deux totaux, sans toucher aux appels.
+
+<div slot="indice1">Essaie `print(prixTotal(15, 3))` tout seul : que s'affiche-t-il ?</div>
+<div slot="indice2">La fonction calcule `total`, mais que fait-elle ensuite de ce résultat ?</div>
+<div slot="indice3">Ajoute `return total` en dernière ligne de la fonction (ou écris directement `return prix * quantite`).</div>
+<div slot="solution">Une fonction sans `return` renvoie `nil`, et `..` ne sait pas coller `nil` à un texte. Le message parle de concaténation (l'endroit où ça casse), mais la cause est dans la fonction (l'endroit où le résultat se perd). Réflexe : quand tu vois `nil` là où tu attendais un nombre, vérifie le `return`.</div>
+</Exercice>
+
+<Exercice id="B5-ex12" titre="Lecture : la globale oubliée" niveau="jaune" type="lecture" dossier="B5/ex12" fichier="globale.lua">
+Prédis les cinq lignes affichées. Une seule des deux fonctions oublie `local`.
+
+<div slot="indice1">Avant tout appel, `vie` n'a jamais été créée dans le fichier.</div>
+<div slot="indice2">`vie = 100` sans `local` crée une variable **globale** : elle reste après la fin de la fonction.</div>
+<div slot="indice3">Dans `degats`, `local vie = 10` crée une autre variable `vie`, qui disparaît à la fin de la fonction : la globale ne bouge pas.</div>
+<div slot="solution">La globale créée par `soin()` survit : n'importe quelle fonction, ou n'importe quel autre fichier, peut la lire ou la changer. C'est le risque dont parle l'encadré « Toujours local ». `degats` n'y a jamais touché, grâce à son `local`.</div>
+</Exercice>
+
+<Exercice id="B5-ex13" titre="Défi : le distributeur de billets" niveau="rouge" dossier="B5/ex13" fichier="distributeur.lua">
+Un distributeur ne rend que des billets de 50, 20 et 10 €. Écris `decomposer(montant)` qui renvoie **quatre** valeurs : le nombre de billets de 50, de 20, de 10, puis ce qui reste. Écris ensuite `afficherRetrait(montant)` qui l'utilise, et teste 130 €, 185 € et 40 €.
+
+<div slot="indice1">Billets de 50 : `montant // 50`. Ce qu'il reste après eux : `montant % 50`.</div>
+<div slot="indice2">Après chaque étape, remplace `montant` par ce qu'il reste : un paramètre est une variable locale, tu peux la modifier.</div>
+<div slot="indice3">`return b50, b20, b10, reste`, puis à l'appel : `local b50, b20, b10, reste = decomposer(montant)`.</div>
+<div slot="solution">Chaque billet rendu enlève sa part au montant : le reste d'une étape devient le montant de la suivante. Quatre valeurs de retour, c'est déjà beaucoup : au-delà, on les rangera dans une table (module B6).</div>
+</Exercice>
+
+<Exercice id="B5-ex14" titre="Défi : le guichet qui explique ses refus" niveau="rouge" dossier="B5/ex14" fichier="guichet.lua">
+Écris `acheter(solde, prix, stock)` qui renvoie le nouveau solde, **ou** `nil` suivi de la raison du refus (« rupture de stock », « il te manque N € »). Écris ensuite `tenter(produit, solde, prix, stock)` qui affiche le verdict et renvoie le solde (inchangé si l'achat est refusé). Rejoue les quatre achats du résultat attendu.
+
+<div slot="indice1">`return nil, "rupture de stock"` : deux valeurs de retour, la première est `nil`.</div>
+<div slot="indice2">Dans `tenter` : `local nouveauSolde, raison = acheter(…)`, puis `if nouveauSolde == nil then`.</div>
+<div slot="indice3">Chaque achat met le solde à jour : `solde = tenter("casque", solde, 60, 5)`.</div>
+<div slot="solution">Convention courante en Lua : en cas d'échec, une fonction renvoie `nil` puis un message (la bibliothèque standard fait pareil). Celui qui l'appelle teste le premier résultat. Au module B8, tu verras l'autre méthode : lever une erreur avec `error` et l'attraper avec `pcall`.</div>
+</Exercice>
+
 ## Quiz du module B5
 
 <Quiz id="B5-quiz" questions={[
   { q: "Dans `local function saluer(nom)`, `nom` est…", choix: ["Un argument", "Un paramètre", "Une valeur de retour", "Une variable globale"], ok: 1, pourquoi: "Paramètre dans la définition ; argument à l'appel." },
-  { q: "Différence entre `print` et `return` ?", choix: ["Aucune", "`print` affiche, `return` renvoie une valeur au code appelant", "`return` affiche en rouge", "`print` arrête la fonction"], ok: 1, pourquoi: "Un résultat renvoyé peut être réutilisé." },
-  { q: "Que vaut un paramètre non fourni à l'appel ?", choix: ["0", "`\"\"`", "`nil`", "Une erreur immédiate"], ok: 2, pourquoi: "Il vaut nil ; `x = x or defaut` donne une valeur par défaut." },
-  { q: "Pourquoi écrire `local` devant les variables ?", choix: ["C'est plus rapide à taper", "Pour limiter leur portée et éviter les conflits entre scripts", "Lua l'exige", "Pour les afficher"], ok: 1, pourquoi: "Les globales sont partagées partout : source de bugs." },
+  { q: "Différence entre `print` et `return` ?", choix: ["Aucune, c'est la même chose", "`return` affiche en rouge", "`print` arrête la fonction", "`print` affiche, `return` renvoie une valeur au code appelant"], ok: 3, pourquoi: "Un résultat renvoyé peut être réutilisé ; un résultat affiché est perdu pour le programme." },
+  { q: "Que vaut un paramètre non fourni à l'appel ?", choix: ["`nil`", "0", "`\"\"`", "Une erreur immédiate"], ok: 0, pourquoi: "Il vaut nil ; l'erreur n'arrive que si tu l'utilises dans un calcul. `x = x or defaut` donne une valeur par défaut." },
+  { q: "Pourquoi écrire `local` devant les variables ?", choix: ["C'est plus rapide à taper", "Lua l'exige", "Pour limiter leur portée et éviter les conflits entre scripts", "Pour les afficher"], ok: 2, pourquoi: "Les globales sont partagées partout : source de bugs." },
   { q: "`local a, b = f()` avec `return 3, 10` : que vaut b ?", choix: ["3", "10", "nil", "13"], ok: 1, pourquoi: "Les valeurs sont rangées dans l'ordre." },
-  { q: "Appel avant définition d'une `local function` :", choix: ["Fonctionne", "`attempt to call a nil value`", "Avertissement seulement", "Le programme ignore la ligne"], ok: 1, pourquoi: "Lua lit de haut en bas : la fonction n'existe pas encore." },
-  { q: "Une variable `local` créée dans un `if` existe…", choix: ["Partout", "Seulement dans ce bloc if", "Dans tout le fichier après le if", "Jusqu'à la fin de la fonction suivante"], ok: 1, pourquoi: "La portée d'une locale est son bloc." },
-  { q: "Meilleur nom de fonction ?", choix: ["`f`", "`truc`", "`calculerSalaire`", "`salaire2`"], ok: 2, pourquoi: "Un verbe + ce qu'elle fait." },
-  { q: "Que renvoie une fonction sans `return` ?", choix: ["0", "`nil`", "`false`", "Une erreur"], ok: 1, pourquoi: "Rien (nil)." },
-  { q: "`math.max(40 - 35, 0)` vaut…", choix: ["0", "5", "35", "40"], ok: 1, pourquoi: "Le plus grand de 5 et 0." },
+  { q: "Appel d'une `local function` avant sa définition :", choix: ["Fonctionne", "Avertissement seulement", "Le programme ignore la ligne", "`attempt to call a nil value`"], ok: 3, pourquoi: "Lua lit de haut en bas : la fonction n'existe pas encore." },
+  { q: "Une variable `local` créée dans un `if` existe…", choix: ["Partout", "Dans tout le fichier après le if", "Seulement dans ce bloc if", "Jusqu'à la fin de la fonction suivante"], ok: 2, pourquoi: "La portée d'une locale est son bloc." },
+  { q: "Meilleur nom de fonction ?", choix: ["`calculerSalaire`", "`f`", "`truc`", "`salaire2`"], ok: 0, pourquoi: "Un verbe + ce qu'elle fait." },
+  { q: "Que renvoie une fonction sans `return` ?", choix: ["0", "`nil`", "`false`", "Une erreur"], ok: 1, pourquoi: "Rien (nil) : c'est la cause classique de `attempt to concatenate a nil value`." },
+  { q: "Après `local x = 1`, `local function f() local x = 2 end` et `f()`, que vaut `x` dans le fichier ?", choix: ["2", "nil", "Une erreur", "1"], ok: 3, pourquoi: "Le `x` de la fonction est une autre variable, qui cache celle du fichier sans la modifier." },
 ]} />
+
+## Fiche mémo
+
+Garde cette fiche sous la main (ou recopie-la à la main : c'est encore mieux).
+
+| Je veux… | J'écris… |
+|---|---|
+| Définir une fonction | `local function nom(param1, param2) … end` |
+| L'appeler | `nom(arg1, arg2)` (les parenthèses font l'appel) |
+| Renvoyer un résultat | `return valeur` (dernière instruction de son bloc) |
+| Sortir tôt | `if … then return … end` |
+| Renvoyer plusieurs résultats | `return a, b` puis `local x, y = nom()` |
+| Signaler un échec avec une raison | `return nil, "message"` |
+| Une valeur par défaut | `param = param or valeur` |
+| Une variable qui n'existe que dans la fonction | `local x = …` |
+| Une constante | `local TAUX = 20` (majuscules) |
+| Tester une fonction seule | `print(nom(valeurs simples))` |
+| Comprendre un programme qui se comporte mal | une **trace** : une ligne par instruction, une colonne par variable |
 
 ## Récapitulatif
 
-- `local function nom(params) … return valeur end` ; définir **avant** d'appeler.
-- `return` renvoie (une ou plusieurs valeurs), `print` affiche.
-- Portée : une locale vit dans son bloc ; **`local` partout**.
-- Paramètre par défaut : `p = p or valeur`. Une fonction = un verbe, une tâche, peu de lignes.
+- `local function nom(params) … return valeur end` ; définir **avant** d'appeler ; les parenthèses font l'appel.
+- `return` renvoie (une ou plusieurs valeurs) et termine la fonction ; `print` affiche. Sans `return`, on obtient `nil`.
+- En cas d'échec, la convention `return nil, "message"` explique le refus.
+- Portée : une locale vit dans son bloc ; **`local` partout** (un `local` oublié crée une globale sans prévenir).
+- Paramètre par défaut : `p = p or valeur`. Une fonction = un verbe, une tâche, peu de lignes ; les petites fonctions s'assemblent.
+- Pour comprendre un programme, **joue l'ordinateur** avec une trace d'exécution.
+
+<Encadre type="astuce" titre="🏋️ Pour t'entraîner encore">
+Tu as fini le module ? Tes fonctions ne sont solides que si tu en as écrit beaucoup. La salle d'entraînement te propose des dizaines d'exercices courts sur ce thème : [Fonctions et récursivité](/entrainement/lua-04-fonctions-recursivite/). Quinze minutes par jour valent mieux que trois heures un dimanche.
+</Encadre>
 
 ## Je suis bloqué, que faire ?
 
-Teste ta fonction **seule** avec des valeurs simples (`print(calculerSalaire(1, 10))`) avant de l'utiliser ailleurs. Ajoute des `print` au début de la fonction pour voir les paramètres reçus.
+1. **Relis le message d'erreur** : il donne le fichier, la ligne et le type de problème.
+2. **Teste ta fonction seule** avec des valeurs simples (`print(calculerSalaire(1, 10))`) avant de l'utiliser ailleurs.
+3. **Joue l'ordinateur** : refais la trace sur papier, ligne après ligne.
+4. Ajoute des `print` au début de la fonction pour voir les paramètres **vraiment** reçus.
+5. Demande à une IA, mais en tuteur : « Je débute en Lua. Voici ma fonction et le message d'erreur : … Ne me donne pas la solution : pose-moi une question puis donne-moi un indice à la fois. »
+6. Toujours bloqué ? Pose ta question sur le Discord de la communauté, avec ton code et le message d'erreur.
 
 <Videos recherche="Lua fonctions tutoriel français" liste={[]} />
 

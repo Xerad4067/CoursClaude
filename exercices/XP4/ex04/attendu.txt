@@ -1,0 +1,2 @@
+Reçu : Ce serveur est nul, vraiment nul !
+Affiché : Ce serveur est ***, vraiment *** !

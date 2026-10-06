@@ -1,0 +1,577 @@
+---
+title: "D1 · Python : premiers pas, comparé à Lua"
+description: Installer Python sur tes deux machines et retrouver en Python tout ce que tu sais déjà faire en Lua (variables, texte, saisie, conditions), avec les pièges de passage.
+parcours: D
+module: D1
+duree: 2 h 30
+ou: les-deux
+prerequis: Modules B1 à B6 du parcours B (surtout B1 à B3). Aucun accès à Nanos World n'est nécessaire.
+resultat: Une fiche de personnage et un ticket de caisse écrits en Python, avec une saisie au clavier.
+objectifs:
+  - Installer Python 3.13 sur tes deux machines et lancer un fichier avec python fichier.py
+  - Traduire variables, types et opérateurs de Lua vers Python, et l'inverse
+  - Afficher du texte avec print et les f-strings, lire une saisie avec input
+  - Écrire des conditions if, elif, else en respectant l'indentation
+  - Citer les différences qui piègent (None, True, valeurs fausses, indentation)
+sidebar:
+  order: 1
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+import Rappel from '../../../components/Rappel.astro';
+
+<TroisDurees
+  quinze="Étape 1 : installer Python et lancer ton premier fichier."
+  quarante="Étapes 1 à 3 et exercices 1 à 4."
+  deuxh="Tout le module jusqu'au mini-projet. Les exercices 🔴 peuvent attendre la séance suivante."
+/>
+
+<Rappel questions={[
+  { q: "En Lua, quelles sont les deux seules valeurs « fausses » dans un `if` ?", r: "`false` et `nil`. Même `0` et la chaîne vide `\"\"` sont considérés comme **vrais** en Lua.", de: "B3" },
+  { q: "Que donnent `17 // 5`, `17 % 5` et `17 / 5` en Lua ?", r: "`3` (quotient entier), `2` (reste) et `3.4` (division décimale).", de: "B2" },
+  { q: "Comment colle-t-on deux textes en Lua, et comment transforme-t-on `\"250\"` en nombre ?", r: "Avec `..`, et avec `tonumber(\"250\")` (qui renvoie `nil` si le texte n'est pas un nombre).", de: "B2" },
+  { q: "Cite les types de valeurs de Lua rencontrés au module B1.", r: "`number` (entiers et décimaux), `string`, `boolean`, `nil`, et `table` (avec `function`).", de: "B1" },
+  { q: "Quel est l'indice du premier élément d'une liste Lua, et comment connaît-on sa taille ?", r: "Le premier élément est à l'indice `1` ; la taille se lit avec `#liste`.", de: "B6" },
+]} />
+
+**Pourquoi c'est utile ?** Ton cours de BTS SIO vient de commencer **Python** : ce module t'aide tout de suite, parce que tu sais déjà programmer (en Lua). Ici, on ne réapprend pas : on **traduit**. À chaque notion, tu vois les deux langages côte à côte, et les différences qui piègent sont dites clairement. Et ce que tu écris en Python (argent, métiers, fiches de joueurs) se programme avec la même logique que sur ton serveur roleplay.
+
+<Encadre type="analogie">
+Lua et Python sont deux **langues de la même famille**, comme l'espagnol et l'italien : beaucoup de mots se ressemblent, la grammaire est proche, mais quelques « faux amis » font tomber les débutants. Ce module est ton **dictionnaire de faux amis**.
+</Encadre>
+
+## Étape 1 · Installer Python et lancer un fichier (20 min)
+
+Cette étape se fait sur **tes deux machines** (portable 💻 et PC fixe 🖥️) : 5 minutes chacune. Si ton cours de BTS t'a déjà fait installer Python, commence par vérifier (point 1).
+
+1. Ouvre le terminal (voir [le tutoriel d'installation](/installer/tutoriel/)) et tape :
+
+```powershell
+python --version
+py --version
+```
+
+Si tu vois `Python 3.13.x` (ou un autre `Python 3.x`), Python est déjà là : passe au point 3. Ce cours est **testé avec Python 3.13** ; une autre version 3.x récente suffit pour la plupart des exemples, mais en cas de doute installe la 3.13.
+
+2. Sinon, installe-le avec `winget`. L'identifiant `Python.Python.3.13` est **vérifié** dans le dépôt officiel des manifestes `winget` (`microsoft/winget-pkgs`, version 3.13.15 vue le 06/10/2026), mais la commande est **non testée sur Windows** :
+
+```powershell
+winget install -e --id Python.Python.3.13
+```
+
+Puis **ferme et rouvre le terminal** (Windows relit la liste des programmes à l'ouverture) et relance `python --version`. Le manifeste déclare les commandes `python` et `py` : `py` est le « lanceur » de Python pour Windows (il retrouve les versions installées).
+
+3. Dans VS Code, installe l'extension **Python** (identifiant `ms-python.python`, éditeur Microsoft : identifiant vérifié dans la documentation de VS Code). Elle apporte la coloration, l'autocomplétion et le bouton d'exécution ; **elle n'installe pas Python lui-même**. En ligne de commande (non testé sur Windows) :
+
+```powershell
+code --install-extension ms-python.python
+```
+
+4. Dans ton dépôt d'apprentissage, crée le dossier du module et le fichier :
+
+```powershell
+cd ~\Dev\mon-apprentissage
+mkdir python
+cd python
+code .
+```
+
+Dans VS Code, crée le fichier `bonjour.py` (le nom **finit par `.py`**) :
+
+```python title="python/bonjour.py"
+# Mon premier programme Python
+print("Bonjour depuis Python !")
+```
+
+5. Lance-le depuis le terminal intégré de VS Code (menu **Terminal → Nouveau terminal**) :
+
+```powershell
+python bonjour.py
+```
+
+Résultat attendu : `Bonjour depuis Python !`. Tu peux aussi cliquer sur le bouton ▶ **Run Python File** en haut à droite de l'éditeur (d'après la documentation de VS Code, il lance `python bonjour.py` sous Windows). Si VS Code te demande de choisir un « interpréteur », prends celui de Python 3.13 (commande **Python: Select Interpreter**).
+
+Voici tes premiers repères, côte à côte :
+
+| | En Lua | En Python |
+|---|---|---|
+| Lancer un fichier | `lua bonjour.lua` | `python bonjour.py` |
+| Commentaire | `-- texte` | `# texte` |
+| Afficher | `print("Salut")` | `print("Salut")` |
+| Créer une variable | `local x = 5` | `x = 5` (pas de `local`) |
+| Fin d'un bloc | `end` | rien : c'est l'**indentation** (étape 5) |
+
+<Encadre type="astuce">
+Tape juste `python` (sans nom de fichier) : tu entres dans la **console interactive** (`>>>`), où chaque ligne est exécutée tout de suite. Parfait pour tester `7 // 2` en deux secondes. Pour en sortir : `exit()`.
+</Encadre>
+
+Pour vérifier la **synchronisation** de tes deux machines : fais un commit et un `git push` de `bonjour.py` sur la première, puis un `git pull` sur la seconde et lance `python bonjour.py` là aussi.
+
+<FinEtape id="D1-e1" titre="Python installé" victoire="python --version répond et python bonjour.py affiche ton message sur tes deux machines." prochaine="les variables et les types, en Python (étape 2)." />
+
+## Étape 2 · Variables et types (20 min)
+
+En Python, tu crées une variable en lui donnant une valeur : `nom = "Sam"`. Pas de `local`, pas de mot-clé. Ce que tu écris est **à la fois** la création et l'affectation.
+
+```python title="d1/variables.py"
+nom = "Sam"          # str : du texte
+argent = 1500        # int : un nombre entier
+taux = 1.5           # float : un nombre à virgule (avec un POINT)
+permis = True        # bool : True ou False, avec une MAJUSCULE
+vehicule = None      # None : « rien », l'équivalent de nil
+
+argent = argent + 200            # on change le contenu : même idée qu'en Lua
+print(nom, argent, taux, permis, vehicule)   # Sam 1700 1.5 True None
+print(type(argent))                          # <class 'int'>
+```
+
+Les types se correspondent presque un pour un :
+
+| En Lua | En Python | Exemple |
+|---|---|---|
+| `number` (entier) | `int` | `1500` |
+| `number` (décimal) | `float` | `3.5` |
+| `string` | `str` | `"Sam"` |
+| `boolean` : `true` / `false` | `bool` : `True` / `False` | `True` |
+| `nil` | `None` (son type s'appelle `NoneType`) | `None` |
+| `table` | `list`, `dict`, `tuple`, `set` (module [D2](/parcours-d/d2-python-structures/)) | `[1, 2]` |
+
+`type(valeur)` donne le type, comme en Lua. Les deux langages ont des variables **dynamiques** : une même variable peut contenir un nombre puis du texte.
+
+<Encadre type="piege" titre="⚠️ True, False, None : la majuscule compte">
+En Lua, `true`, `false` et `nil` sont en minuscules. En Python, ce sont `True`, `False` et `None`. Si tu écris `permis = true`, Python répond :
+
+```text
+NameError: name 'true' is not defined. Did you mean: 'True'?
+```
+
+Et `nil` n'existe pas du tout : `NameError: name 'nil' is not defined`.
+</Encadre>
+
+<Encadre type="retenir" titre="Une faute de frappe ne passe plus inaperçue">
+En Lua, `print(argnet)` affichait `nil` sans rien dire (module B1) : un bug **silencieux**. En Python, la même faute plante tout de suite et propose même la correction :
+
+```text
+NameError: name 'argnet' is not defined. Did you mean: 'argent'?
+```
+
+C'est moins confortable sur le moment, mais plus honnête : tu trouves le bug plus vite.
+</Encadre>
+
+### Bien nommer en Python
+
+Le cours Lua utilisait le *camelCase* (`prixTotal`). En Python, la convention officielle (PEP 8) est le ***snake_case*** : minuscules et tirets bas, `prix_total`, `liste_courses`. Comme en Lua : pas d'espace, ne commence pas par un chiffre, et dans ce cours **pas d'accents dans les noms** (`metier`, pas `métier`) pour éviter les soucis entre machines.
+
+<FinEtape id="D1-e2" titre="Variables et types" victoire="tu crées des variables de chaque type et tu affiches leur type avec type()." prochaine="afficher du texte avec print et les f-strings (étape 3)." />
+
+## Étape 3 · Afficher, f-strings et input (20 min)
+
+**`print`** ressemble à celui de Lua, avec une différence : quand tu lui donnes plusieurs valeurs, il les sépare par une **espace** (Lua : une **tabulation**). Et tu peux choisir la séparation avec `sep` et la fin de ligne avec `end` :
+
+```python title="d1/print.py"
+print("Sam", 1500, "taxi")             # Sam 1500 taxi
+print("Sam", 1500, "taxi", sep=" | ")  # Sam | 1500 | taxi
+print("Chargement", end="...")         # pas de retour à la ligne
+print("terminé")                       # Chargement...terminé
+```
+
+Pour **coller du texte avec des variables**, Python n'utilise pas `..` mais les **f-strings** (*formatted string literals*, « chaînes formatées »). Tu écris un `f` juste avant le guillemet, et tout ce qui est entre accolades est calculé :
+
+```python title="d1/fstring.py"
+nom = "Sam"
+argent = 1500
+prix = 3.5
+print(f"{nom} a {argent} €")            # Sam a 1500 €
+print(f"Prix : {prix:.2f} €")           # Prix : 3.50 € (2 chiffres après la virgule)
+print(f"Double : {argent * 2}")         # on peut calculer dans les accolades
+print(f"Avec séparateur : {argent:,}")  # Avec séparateur : 1,500
+```
+
+Après les deux-points, le **format** : `.2f` (deux décimales) joue le rôle du `%.2f` de `string.format`.
+
+| But | En Lua | En Python |
+|---|---|---|
+| Coller du texte et des valeurs | `"Sam a " .. argent .. " €"` | `f"Sam a {argent} €"` |
+| Mettre en forme un nombre | `string.format("%.2f", x)` | `f"{x:.2f}"` |
+| Longueur d'un texte | `#nom` | `len(nom)` |
+| Majuscules | `string.upper(nom)` | `nom.upper()` |
+| Répéter un texte | `string.rep("=", 5)` | `"=" * 5` |
+| Texte → nombre | `tonumber("250")` (`nil` si impossible) | `int("250")` ou `float("2.5")` (**erreur** si impossible) |
+| Nombre → texte | `tostring(42)` | `str(42)` |
+| Lire le clavier | `io.read()` | `input("Question : ")` |
+
+### Lire le clavier avec input
+
+```python title="d1/saisie.py"
+pseudo = input("Ton pseudo : ")    # affiche la question, attend une ligne + Entrée
+age_texte = input("Ton âge : ")    # toujours du TEXTE, même si tu tapes des chiffres
+age = int(age_texte)               # conversion en nombre entier
+print(f"Salut {pseudo}, l'an prochain tu auras {age + 1} ans")
+```
+
+Si tu tapes `Sam` puis `17`, tu vois :
+
+```text
+Ton pseudo : Sam
+Ton âge : 17
+Salut Sam, l'an prochain tu auras 18 ans
+```
+
+<Encadre type="piege">
+`input` renvoie **toujours du texte**. Si tu tapes `abc` et que tu fais `int("abc")`, Python s'arrête avec `ValueError: invalid literal for int() with base 10: 'abc'`. En Lua, `tonumber` te rendait `nil` et le programme continuait ; en Python, il faudra **attraper** l'erreur avec `try` / `except` (module [D2](/parcours-d/d2-python-structures/)).
+</Encadre>
+
+<FinEtape id="D1-e3" titre="print, f-strings et input" victoire="ton programme pose une question, lit la réponse et affiche une phrase mise en forme." prochaine="les opérateurs et les booléens (étape 4)." />
+
+## Étape 4 · Opérateurs et booléens (20 min)
+
+Bonne nouvelle : presque tous les opérateurs que tu connais **existent à l'identique**.
+
+| Opération | En Lua | En Python | Exemple Python et résultat |
+|---|---|---|---|
+| Calculs de base | `+ - *` | `+ - *` | `12 * 3` donne `36` |
+| Division décimale | `/` | `/` | `10 / 4` donne `2.5` ; `10 / 2` donne `5.0` |
+| Division entière | `//` | `//` | `17 // 5` donne `3` |
+| Reste (modulo) | `%` | `%` | `17 % 5` donne `2` |
+| Puissance | `^` | `**` | `2 ** 3` donne `8` (en Lua, `2 ^ 3` donne `8.0`) |
+| Égal / différent | `==` / `~=` | `==` / `!=` | `3 != 4` donne `True` |
+| Et / ou / non | `and` `or` `not` | `and` `or` `not` | identiques |
+| Raccourci d'ajout | (n'existe pas) | `argent += 100` | équivaut à `argent = argent + 100` |
+| Coller deux textes | `..` | `+` (deux `str` seulement) | `"Sam" + " Rivera"` |
+
+Deux petits bonus de Python : `min`, `max` et `abs` existent sans rien importer (`max(3, 7)` donne `7`), et on peut **enchaîner** des comparaisons : `50 <= vitesse <= 130`, impossible en Lua.
+
+### Le plus gros piège : ce qui est « faux »
+
+<Encadre type="piege" titre="⚠️ En Python, 0 et le texte vide sont faux">
+En Lua, **seuls `false` et `nil`** sont faux (B3). En Python, c'est plus large :
+
+| Valeur | Dans un `if` en Lua | Dans un `if` en Python |
+|---|---|---|
+| `0` (et `0.0`) | vraie | **fausse** |
+| `""` (texte vide) | vraie | **fausse** |
+| liste ou dictionnaire vide | vraie | **fausse** |
+| `None` / `nil` | fausse | fausse |
+| `False` / `false` | fausse | fausse |
+
+Conséquence directe : le truc `valeur or defaut` ne se comporte plus pareil. Avec `argent = 0`, Lua donne `0`, mais Python donne `100` pour `argent or 100` !
+</Encadre>
+
+Pour garder le comportement de Lua (« seulement si la valeur est absente »), on compare explicitement avec `None`, avec **`is None`** ou **`is not None`** (et pas `== None`). Et pour choisir une valeur en une ligne, Python a l'**expression conditionnelle** `valeur_si_vrai if condition else valeur_sinon` :
+
+```python title="d1/defaut.py"
+prime = 0
+print(prime or 300)                             # 300 : le 0 est « faux », piège !
+print(prime if prime is not None else 300)      # 0 : on teste seulement l'absence
+```
+
+### Texte et nombres ne se mélangent plus
+
+En Lua, `"10" + 5` valait `15` (conversion automatique). En Python, mélanger texte et nombre **plante** :
+
+```text
+TypeError: can only concatenate str (not "int") to str
+```
+
+Il faut convertir toi-même (`str(5)`, `int("10")`) ou, mieux, utiliser une f-string.
+
+<FinEtape id="D1-e4" titre="Opérateurs et booléens" victoire="tu traduis les calculs et les comparaisons de Lua en Python, et tu sais pourquoi 0 or 100 donne 100." prochaine="les conditions et l'indentation (étape 5)." />
+
+## Étape 5 · Conditions et indentation (25 min)
+
+C'est **la** grande différence visuelle. En Lua, `then` et `end` entourent un bloc. En Python, il n'y a ni `then` ni `end` : un bloc commence après un **deux-points** `:` et se reconnaît à son **retrait** (l'*indentation*) de **4 espaces**.
+
+<Encadre type="analogie">
+Pense à une liste à puces dans un document : les sous-points sont **décalés vers la droite**, et on sait qu'on a fini quand on revient à gauche. Python lit ton code comme ça : le décalage **fait partie du programme**.
+</Encadre>
+
+```python title="d1/permis.py"
+age = 17
+if age >= 18:
+    print("Tu peux passer le permis")      # décalé de 4 espaces : dans le if
+else:
+    print("Encore", 18 - age, "an(s) à attendre")
+print("Fin du contrôle")                    # pas décalé : toujours exécuté
+```
+
+```lua title="lua · le même programme"
+local age = 17
+if age >= 18 then
+  print("Tu peux passer le permis")
+else
+  print("Encore " .. 18 - age .. " an(s) à attendre")
+end
+print("Fin du contrôle")
+```
+
+| En Lua | En Python |
+|---|---|
+| `if age >= 18 then` | `if age >= 18:` |
+| `elseif sante >= 30 then` | `elif sante >= 30:` |
+| `else` | `else:` |
+| `end` | rien : on revient d'un niveau vers la gauche |
+
+Trois règles :
+1. une ligne `if`, `elif` ou `else` **finit par `:`** ;
+2. toutes les lignes d'un même bloc ont **exactement le même retrait** (4 espaces, la règle de la PEP 8) ;
+3. **jamais de mélange** tabulations et espaces. Dans VS Code, la touche **Tab** insère 4 espaces par défaut (d'après la documentation de VS Code) : tu n'as rien à régler.
+
+```python title="d1/sante.py"
+sante = 35
+if sante >= 70:
+    print("En forme")
+elif sante >= 30:      # elif = « sinon si » (Lua : elseif)
+    print("Blessé")
+else:
+    print("Critique")  # Blessé s'affiche : 35 >= 30, et le reste est ignoré
+```
+
+Comme en Lua, Python teste **dans l'ordre** et s'arrête au premier cas vrai : range tes cas du plus restrictif au plus large (module B3). Pas besoin de parenthèses autour de la condition, et `and`, `or`, `not` s'écrivent comme en Lua.
+
+<Encadre type="astuce">
+Un message d'erreur Python se lit **de bas en haut** : la **dernière ligne** dit *quoi* (`IndentationError: …`), la ligne `File "…", line 3` juste au-dessus dit *où*. Commence toujours par la dernière ligne.
+</Encadre>
+
+<FinEtape id="D1-e5" titre="Conditions et indentation" victoire="ton programme choisit entre plusieurs chemins avec if, elif et else, sans erreur d'indentation." prochaine="les exercices, puis le mini-projet fiche et ticket." />
+
+## Erreurs fréquentes
+
+Messages copiés tels quels depuis une exécution réelle avec **Python 3.13** (les chemins et le détail du texte changent légèrement avec d'autres versions).
+
+| Message | Cause | Solution |
+|---|---|---|
+| `IndentationError: expected an indented block after 'if' statement on line 2` | La ligne après `if …:` n'est pas décalée | Décale-la de 4 espaces |
+| `IndentationError: unindent does not match any outer indentation level` | Une ligne revient à un retrait qui n'existe pas | Aligne-la exactement sous son `if` |
+| `IndentationError: unexpected indent` | Une ligne est décalée sans raison | Retire les espaces en trop |
+| `TabError: inconsistent use of tabs and spaces in indentation` | Tabulations et espaces mélangés | Utilise seulement des espaces |
+| `SyntaxError: expected ':'` | `:` oublié à la fin de `if`, `else`, `def`… | Ajoute le `:` |
+| `SyntaxError: invalid syntax` (flèche sous `elseif`) | Le `elseif` de Lua n'existe pas | Écris `elif` |
+| `SyntaxError: invalid syntax. Maybe you meant '==' or ':=' instead of '='?` | `=` à la place de `==` dans un `if` | Utilise `==` pour comparer |
+| `NameError: name 'true' is not defined. Did you mean: 'True'?` | `true`, `false` écrits à la Lua | `True`, `False`, `None` |
+| `NameError: name 'argnet' is not defined. Did you mean: 'argent'?` | Faute de frappe dans un nom | Corrige l'orthographe |
+| `TypeError: can only concatenate str (not "int") to str` | `+` entre un texte et un nombre | Utilise une f-string ou `str()` |
+| `ValueError: invalid literal for int() with base 10: 'abc'` | `int()` sur un texte qui n'est pas un nombre | Vérifie la saisie (`try` / `except`, module D2) |
+| `SyntaxError: Missing parentheses in call to 'print'. Did you mean print(...)?` | `print "texte"` sans parenthèses (vieux Python 2) | `print("texte")` |
+| `python` n'est pas reconnu (Windows) | Terminal ouvert avant l'installation, ou Python absent | Ferme et rouvre le terminal, essaie `py --version`, sinon reprends l'étape 1 (message exact **non vérifié sur Windows**) |
+
+## Exercices
+
+<Exercice id="D1-ex01" titre="Trois boîtes, en Python" niveau="vert" dossier="D1/ex01" fichier="trois.py">
+Crée les variables `nom`, `argent` et `metier` (valeurs `Sam`, `1500`, `taxi`) et affiche-les l'une après l'autre. Puis affiche les trois **sur une seule ligne** avec un seul `print` : regarde par quoi Python sépare les valeurs.
+
+<div slot="indice1">En Python, pas de `local` : on écrit directement `nom = "Sam"`.</div>
+<div slot="indice2">`print(nom)` affiche le contenu. Plusieurs valeurs dans un même `print` se séparent par des virgules.</div>
+<div slot="indice3">La dernière ligne : `print(nom, argent, metier)`.</div>
+<div slot="solution">Le texte va entre guillemets, le nombre sans. Entre les valeurs d'un même `print`, Python met une **espace** (Lua mettait une tabulation) : c'est un détail qui change l'affichage mais pas la logique.</div>
+</Exercice>
+
+<Exercice id="D1-ex02" titre="Quel type ?" niveau="vert" dossier="D1/ex02" fichier="types.py">
+Affiche avec `type()` le type de `1500`, `3.5`, `"taxi"`, `True`, `None`, `"42"`, `10 / 2` puis `10 // 2` (dans cet ordre, une ligne chacun).
+
+<div slot="indice1">`print(type(1500))` affiche le type de `1500`.</div>
+<div slot="indice2">`True` et `None` s'écrivent **sans guillemets** et avec une majuscule.</div>
+<div slot="indice3">Deux surprises : `"42"` (entre guillemets) est un `str`, et `10 / 2` est un `float` (`5.0`) alors que `10 // 2` est un `int`.</div>
+<div slot="solution">La division `/` donne **toujours** un `float`, comme en Lua. La division entière `//` de deux `int` donne un `int`. Et `None` a pour type `NoneType` (le `nil` de Python).</div>
+</Exercice>
+
+<Exercice id="D1-ex03" titre="Traduire : le plein d'essence (Lua vers Python)" niveau="vert" dossier="D1/ex03" fichier="plein.py">
+Voici un programme Lua. Écris le **même programme en Python** : il doit afficher exactement les quatre lignes attendues ci-dessous.
+
+```lua title="plein.lua"
+local argent = 130
+local prix_plein = 40
+local pleins = argent // prix_plein
+local reste = argent % prix_plein
+local nom = "Sam"
+print(nom .. " peut faire " .. pleins .. " pleins")
+print("Il lui reste " .. reste .. " €")
+print("La moitié de son argent : " .. argent / 2)
+print(#nom)
+```
+
+<div slot="indice1">Regarde ce qui change : le mot `local`, les `..`, le `#nom`. Les calculs `//`, `%` et `/` sont identiques.</div>
+<div slot="indice2">Les `..` deviennent une f-string : `f"{nom} peut faire {pleins} pleins"`.</div>
+<div slot="indice3">`#nom` devient `len(nom)`. Pas de `local` en Python.</div>
+<div slot="solution">`65.0` s'affiche avec un `.0` dans les deux langages car `/` donne toujours un décimal. Aide-mémoire : `local` disparaît, `..` devient une f-string, `#x` devient `len(x)`, `--` devient `#`.</div>
+</Exercice>
+
+<Exercice id="D1-ex04" titre="Débogage : le ticket qui plante" niveau="jaune" type="debug" dossier="D1/ex04" fichier="ticket.py">
+Ce programme plante avec `TypeError: can only concatenate str (not "int") to str`. Corrige-le pour qu'il affiche les deux lignes attendues.
+
+<div slot="indice1">Lis la **dernière** ligne du message : elle parle de `str` et de `int`. Quelle ligne mélange un texte et un nombre ?</div>
+<div slot="indice2">En Python, `+` ne convertit pas un nombre en texte tout seul (Lua le faisait avec `..`).</div>
+<div slot="indice3">Utilise une f-string : `f"Total : {total} €"`, ou `str(total)`.</div>
+<div slot="solution">`"Article : " + article` marche (deux textes). `"Total : " + total` plante car `total` est un `int`. La f-string convertit toute seule : c'est la façon à privilégier. Erreur classique à retenir : **Python ne mélange jamais texte et nombre avec `+`**.</div>
+</Exercice>
+
+<Exercice id="D1-ex05" titre="Lecture : vrai ou faux ?" niveau="jaune" type="lecture" dossier="D1/ex05" fichier="vrai_ou_faux.py">
+Sans lancer le programme, prédis les **sept lignes** affichées. Puis vérifie en l'exécutant.
+
+<div slot="indice1">`//` arrondit **vers le bas** : que donne `-3.5` arrondi vers le bas ?</div>
+<div slot="indice2">En Python, `0`, `""` et `None` sont faux. Tout nombre non nul et tout texte non vide sont vrais.</div>
+<div slot="indice3">`argent or 100` : `or` renvoie le premier élément « vrai ». Avec `argent = 0`, qui est faux, il passe au suivant.</div>
+<div slot="solution">`-7 // 2` donne `-4` (arrondi vers le bas, pas vers zéro), comme en Lua. `"ab" * 3` répète le texte. `1 < 5 < 10` est une comparaison enchaînée. Et `0 or 100` donne `100` : en Lua, le même calcul donnait `0`, car `0` y est vrai. C'est **le piège numéro 1** du passage Lua vers Python.</div>
+</Exercice>
+
+<Exercice id="D1-ex06" titre="À la pompe" niveau="jaune" dossier="D1/ex06" fichier="pompe.py">
+Demande le nom du client, le nombre de litres (décimal) et le prix au litre (décimal), puis affiche `Sam doit payer 49.75 €` (avec **deux** décimales). Avec les saisies simulées `Sam`, `25` et `1.99`, tu dois obtenir exactement la conversation ci-dessous.
+
+<div slot="indice1">`input` renvoie toujours du **texte** : il faut le convertir avant de multiplier.</div>
+<div slot="indice2">`float(input("Litres : "))` lit un nombre décimal.</div>
+<div slot="indice3">Pour deux décimales, dans la f-string : `{total:.2f}`.</div>
+<div slot="solution">On convertit avec `float` (décimal) plutôt qu'`int` car les litres et le prix ont une virgule. Sans `:.2f`, Python afficherait toutes les décimales du calcul flottant (par exemple `49.75000000000001` dans d'autres cas).</div>
+</Exercice>
+
+<Exercice id="D1-ex07" titre="Traduire : le garage de Kim (Python vers Lua)" niveau="jaune" dossier="D1/ex07" fichier="garage.lua">
+Cette fois, c'est l'inverse : voici un programme **Python** à traduire **en Lua**. Il doit afficher exactement les trois lignes attendues ci-dessous. (Ce fichier se lance avec `lua garage.lua`.)
+
+```python title="garage.py"
+# Le garage de Kim
+vehicules = 3
+places = 14
+age = 17
+permis = False
+
+if age >= 18 and permis:
+    print("Kim peut conduire")
+elif age >= 16 and not permis:
+    print("Kim peut passer le permis")
+else:
+    print("Kim doit attendre")
+
+if vehicules != 0:
+    print(f"{places // vehicules} places par véhicule, reste {places % vehicules}")
+
+nom = "Kim"
+print(f"{nom} a {len(nom)} lettres")
+```
+
+<div slot="indice1">Chaque bloc `if` de Lua a besoin de `then` et de `end`. Les mots qui changent : `elif`, `!=`, `False`.</div>
+<div slot="indice2">Les f-strings deviennent des `..`, `len(nom)` devient `#nom`, et `#` (commentaire) devient `--`. Déclare chaque variable avec `local`.</div>
+<div slot="indice3">`print(places // vehicules .. " places par véhicule, reste " .. places % vehicules)`.</div>
+<div slot="solution">Traduire dans ce sens oblige à **ajouter** `local`, `then`, `end` et à remplacer `!=` par `~=`, `elif` par `elseif`, `False` par `false`. Les opérateurs `//`, `%`, `and`, `not` ne changent pas. Tu peux vérifier : le résultat est identique dans les deux langages.</div>
+</Exercice>
+
+<Exercice id="D1-ex08" titre="Le tarif du parc" niveau="jaune" dossier="D1/ex08" fichier="tarif_parc.py">
+Demande l'âge du visiteur. Entrée du parc : gratuite en dessous de 6 ans, 5 € de 6 à 17 ans, 12 € de 18 à 64 ans, 8 € à partir de 65 ans. Affiche l'âge puis le tarif. Avec la saisie simulée `34`, tu dois obtenir la conversation ci-dessous. Teste ensuite toi-même `4`, `15` et `70` pour vérifier chaque cas.
+
+<div slot="indice1">Une chaîne de conditions : `if`, puis plusieurs `elif`, puis `else`. Chaque ligne finit par `:`.</div>
+<div slot="indice2">Convertis la saisie avec `int(input("Ton âge : "))`.</div>
+<div slot="indice3">Teste du plus petit âge au plus grand (`age < 6`, puis `age < 18`, puis `age < 65`) et range le tarif dans une variable avant l'affichage.</div>
+<div slot="solution">Comme Python s'arrête au premier cas vrai, il suffit de tester `age < 18` sans préciser « et au moins 6 » : on y arrive seulement si `age < 6` était faux. Penser à **l'ordre des cas** évite de longues conditions.</div>
+</Exercice>
+
+<Exercice id="D1-ex09" titre="Débogage : le videur du parc" niveau="jaune" type="debug" dossier="D1/ex09" fichier="location.py">
+Ce programme ne démarre même pas. Corrige-le pour qu'il affiche `Location autorisée`. Attention : il y a **deux** erreurs, et Python te les montre **une à la fois**.
+
+<div slot="indice1">Lis la dernière ligne du message : elle contient le type d'erreur et le numéro de ligne juste au-dessus.</div>
+<div slot="indice2">Après un `:`, la ligne suivante doit être **décalée de 4 espaces**. Et le `elseif` de Lua n'existe pas en Python.</div>
+<div slot="indice3">Décale le premier `print` de 4 espaces, puis remplace `elseif` par `elif`.</div>
+<div slot="solution">Première erreur : `IndentationError: expected an indented block after 'if' statement on line 4`. Seconde, une fois la première corrigée : `SyntaxError: invalid syntax` sur `elseif`. Les deux viennent de l'habitude de Lua (blocs fermés par `end`, mot `elseif`). Retiens le couple **deux-points + retrait**.</div>
+</Exercice>
+
+<Exercice id="D1-ex10" titre="Le contrôle routier" niveau="jaune" dossier="D1/ex10" fichier="controle.py">
+Avec `age = 19`, `permis = True`, `suspendu = False`, `vitesse = 90` et `vehicule = None`, affiche `Conduite autorisée` si l'âge est d'au moins 18 ans, qu'il y a un permis et que le permis n'est pas suspendu ; `Vitesse légale` si la vitesse est entre 50 et 130 (**une seule** comparaison) ; `Pas de véhicule enregistré` si `vehicule` vaut `None`.
+
+<div slot="indice1">`and` et `not` s'écrivent exactement comme en Lua.</div>
+<div slot="indice2">Python accepte `50 <= vitesse <= 130` en une seule expression.</div>
+<div slot="indice3">Pour tester l'absence de valeur : `if vehicule is None:`.</div>
+<div slot="solution">On écrit `is None` (et pas `== None`) : c'est la façon recommandée par la PEP 8 de tester `None`. Retiens aussi que la comparaison enchaînée `a <= x <= b` n'existe pas en Lua, où il faut écrire `x >= a and x <= b`.</div>
+</Exercice>
+
+<Exercice id="D1-ex11" titre="Défi : le distributeur de billets" niveau="rouge" dossier="D1/ex11" fichier="distributeur.py">
+Le distributeur ne donne que des billets de 50, 20 et 10 €. Demande un montant entier, puis affiche combien de billets de chaque sorte (en commençant par les plus gros) et la somme qui ne peut pas être distribuée. Avec la saisie simulée `187`, tu dois obtenir la conversation ci-dessous.
+
+<div slot="indice1">`//` donne le nombre de billets d'une valeur, `%` donne ce qu'il reste à distribuer.</div>
+<div slot="indice2">Enchaîne : les billets de 50 d'abord, puis les billets de 20 sur ce qui reste, puis ceux de 10.</div>
+<div slot="indice3">Après chaque étape, mets le montant à jour : `montant = montant % 50`.</div>
+<div slot="solution">C'est le même raisonnement que « 17 bonbons pour 5 enfants » du module B2, répété trois fois. Il y a du code répété : au module D2, une **boucle** et une **liste** de billets raccourciront tout ça.</div>
+</Exercice>
+
+<Exercice id="D1-ex12" titre="Défi : le piège du zéro (Lua vers Python)" niveau="rouge" dossier="D1/ex12" fichier="piege_zero.py">
+Traduis ce programme Lua en Python **sans changer son comportement** : la sortie doit être exactement celle ci-dessous. Attention : une traduction « mot à mot » avec `if argent:` ne donnerait **pas** le même résultat.
+
+```lua title="piege_zero.lua"
+local argent = 0
+local permis = nil
+local metier = ""
+if argent then print("Compte ouvert") else print("Pas de compte") end
+if permis then print("Permis valide") else print("Pas de permis") end
+if metier then print("Métier : [" .. metier .. "]") else print("Sans métier") end
+local salaire = nil
+print("Salaire : " .. (salaire or 1200))
+local prime = 0
+print("Prime : " .. (prime or 300))
+```
+
+<div slot="indice1">En Lua, `0` et `""` sont vrais ; en Python, ils sont faux. Il faut donc ne tester **que** l'absence de valeur.</div>
+<div slot="indice2">Remplace chaque `if x then` par `if x is not None:`.</div>
+<div slot="indice3">Pour `salaire or 1200` : `salaire if salaire is not None else 1200`. Pareil pour la prime.</div>
+<div slot="solution">`prime or 300` donnerait `300` en Python (le `0` est faux) alors que Lua garde `0`. L'expression `valeur if valeur is not None else defaut` reproduit exactement le comportement de Lua. Ce piège est classique quand on porte du code d'un langage à l'autre : relis toujours les `if x` et les `x or y`.</div>
+</Exercice>
+
+<Exercice id="D1-ex13" titre="Mini-projet : la fiche de personnage et le ticket de caisse" niveau="rouge" type="projet" dossier="D1/ex13" fichier="fiche_et_ticket.py">
+Retrouve B1 et B2 en Python, dans **un seul programme**. Il demande le nom, le métier et l'argent du personnage ; affiche sa fiche (avec une ligne « Situation » : `à l'aise` à partir de 1000 €, `correct` à partir de 100 €, sinon `fauché`) ; puis le ticket de la supérette (2 pains à 1,20 € et 3 bouteilles d'eau à 0,80 €, total et TVA de 20 % incluse) ; enfin le paiement, refusé si l'argent ne suffit pas. Saisies simulées : `Sam Rivera`, `chauffeur de taxi`, `1500`.
+
+<div slot="validation">La fiche et le ticket sont identiques à ceux de B1 et B2 (sauf `True` avec une majuscule) ; la TVA est de 0,80 € ; avec 3 € au lieu de 1500 €, le programme affiche que le personnage n'a pas assez d'argent au lieu de payer.</div>
+<div slot="indice1">Découpe en trois parties : fiche, ticket, paiement. Écris-les et teste-les l'une après l'autre.</div>
+<div slot="indice2">Les nombres avec deux décimales : `{total:.2f}`. Le tiret répété : `"-" * 20`. La TVA incluse dans un prix TTC : `total * 20 / 120`.</div>
+<div slot="indice3">Le paiement est une condition : `if total <= argent:` puis `argent - total`, sinon un message de refus.</div>
+<div slot="solution">Tu viens de réécrire en Python deux mini-projets de Lua, avec la même logique. Les différences : les f-strings à la place de `..` et de `string.format`, `input` à la place de `io.read`, l'indentation à la place de `end`, `True` avec une majuscule. Ce programme est le point de départ du mini-projet D2 (l'inventaire), où tu ajouteras des fonctions et des fichiers.</div>
+</Exercice>
+
+## Quiz du module D1
+
+<Quiz id="D1-quiz" questions={[
+  { q: "Quelle commande lance le fichier `bonjour.py` ?", choix: ["`lua bonjour.py`", "`python bonjour.py`", "`run bonjour.py`", "`bonjour.py --lancer`"], ok: 1, pourquoi: "On lance Python avec le nom du fichier : `python bonjour.py` (ou `py bonjour.py` avec le lanceur Windows)." },
+  { q: "Quel est l'équivalent Python du `nil` de Lua ?", choix: ["`null`", "`nil`", "`None`", "`void`"], ok: 2, pourquoi: "`None`, avec une majuscule. Son type s'appelle `NoneType`." },
+  { q: "Que valent `7 // 2` et `7 % 2` en Python ?", choix: ["`3.5` et `1`", "`4` et `1`", "`3` et `0`", "`3` et `1`"], ok: 3, pourquoi: "Comme en Lua : quotient entier `3` et reste `1`." },
+  { q: "Laquelle de ces valeurs est vraie en Lua mais **fausse** en Python ?", choix: ["`None`", "`False`", "`0`", "`\"abc\"`"], ok: 2, pourquoi: "`0` est vrai en Lua (seuls `false` et `nil` sont faux) mais faux en Python." },
+  { q: "Que fait `print(\"Total : \" + 42)` en Python ?", choix: ["Affiche `Total : 42`", "Provoque une `TypeError`", "Affiche `Total : `", "Provoque une `SyntaxError`"], ok: 1, pourquoi: "Python ne convertit pas le nombre en texte avec `+` : `TypeError: can only concatenate str (not \"int\") to str`." },
+  { q: "Que renvoie `input(\"Âge : \")` quand on tape `17` ?", choix: ["Le nombre `17`", "Le texte `\"17\"`", "`None`", "Le booléen `True`"], ok: 1, pourquoi: "`input` renvoie toujours un `str` : il faut convertir avec `int()`." },
+  { q: "Comment écrit-on « sinon si » en Python ?", choix: ["`elseif`", "`else if`", "`elsif`", "`elif`"], ok: 3, pourquoi: "`elif`. Le `elseif` de Lua provoque une `SyntaxError`." },
+  { q: "Qu'est-ce qui marque la fin d'un bloc `if` en Python ?", choix: ["Le mot `end`", "Une accolade fermante", "Le retour au retrait précédent", "Un point-virgule"], ok: 2, pourquoi: "Il n'y a pas de `end` : le bloc se termine quand l'indentation revient en arrière." },
+  { q: "Quel opérateur calcule une puissance en Python ?", choix: ["`**`", "`^`", "`^^`", "`//`"], ok: 0, pourquoi: "`2 ** 3` vaut `8`. Le `^` de Lua n'existe pas pour ça en Python." },
+  { q: "Que donne `f\"{prix:.2f} €\"` avec `prix = 3.5` ?", choix: ["`3.5 €`", "`3.500000 €`", "`3.50 €`", "`.2f €`"], ok: 2, pourquoi: "`.2f` affiche deux chiffres après la virgule : `3.50 €`." },
+]} />
+
+## Récapitulatif
+
+- Python : `python fichier.py`. Commentaire `#`. Pas de `local` : `x = 5`. Variables en `snake_case`.
+- Types : `int`, `float`, `str`, `bool` (`True` / `False`), `None` ; `type()` donne le type. Aucune conversion automatique texte / nombre : `int()`, `float()`, `str()`.
+- Afficher : `print(a, b)` sépare par une espace ; les **f-strings** `f"{nom} a {argent} €"` remplacent `..` et `string.format` (`:.2f` pour deux décimales). Lire : `input("…")` renvoie toujours du texte.
+- Opérateurs identiques à Lua (`+ - * / // %`, `and or not`), sauf `**` (puissance), `!=` (différent), `+=`, et `len()` à la place de `#`.
+- **Piège numéro 1** : `0`, `""` et les collections vides sont **faux** en Python (vrais en Lua) ; teste `is None` pour l'absence de valeur.
+- Conditions : `if … :`, `elif … :`, `else:` ; le bloc est **retiré de 4 espaces**, sans `then` ni `end`.
+- Une erreur Python se lit par la **dernière ligne** (le quoi) puis la ligne `line N` (le où).
+
+## Je suis bloqué, que faire ?
+
+1. **Relis l'erreur par le bas** : le type (`IndentationError`, `NameError`, `TypeError`…) puis le numéro de ligne.
+2. **Isole** : copie les 5 lignes en cause dans un fichier à part, ou teste-les dans la console interactive (`python`).
+3. **Compte tes espaces** : en cas d'`IndentationError`, regarde l'indentation affichée en bas à droite de VS Code ou active `editor.renderWhitespace` (voir le tutoriel d'installation).
+4. **Compare avec Lua** : si ça marchait en Lua, cherche dans le tableau de l'étape correspondante ce qui change.
+5. **Cherche dans la doc** : le [tutoriel officiel](https://docs.python.org/fr/3/tutorial/) est en français.
+6. **Demande à une IA des indices, pas la solution.** Prompt modèle :
+
+```text
+Je débute en Python et je viens de Lua. Voici mon code et le message d'erreur exact.
+Ne me donne PAS le code corrigé : explique-moi d'abord ce que dit le message,
+puis donne-moi un indice pour que je trouve l'erreur moi-même.
+```
+
+7. Sinon, demande sur le Discord de ta communauté en collant le code **et** le message complet.
+
+<Videos recherche="Python débutant tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Tutoriel Python officiel (en français) : une introduction informelle](https://docs.python.org/fr/3/tutorial/introduction.html)
+- [Tutoriel Python officiel : `if`, `for`, fonctions](https://docs.python.org/fr/3/tutorial/controlflow.html)
+- [Tutoriel Python officiel : formater l'affichage (f-strings)](https://docs.python.org/fr/3/tutorial/inputoutput.html)
+- [Documentation VS Code : démarrer avec Python](https://code.visualstudio.com/docs/python/python-tutorial) (en anglais)

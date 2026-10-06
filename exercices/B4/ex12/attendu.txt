@@ -1,0 +1,6 @@
+Jour 1 : livraison 1
+Jour 2 : livraison 1
+Jour 2 : livraison 2
+Jour 3 : livraison 1
+Jour 3 : livraison 2
+Jour 3 : livraison 3

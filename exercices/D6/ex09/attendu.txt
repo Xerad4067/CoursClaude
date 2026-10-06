@@ -1,0 +1,10 @@
+plaque | modele
+TX-001-RP | Berline Aster
+TX-002-RP | Berline Aster
+
+plaque | modele | prix
+SC-002-RP | Scooter Gazelle | 2800
+MO-051-RP | Moto Foudre | 6500
+CI-300-RP | Citadine Pico | 9000
+CP-880-RP | Coupe Eclair | 38000
+CA-450-RP | Camion Colosse | 52000

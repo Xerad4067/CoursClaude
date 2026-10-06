@@ -1,0 +1,2 @@
+Planning complet : 10, 15, 40, 40, 55, 70, 90
+Un seul taxi : 5, 8

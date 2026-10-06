@@ -1,0 +1,4 @@
+Sam peut prendre le volant.
+Kim doit rester piéton.
+Alex doit rester piéton.
+true

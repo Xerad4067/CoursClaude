@@ -1,0 +1,5 @@
+corde : inconnu
+Total : 17 €
+eau coûte 1 €
+lampe coûte 12 €
+pain coûte 2 €

@@ -1,0 +1,17 @@
+plaque | modele
+BA-120-RP | Berline Aster
+CA-450-RP | Camion Colosse
+CI-300-RP | Citadine Pico
+CI-301-RP | Citadine Pico
+CP-880-RP | Coupe Eclair
+FO-310-RP | Fourgon Relais
+MD-777-RP | SUV Orion
+ME-042-RP | Fourgon Relais
+MO-050-RP | Moto Foudre
+MO-051-RP | Moto Foudre
+PL-210-RP | Pickup Rhino
+PO-911-RP | Camion Titan
+SC-001-RP | Scooter Gazelle
+SC-002-RP | Scooter Gazelle
+TX-001-RP | Berline Aster
+TX-002-RP | Berline Aster

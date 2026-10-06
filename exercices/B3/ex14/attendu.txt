@@ -1,0 +1,3 @@
+Il est 7 h : le magasin est fermé
+Il est 14 h : le magasin est ouvert
+Il est 20 h : le magasin est fermé

@@ -1,0 +1,7 @@
+Sam arrive (file : Sam)
+Kim arrive (file : Sam, Kim)
+On sert Sam (file : Kim)
+Alex arrive (file : Kim, Alex)
+On sert Kim (file : Alex)
+On sert Alex (file : vide)
+Personne à servir

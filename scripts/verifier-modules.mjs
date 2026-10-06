@@ -20,7 +20,7 @@ const front = (txt) => {
 	return d;
 };
 const attr = (b, n) => { const m = b.match(new RegExp(`\\b${n}=(?:"([^"]*)"|'([^']*)')`)); return m ? (m[1] ?? m[2]) : undefined; };
-const existeSolution = (dossier) => ['lua', 'py', 'js', 'sql', 'sh', 'html'].some((e) => fs.existsSync(path.join(racine, 'exercices', dossier, `solution.${e}`)));
+const existeSolution = (dossier) => ['lua', 'py', 'js', 'sql', 'sh', 'html', 'toml'].some((e) => fs.existsSync(path.join(racine, 'exercices', dossier, `solution.${e}`)));
 
 let erreurs = 0, avertissements = 0, modules = 0, exercicesTotal = 0;
 const idsVus = new Map();
@@ -94,7 +94,7 @@ for (const f of fichiers(docs).sort()) {
 		if (dossier) {
 			if (!existeSolution(dossier)) E(`${id} : exercices/${dossier}/solution.* introuvable`);
 			else if (!fs.existsSync(path.join(racine, 'exercices', dossier, 'attendu.txt'))) E(`${id} : attendu.txt manquant`);
-			if (type === 'debug' && !['lua', 'py', 'js', 'sql', 'sh', 'html'].some((e) => fs.existsSync(path.join(racine, 'exercices', dossier, `casse.${e}`)))) E(`${id} : exercice de débogage sans casse.*`);
+			if (type === 'debug' && !['lua', 'py', 'js', 'sql', 'sh', 'html', 'toml'].some((e) => fs.existsSync(path.join(racine, 'exercices', dossier, `casse.${e}`)))) E(`${id} : exercice de débogage sans casse.*`);
 		} else if (['B', 'C', 'D'].includes(parcours)) W(`${id} : pas de dossier de solution testée`);
 	}
 	if (!niveaux.vert || !niveaux.jaune || !niveaux.rouge) E(`les trois niveaux 🟢🟡🔴 sont requis (vert ${niveaux.vert}, jaune ${niveaux.jaune}, rouge ${niveaux.rouge})`);

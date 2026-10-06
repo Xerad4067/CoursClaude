@@ -1,0 +1,8 @@
+Sam
+1600
+sans métier
+True
+nom : Sam
+argent : 1600
+permis : True
+3

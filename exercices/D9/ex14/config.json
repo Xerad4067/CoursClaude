@@ -1,0 +1,4 @@
+{
+  "saisies": { "#qte-pain": "2", "#qte-eau": "0", "#qte-lampe": "5", "#qte-corde": "2.5" },
+  "clics": ["#ajout-pain", "#ajout-eau", "#ajout-lampe", "#ajout-corde", "#ajout-pain"]
+}

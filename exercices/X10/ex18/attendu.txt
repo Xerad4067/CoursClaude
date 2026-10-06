@@ -1,0 +1,8 @@
+=== Concession du Parc ===
+Refusé : prix invalide pour Épave
+4 véhicules
+Scooter (3000 €)
+Berline (22000 €)
+Pick-up (30000 €, charge 2 t)
+Citerne (45000 €, charge 12 t)
+Le plus cher : Citerne (45000 €, charge 12 t)

@@ -1,0 +1,7 @@
+vide
+plein
+false
+nil
+0
+true
+false

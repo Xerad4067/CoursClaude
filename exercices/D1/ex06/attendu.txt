@@ -1,0 +1,4 @@
+Nom : Sam
+Litres : 25
+Prix au litre : 1.99
+Sam doit payer 49.75 €

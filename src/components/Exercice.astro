@@ -17,7 +17,7 @@ interface Props {
 const { id, titre, niveau, type, dossier, fichier: fichierDonne, lang: langDonnee } = Astro.props;
 
 // Le langage se déduit du fichier de solution présent : solution.lua, .py, .js, .sql, .sh ou .html.
-const tous = import.meta.glob('/exercices/**/*.{lua,py,js,sql,sh,html,txt}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const tous = import.meta.glob('/exercices/**/*.{lua,py,js,sql,sh,html,toml,txt}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const langages = [
 	{ ext: 'lua', lang: 'lua', defaut: 'main.lua', test: 'Lua 5.4' },
 	{ ext: 'py', lang: 'python', defaut: 'main.py', test: 'Python 3' },
@@ -25,6 +25,7 @@ const langages = [
 	{ ext: 'sql', lang: 'sql', defaut: 'requetes.sql', test: 'SQLite' },
 	{ ext: 'sh', lang: 'bash', defaut: 'git.sh', test: 'Git (script bash, Linux)' },
 	{ ext: 'html', lang: 'html', defaut: 'index.html', test: 'Chromium' },
+	{ ext: 'toml', lang: 'toml', defaut: 'Package.toml', test: 'un analyseur TOML (syntaxe du fichier seulement, pas le jeu)' },
 ];
 const brut = (nom: string) => (dossier ? tous[`/exercices/${dossier}/${nom}`]?.replace(/\s+$/, '') : undefined);
 const trouve = dossier ? langages.find((l) => brut(`solution.${l.ext}`) !== undefined) : undefined;
@@ -36,9 +37,9 @@ const solution = lire('solution.EXT');
 const attendu = lire('attendu.txt');
 const casse = lire('casse.EXT');
 const depart = lire('depart.EXT');
-if (dossier && !solution) throw new Error(`Exercice ${id} : exercices/${dossier}/solution.(lua|py|js|sql|sh|html) introuvable`);
+if (dossier && !solution) throw new Error(`Exercice ${id} : exercices/${dossier}/solution.(lua|py|js|sql|sh|html|toml) introuvable`);
 
-const etiquetteAttendu = ext === 'html' ? 'Ce que la page doit afficher (texte visible) :' : ext === 'sql' ? 'Résultat attendu :' : 'Résultat attendu dans le terminal :';
+const etiquetteAttendu = ext === 'html' ? 'Ce que la page doit afficher (texte visible) :' : ext === 'sql' ? 'Résultat attendu :' : ext === 'toml' ? 'Ce que le fichier contient une fois lu (JSON trié, pour vérifier les clés) :' : 'Résultat attendu dans le terminal :';
 const niveaux = { vert: '🟢 Échauffement', jaune: '🟡 Application', rouge: '🔴 Défi' };
 const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 Lecture de code', projet: '🏗️ Mini-projet' };
 ---
@@ -63,7 +64,7 @@ const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 
 		attendu && type !== 'lecture' && (
 			<>
 				<p class="sous-titre-exo">{etiquetteAttendu}</p>
-				<Code code={attendu} lang="txt" frame={ext === 'html' || ext === 'sql' ? 'none' : 'terminal'} title={ext === 'html' ? 'Texte affiché dans la page' : ext === 'sql' ? 'Résultat' : 'Terminal'} />
+				<Code code={attendu} lang="txt" frame={ext === 'html' || ext === 'sql' || ext === 'toml' ? 'none' : 'terminal'} title={ext === 'html' ? 'Texte affiché dans la page' : ext === 'sql' ? 'Résultat' : ext === 'toml' ? 'Fichier lu' : 'Terminal'} />
 			</>
 		)
 	}

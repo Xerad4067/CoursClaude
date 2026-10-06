@@ -1,0 +1,6 @@
+Combien de pains ? 3
+  -> 3 pain(s) : 6 euros
+Combien de pains ? trois
+  -> « trois » n'est pas un nombre entier
+Combien de pains ? 10
+  -> 10 pain(s) : 20 euros

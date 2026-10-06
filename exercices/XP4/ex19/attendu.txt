@@ -1,0 +1,17 @@
+Sac chargé : {}
+> /ajouter pain 3
+> /ajouter eau 12
+> /retirer pain 1
+> /retirer lampe 1
+Refusé : pas assez de lampe
+> /ajouter lampe abc
+Refusé : « abc » n'est pas un nombre entier
+> /donner Kim 5
+Refusé : commande inconnue : /donner
+> /liste
+  eau      12
+  pain      2
+> /quitter
+--- redémarrage ---
+  eau      12
+  pain      2

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Mon premier clic</title>
+  </head>
+  <body>
+    <h1>Port-Soleil RP</h1>
+    <p id="message">Clique sur le bouton.</p>
+    <button id="bouton" type="button">Dire bonjour</button>
+
+    <!-- Le script est placé APRÈS les éléments qu'il cherche : la page se lit de haut en bas -->
+    <script>
+      // 1. On récupère les deux éléments de la page grâce à leur id
+      const message = document.querySelector("#message");
+      const bouton = document.querySelector("#bouton");
+
+      // 2. On dit : « quand on clique sur le bouton, exécute cette fonction »
+      bouton.addEventListener("click", () => {
+        message.textContent = "Bienvenue à Port-Soleil !";
+      });
+    </script>
+  </body>
+</html>

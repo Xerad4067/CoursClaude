@@ -1,0 +1,3 @@
+Aller : Garage > Parc > Grotte > Plage
+Retour : Plage > Grotte > Parc > Garage
+Trajet : 5 étapes, sauvegarde : 4 étapes

@@ -1,0 +1,20 @@
+nb_joueurs | argent_total | niveau_moyen | niveau_max
+20 | 68420 | 4.5 | 9
+
+metier | nb_joueurs
+taxi | 4
+mécanicien | 3
+médecin | 3
+policier | 3
+boulanger | 2
+pompier | 2
+
+type | nb | valeur
+camion | 1 | 52000
+voiture | 2 | 47000
+moto | 2 | 9300
+
+article | total_vendu
+eau | 26
+pain | 25
+sandwich | 15

@@ -1,0 +1,9 @@
+Scores (ordre alphabétique) :
+  Alex : 35
+  Kim : 57
+  Robin : 48
+  Sam : 42
+Total : 182
+Moyenne : 45.5
+Meilleur : Kim (57)
+Dernier : Alex (35)

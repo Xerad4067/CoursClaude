@@ -1,0 +1,3 @@
+Avant : [   kim la conductrice  ]
+Après : [Kim La Conductrice]
+En majuscules : KIM LA CONDUCTRICE

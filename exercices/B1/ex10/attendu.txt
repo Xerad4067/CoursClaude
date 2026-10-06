@@ -1,0 +1,4 @@
+1500	number
+mille cinq cents	string
+true	boolean
+nil	nil

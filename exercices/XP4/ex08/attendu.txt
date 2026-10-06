@@ -1,0 +1,3 @@
+Signalé : Sam fait de la triche (position 15, avant : 'Sam fait de la ')
+OK      : Belle partie, merci !
+Signalé : Pas de triche ici (position 7, avant : 'Pas de ')

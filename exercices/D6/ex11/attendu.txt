@@ -1,0 +1,8 @@
+article | chiffre_affaires
+essence | 360
+trousse de soin | 240
+lampe | 160
+sandwich | 90
+corde | 72
+pain | 72
+eau | 52

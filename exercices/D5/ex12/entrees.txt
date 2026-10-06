@@ -1,0 +1,10 @@
+voiture
+AB-123-CD
+moto
+MM-001-AA
+tracteur
+autre
+ZZ-000-ZZ
+voiture
+KM-456-LP
+fin

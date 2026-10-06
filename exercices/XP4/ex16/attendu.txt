@@ -1,0 +1,5 @@
+{"pain": 3, "eau": 12, "\u00e9p\u00e9e": 1}
+{"pain": 3, "eau": 12, "épée": 1}
+True
+str dict
+5

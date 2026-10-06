@@ -229,7 +229,7 @@ La carte vide `default-blank-map` (`nanos-world::BlankMap`, « literally Empty a
 | R19 | Traces : seuls les objets qui **bloquent le canal Visibility** sont retournés avec `TraceMode.TraceOnlyVisibility`. | [BLOG `blog/2025-06-11-june.mdx`], [DOC `scripting-reference/static-classes/trace.mdx`] | Utile pour les outils Sandbox (Spawn Menu, Physics Gun). |
 | R20 | Level Streaming et World Partition **pris en charge** ; coordonnées double précision (grands niveaux). | [BLOG `blog/2023-02-01-january.mdx`], EXT-API `StaticClasses/Level.json` | Pas nécessaires pour de petites maps. |
 | R21 | Les assets doivent être **recookés** à chaque nouvelle version d'Unreal du jeu ; `unreal_version` sert à éviter les plantages d'anciens assets. Le passage au patch 5.4.4 : « no cooked asset should break in this update ». | [BLOG `blog/2022-05-04-april.mdx`, `blog/2022-04-06-march.mdx`, `blog/2025-04-09-april.mdx`], `importing-assets.mdx` | Le jeu a refusé 5.6.1 à cause de problèmes de cook [BLOG `blog/2025-09-03-august.mdx`] : n'utiliser **que** la version exigée. |
-| R22 | Git : pousser des assets cookés dans Git sans **LFS** casse le pack ; la doc qualifie la méthode « not a great solution ». | `importing-assets.mdx` (dépannage n° 5) | À répercuter dans le parcours (A4 : synchro Git). |
+| R22 | Git : si des assets cookés sont versionnés avec Git (LFS), **LFS doit aussi être activé** sur la machine qui clone ; la doc juge la méthode « not a great solution ». | `importing-assets.mdx` (dépannage n° 5) | À répercuter dans le parcours (A4 : synchro Git) : éviter de synchroniser les assets cookés par un dépôt ordinaire. |
 | R23 | **Limites chiffrées** (taille de map, nombre de triangles, de lumières, de meshes, de matériaux, de Props) : **NON DOCUMENTÉ**. | — | Ne donner aucun chiffre « officiel » autre que R9, R10. |
 | R24 | Conseil des développeurs sur l'herbe : ombres dynamiques sur les meshes d'herbe = « usually a bad decision » ; ils sont passés aux **Contact Shadows**. | [BLOG `blog/2025-04-09-april.mdx`] | Anecdote de la map de test, pas une règle. |
 
@@ -365,7 +365,7 @@ end)
 
 ### 5.4 Grottes
 
-**La doc ne dit rien sur les grottes** (aucune occurrence de `cave` dans `docs/` ni `blog/`). Aucun asset de grotte dans `DefaultAssetPack.toml` (recherches `cave`, `tunnel`, `mine`, `stalac`, `underground` : rien ; seul `SM_Rock_03..07` existe). Ce qui est **documenté et réutilisable** pour une grotte : import FBX + collisions (R11), `PM_Rock` pour les bruits de pas [DOC `default-materials.mdx`], `Light` (R15), `Particle` `P_Fire`, `Sound` avec `SetLowPassFilter`, `PostProcess` par script, `SkyMode.NoClouds`, tag `Sun` (le soleil de la map peut être supprimé par un script). **Les méthodes de construction de la grotte sont des connaissances générales NON VÉRIFIÉES** : voir 6.2.
+**La doc ne dit rien sur les grottes** (aucune occurrence de `cave` dans `docs/` ni `blog/`). Aucun asset de grotte dans `DefaultAssetPack.toml` (recherches `cave`, `tunnel`, `mine`, `stalac`, `underground` : rien ; seul `SM_Rock_03..07` existe). Ce qui est **documenté et réutilisable** pour une grotte : import FBX + collisions (R11), `PM_Rock` pour les bruits de pas [DOC `default-materials.mdx`], `Light` (R15), `Particle` `P_Fire`, `Sound` avec `SetLowPassFilter`, `PostProcess` par script, `SkyMode.NoClouds`, tag `Sun` (le soleil de la map peut être supprimé par un script). **Les méthodes de construction de la grotte sont des connaissances générales NON VÉRIFIÉES** : voir 6.3.
 
 ---
 
@@ -380,7 +380,7 @@ end)
 | Acteurs, composants, Outliner, panneau Details, panneau Place Actors | Poser et régler des objets | `.../levels-in-unreal-engine` ; la doc Nanos ne cite que « Place Actors -> Basic » | à vérifier |
 | Niveaux, World Settings, sous-niveaux | Créer la map | `.../managing-multiple-levels-in-unreal-engine` | à vérifier |
 | Content Browser / Content Drawer, glisser-déposer FBX, copier un asset sans le déplacer à la main (redirecteurs, « Fix Up Redirectors ») | Organiser le pack ; R7 | — | à vérifier |
-| Navigation dans la vue : clic droit + WASD, `F` (documentés, page ancienne) ; molette = vitesse de caméra, Alt + clic = orbite, `W/E/R` = déplacer/tourner/échelle, `End` = poser au sol, Alt + glisser = dupliquer, `Ctrl+S` | Gagner du temps | — | à vérifier (seuls clic droit + ZQSD et `F` viennent de la doc) |
+| Navigation dans la vue : clic droit + WASD, `F` (documentés, page ancienne) ; molette = vitesse de caméra, Alt + clic = orbite, `W/E/R` = déplacer/tourner/échelle, `End` = poser au sol, Alt + glisser = dupliquer, `Ctrl+S` | Gagner du temps | — | à vérifier (seuls clic droit + WASD et `F` viennent de la doc) |
 | Matériaux, PBR, nœuds, Material Instance | Couleurs, variations | `.../unreal-engine-materials`, `.../physically-based-materials-in-unreal-engine`, `.../material-inputs-in-unreal-engine`, `.../material-blend-modes-in-unreal-engine` | à vérifier |
 | Lumières : Directional, Sky Light, Point, Spot, Rect ; mobilité Static / Stationary / Movable | Éclairer maisons et grottes | — | à vérifier (seule consigne de la doc : Directional en Movable) |
 | Lumen, Nanite, Virtual Shadow Maps, MegaLights (5.7), Substrate | Rendu et coût mémoire | blog Nanos 2022 et 2025 (non officiel pour Epic) ; réglages de l'ADK : section 7 | à vérifier |
@@ -403,7 +403,7 @@ end)
 |---|---|---|
 | Fermer navigateur, Discord, Steam, jeu avant Unreal | Libère la RAM | à vérifier (bon sens, pas une exigence Epic) |
 | Réglages de qualité de l'éditeur (Engine Scalability), viewport en temps réel limité, « moins de CPU en arrière-plan » | Économiser RAM/GPU | à vérifier |
-| Désactiver Lumen / ray tracing **pour l'éditeur seulement** ; mais l'ADK les active (`r.RayTracing=True`, DX12 SM6, Substrate) [EXT-ADK] | Gain mémoire | à vérifier ; **risque** : l'impact sur la compatibilité du cook est NON DOCUMENTÉ ; la doc demande de **sauvegarder `Config/`** avant une mise à jour de l'ADK |
+| Alléger le rendu **de l'éditeur seulement** (Lumen, ray tracing) ; mais le projet ADK active ray tracing, DX12 SM6, Substrate et des réglages de GI/réflexions (7.1) [EXT-ADK] | Gain mémoire | à vérifier ; **risque** : l'impact d'un changement de réglage sur la compatibilité du cook est NON DOCUMENTÉ ; la doc demande de **sauvegarder `Config/`** avant une mise à jour de l'ADK |
 | Fichier d'échange Windows (page file) assez grand, projet sur SSD, chemin court sans espaces | Éviter les plantages | à vérifier |
 | Petites maps, peu de textures 4K, LODs, sauvegardes fréquentes | Rester dans la RAM | R9, R10 sont documentés ; le reste à vérifier |
 | Cache de shaders (`DerivedDataCache/`) : volumineux, supprimable pour un recook propre (documenté) | Disque | taille NON DOCUMENTÉE |
@@ -425,7 +425,7 @@ Conclusion honnête : **le parcours F ne peut pas garantir une grotte naturelle*
 
 | Élément | Ce que dit la doc Nanos | Comparaison avec le PC fixe |
 |---|---|---|
-| Configuration minimale d'**Unreal / de l'ADK** | **NON DOCUMENTÉ** (aucune page). | Impossible de conclure. Le dépôt du cours cite « Epic recommande 32 Go » : **non vérifié** (page non ouverte, `ETAT_AVANCEMENT_COURS.md`). |
+| Configuration minimale d'**Unreal / de l'ADK** | **NON DOCUMENTÉ** (aucune page). | Impossible de conclure. Le dépôt du cours cite « Epic recommande 32 Go » : **non vérifié** (page Epic non ouverte, `PLAN.md` et `ETAT_AVANCEMENT_COURS.md`). |
 | Configuration minimale du **jeu (client)** | **NON DOCUMENTÉ**. Seuls des conseils de dépannage : mettre à jour les pilotes, basculer DX12/DX11 (`-dx11` / `-dx12`), désactiver ray tracing, overlays, overclocking. | — |
 | Configuration minimale du **serveur** | OS Windows ou Linux ; processeur **2 × 1,0 GHz** ; mémoire **50 Mo** (croît avec joueurs/entités) ; stockage **30 Mo** + assets ; réseau ≥ 1 Mo/s ; ports `7777` TCP/UDP et `7778` UDP ; Windows : *Microsoft Visual C++ Redistributable* (`server-manual/server-installation.mdx`). | Largement satisfait ; **le serveur ne demande pas Unreal ni GPU** : il peut tourner sur le portable pour valider les `Package.toml`. |
 | Système | `Windows 11 SDK (10.0.26100.0)` ; version minimale de Windows : NON DOCUMENTÉ. | Windows 11 : cohérent. |
@@ -433,7 +433,22 @@ Conclusion honnête : **le parcours F ne peut pas garantir une grotte naturelle*
 | GPU | RHI par défaut **DX12** depuis 2022 (« Nanite, Lumen and Virtual Shadow Maps run more efficiently in DX12 ») ; l'ADK cible DX12 SM6 [BLOG `blog/2022-05-04-april.mdx`, EXT-ADK]. Aucune carte nommée. | La RTX 5060 Ti n'est pas citée : support non vérifiable ici. Pilotes à jour (doc). |
 | RAM de l'éditeur | NON DOCUMENTÉ. | 16 Go : inconnu ; voir 6.2. |
 | Disque | NON DOCUMENTÉ (taille d'Unreal, de l'ADK, des caches). Seuls chiffres : 5 Mo par texture 2048², 380 Ko en 512² ; exemple extrême d'un pack de ±130 000 fichiers (±50 Go) [BLOG `blog/2024-10-20-october.mdx`]. | À mesurer le jour de l'installation (le Launcher affiche la taille). |
-| Deux machines | Cookés + Git : utiliser Git LFS, sinon « not a great solution » (R22). | Ne pas synchroniser les assets cookés par un dépôt ordinaire. |
+| Deux machines | Assets cookés dans Git : activer LFS partout ; méthode jugée « not a great solution » (R22). | Éviter de passer les assets cookés par un dépôt ordinaire ; le portable n'en a pas besoin pour valider un `Package.toml`. |
+
+### 7.1 Réglages de rendu du projet ADK (fichiers du dépôt `assets-development-kit`, branche `master`, lus le 06/10/2026 : **[EXT-ADK]**, hors dépôt docs)
+
+Le `README.md` de l'ADK dit que c'est « a project with the same Rendering settings as nanos world official project ». La **signification** des valeurs numériques est NON VÉRIFIÉE (connaissance d'Unreal) ; la doc Nanos ne les commente pas.
+
+| Fichier | Réglage | Valeur |
+|---|---|---|
+| `NanosWorldADK.uproject` | `EngineAssociation` ; plugin `Water` ; `TargetPlatforms` | `"5.7"` ; `Enabled: true` ; Windows, Linux |
+| `Config/DefaultEngine.ini` | RHI Windows ; formats de shaders D3D12 | `DefaultGraphicsRHI_DX12` ; `PCD3D_SM6` |
+| idem | `r.AllowStaticLighting` ; `r.GenerateMeshDistanceFields` | `True` ; `True` |
+| idem | `r.DynamicGlobalIlluminationMethod` ; `r.ReflectionMethod` ; `r.Shadow.Virtual.Enable` | `1` ; `1` ; `1` |
+| idem | `r.RayTracing` ; `r.RayTracing.RayTracingProxies.ProjectEnabled` ; `r.Substrate` | `True` ; `True` ; `True` |
+| idem | `TargetedHardwareClass` ; `DefaultGraphicsPerformance` | `Desktop` ; `Maximum` |
+| idem | `EditorStartupMap` | `/Game/NanosWorld/Maps/NanosWorldEntryMap.NanosWorldEntryMap` (dans `NanosWorld/` : ne pas modifier) |
+| idem | `[CookerSettings]` | `cook.AllowCookedDataInEditorBuilds=True`, `bIterativeCookingForFileCookContent=True` |
 
 ---
 
@@ -488,7 +503,7 @@ Les termes marqués (D) apparaissent dans les pages lues ; la traduction est cel
 
 ## 9. Plan conseillé : parcours F en 8 modules (≈ 28 h)
 
-Hypothèses : débutant complet, **PC fixe uniquement**, **aucun accès au jeu au départ**, Unreal 5.7.X. Étapes de 15 à 20 min (identifiants `F1-e1`...). **[V]** = étape décrite dans la doc ; **[NV]** = non vérifiée ; **[T]** = nécessite le client du jeu.
+Hypothèses : débutant complet, **PC fixe uniquement**, **aucun accès au jeu au départ**, Unreal 5.7.X. Étapes de 15 à 20 min (identifiants `F1-e1`...). **[V]** = étape décrite dans la doc lue (pas testée) ; **[NV]** = non vérifiée ; **[T]** = nécessite le client du jeu.
 
 **Règle d'honnêteté du parcours** : sans le client, on ne peut valider que l'export (dossier cooké, `Assets.toml`, `Package.toml`) et le démarrage du serveur (le serveur ne charge pas le `.umap`). Chaque module a donc un **plan B**.
 
@@ -565,7 +580,7 @@ Hypothèses : débutant complet, **PC fixe uniquement**, **aucun accès au jeu a
 ### F8 : Optimiser, assembler le village de test (3 h)
 
 - **Objectifs** : réunir maison + parc + galerie dans une map, vérifier les performances, préparer le projet fil rouge.
-- **Étapes** : e1 `Cook only maps` ; ne cooker que le nécessaire [V] ; e2 réduire textures/lumières/translucides (R9, R14, R15) [V] ; e3 `load_level_entities = false`, `enable_water_buoyancy` seulement si eau [V] ; e4 NavMesh : savoir qu'il est requis pour les PNJ [V], création [NV] ; e5 points d'apparition multiples (`spawn_points`) [V] ; e6 `Server/Index.lua` du package map : spawn des Props/meubles [V] ; e7 vignette `.webp` + `Assets.jpg` 300x150 [V] ; e8 recook propre : supprimer `Saved/`, `Intermediate/`, `DerivedDataCache/` en cas de souci [V] ; e9 liste de contrôle finale [T] ; e10 sauvegarde du projet **hors Git simple** (LFS) [V, R22] ; e11 (option) publication Vault : jeton jamais dans le dépôt [V].
+- **Étapes** : e1 `Cook only maps` ; ne cooker que le nécessaire [V] ; e2 réduire textures/lumières/translucides (R9, R14, R15) [V] ; e3 `load_level_entities = false`, `enable_water_buoyancy` seulement si eau [V] ; e4 NavMesh : savoir qu'il est requis pour les PNJ [V], création [NV] ; e5 points d'apparition multiples (`spawn_points`) [V] ; e6 `Server/Index.lua` du package map : spawn des Props/meubles [V] ; e7 vignette `.webp` + `Assets.jpg` 300x150 [V] ; e8 recook propre : supprimer `Saved/`, `Intermediate/`, `DerivedDataCache/` en cas de souci [V] ; e9 liste de contrôle finale [T] ; e10 sauvegarde du projet : éviter les assets cookés dans un dépôt Git ordinaire (R22) [V] ; e11 (option) publication Vault : jeton jamais dans le dépôt [V].
 - **Vérifié** : réglages de `Package.toml`, recook, vignettes. **Non vérifié** : seuils de performance (aucune limite chiffrée dans la doc).
 - **Mini-projet** : **le village de test** (maison + parc + galerie), réutilisé par le projet fil rouge (parcours G).
 - **Plan B** : si l'accès au jeu manque encore, livrer le dossier cooké + `Assets.toml` + `Package.toml` + journal serveur, étiquetés « non testé en jeu ».

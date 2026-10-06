@@ -13,6 +13,7 @@ Pour chaque exercice (dossier exercices/<MODULE>/exNN/), selon le langage :
   * solution.sql : SQL exécuté dans SQLite (module sqlite3 de Python) sur la base donnée par config.json
                    {"base": "boutique"} = exercices/_donnees/boutique.sql ; les SELECT sont affichés en tableau.
   * solution.sh  : script shell (Git) exécuté dans un dossier temporaire, comparé à attendu.txt.
+  * solution.toml: fichier TOML (Package.toml…) : on vérifie la syntaxe et on compare le contenu compris (JSON trié) à attendu.txt.
   * casse.<ext>  : (débogage) le code cassé, qui NE doit PAS donner le bon résultat.
 Le test des solutions Lua est fait par exercices/tester.lua.
 """
@@ -23,12 +24,13 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 RACINE = os.path.dirname(os.path.abspath(__file__))
 FILTRE = sys.argv[1] if len(sys.argv) > 1 else None
 DELAI = 20  # secondes maximum par exercice
 
-EXTENSIONS = {"py": "Python", "js": "JavaScript", "sql": "SQL", "sh": "Git/shell"}
+EXTENSIONS = {"py": "Python", "js": "JavaScript", "sql": "SQL", "sh": "Git/shell", "toml": "TOML"}
 
 RUNNER_PYTHON = r'''
 import builtins, runpy, sys, json
@@ -160,7 +162,18 @@ def executer_shell(chemin, dossier):
         return r.returncode == 0, r.stdout, r.stderr
 
 
-EXECUTEURS = {"py": executer_python, "js": executer_js, "sql": executer_sql, "sh": executer_shell}
+def executer_toml(chemin, dossier):
+    """Vérifie la SYNTAXE d'un fichier TOML (Package.toml, Config.toml, Assets.toml…) et affiche ce qui est compris,
+    en JSON trié. Ça ne prouve pas que le jeu accepte les clés : seulement que le fichier est un TOML valide."""
+    try:
+        with open(chemin, "rb") as f:
+            donnees = tomllib.load(f)
+    except tomllib.TOMLDecodeError as e:
+        return False, "", f"TOML invalide : {e}"
+    return True, json.dumps(donnees, indent=2, sort_keys=True, ensure_ascii=False) + "\n", ""
+
+
+EXECUTEURS = {"py": executer_python, "js": executer_js, "sql": executer_sql, "sh": executer_shell, "toml": executer_toml}
 
 
 def premiere_difference(obtenu, attendu):

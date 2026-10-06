@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Fiche du joueur</title>
+  </head>
+  <body>
+    <h1>Fiche du joueur</h1>
+    <p id="accueil"></p>
+    <label for="pseudo">Ton pseudo</label>
+    <input id="pseudo" type="text">
+    <button id="enregistrer" type="button">Enregistrer</button>
+
+    <script>
+      const CLE = "fiche-joueur";   // le nom de la « case » dans localStorage
+
+      const accueil = document.querySelector("#accueil");
+      const champ = document.querySelector("#pseudo");
+
+      // Lire : localStorage ne garde que du TEXTE, on le retransforme en objet avec JSON.parse
+      function lireFiche() {
+        try {
+          const texte = localStorage.getItem(CLE);   // null si rien n'a encore été enregistré
+          if (texte === null) {
+            return null;
+          }
+          return JSON.parse(texte);
+        } catch (erreur) {
+          return null;   // stockage bloqué ou texte abîmé : on repart de zéro
+        }
+      }
+
+      // Écrire : on transforme l'objet en texte avec JSON.stringify
+      function sauverFiche(fiche) {
+        try {
+          localStorage.setItem(CLE, JSON.stringify(fiche));
+        } catch (erreur) {
+          accueil.textContent = "Le navigateur refuse de garder ces données.";
+        }
+      }
+
+      // Au chargement de la page : on regarde si une fiche existe déjà
+      const fiche = lireFiche();
+      if (fiche === null) {
+        accueil.textContent = "Bienvenue, nouveau joueur !";
+      } else {
+        fiche.visites = fiche.visites + 1;
+        sauverFiche(fiche);
+        accueil.textContent = `Bon retour, ${fiche.pseudo} ! Visite n°${fiche.visites}`;
+      }
+
+      document.querySelector("#enregistrer").addEventListener("click", () => {
+        const pseudo = champ.value.trim();
+        if (pseudo === "") {
+          accueil.textContent = "Écris un pseudo d'abord.";
+          return;
+        }
+        sauverFiche({ pseudo: pseudo, visites: 1 });
+        accueil.textContent = `Enregistré : ${pseudo}. Recharge la page (F5) !`;
+      });
+    </script>
+  </body>
+</html>

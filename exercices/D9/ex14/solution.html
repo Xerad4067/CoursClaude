@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Boutique de Port-Soleil</title>
+    <style>
+      body {
+        background: #14161a;
+        color: #e8eaed;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.6;
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      h1, h2 { color: #ffcc66; }
+      ul { padding-left: 1rem; }
+      li { margin-bottom: 0.5rem; }
+      input { width: 4rem; margin-left: 0.4rem; font: inherit; padding: 0.2rem; }
+      button { font: inherit; padding: 0.3rem 0.8rem; background: #f5a524; color: #14161a; border: 0; border-radius: 6px; }
+      .msg { color: #8ab4f8; }
+    </style>
+  </head>
+  <body>
+    <h1>Boutique de Port-Soleil</h1>
+
+    <h2>Produits</h2>
+    <ul id="produits"></ul>
+
+    <h2>Panier</h2>
+    <ul id="panier"></ul>
+    <p>Total : <span id="total">0</span> €</p>
+    <button id="vider" type="button">Vider le panier</button>
+
+    <script>
+      // ---------- Les données (l'état) ----------
+      const catalogue = [
+        { id: "pain", nom: "Pain", prix: 3, stock: 5 },
+        { id: "eau", nom: "Eau", prix: 2, stock: 8 },
+        { id: "lampe", nom: "Lampe", prix: 25, stock: 2 },
+        { id: "corde", nom: "Corde", prix: 12, stock: 3 },
+      ];
+      let panier = {};   // identifiant du produit -> quantité dans le panier
+
+      const listeProduits = document.querySelector("#produits");
+      const listePanier = document.querySelector("#panier");
+      const total = document.querySelector("#total");
+
+      // ---------- Petits outils ----------
+      // Crée un élément avec son texte (évite de répéter createElement + textContent)
+      function creer(balise, texte = "") {
+        const element = document.createElement(balise);
+        element.textContent = texte;
+        return element;
+      }
+
+      // Combien de ce produit peut-on encore ajouter ?
+      function restant(produit) {
+        return produit.stock - (panier[produit.id] || 0);
+      }
+
+      // Renvoie un message d'erreur, ou "" si la quantité est valide
+      function verifierQuantite(texte, produit) {
+        const quantite = Number(texte);
+        if (!Number.isInteger(quantite)) {
+          return "Écris un nombre entier.";
+        }
+        if (quantite < 1) {
+          return "Au moins 1, s'il te plaît.";
+        }
+        if (quantite > restant(produit)) {
+          return `Il n'en reste que ${restant(produit)}.`;
+        }
+        return "";
+      }
+
+      // ---------- Affichage ----------
+      // Remet à jour le panier, le total et les « reste » (la page reflète l'état)
+      function afficherPanier() {
+        listePanier.textContent = "";
+        let somme = 0;
+        for (const produit of catalogue) {
+          const quantite = panier[produit.id] || 0;
+          document.querySelector(`#reste-${produit.id}`).textContent = restant(produit);
+          if (quantite > 0) {
+            somme = somme + quantite * produit.prix;
+            listePanier.append(creer("li", `${produit.nom} × ${quantite} = ${quantite * produit.prix} €`));
+          }
+        }
+        if (somme === 0) {
+          listePanier.append(creer("li", "Le panier est vide."));
+        }
+        total.textContent = somme;
+      }
+
+      // Construit une ligne de la liste des produits (une seule fois, au chargement)
+      function creerLigne(produit) {
+        const ligne = creer("li", `${produit.nom} : ${produit.prix} € (reste `);
+        const reste = creer("span", produit.stock);
+        reste.id = `reste-${produit.id}`;
+        ligne.append(reste, ") ");
+
+        const champ = document.createElement("input");
+        champ.type = "number";
+        champ.value = 1;
+        champ.id = `qte-${produit.id}`;
+        const etiquette = creer("label", "Quantité");
+        etiquette.append(champ);
+
+        const bouton = creer("button", "Ajouter");
+        bouton.type = "button";
+        bouton.id = `ajout-${produit.id}`;
+
+        const message = creer("span");
+        message.className = "msg";
+        message.id = `msg-${produit.id}`;
+
+        bouton.addEventListener("click", () => {
+          const erreur = verifierQuantite(champ.value, produit);
+          if (erreur !== "") {
+            message.textContent = erreur;
+            return;
+          }
+          const quantite = Number(champ.value);
+          panier[produit.id] = (panier[produit.id] || 0) + quantite;
+          message.textContent = `Ajouté : ${quantite}`;
+          afficherPanier();
+        });
+
+        ligne.append(etiquette, " ", bouton, " ", message);
+        return ligne;
+      }
+
+      // ---------- Démarrage ----------
+      for (const produit of catalogue) {
+        listeProduits.append(creerLigne(produit));
+      }
+
+      document.querySelector("#vider").addEventListener("click", () => {
+        panier = {};
+        for (const produit of catalogue) {
+          document.querySelector(`#msg-${produit.id}`).textContent = "";
+        }
+        afficherPanier();
+      });
+
+      afficherPanier();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Joueurs en ligne</title>
+  </head>
+  <body>
+    <h1>Joueurs en ligne</h1>
+    <p>Connectés : <span id="compteur">0</span></p>
+    <button id="connexion" type="button">Un joueur se connecte</button>
+
+    <!-- Le script est après les éléments : quand il les cherche, ils existent déjà -->
+    <script>
+      let joueurs = 0;
+      const compteur = document.querySelector("#compteur");
+      const bouton = document.querySelector("#connexion");
+
+      bouton.addEventListener("click", () => {
+        joueurs = joueurs + 1;
+        compteur.textContent = joueurs;
+      });
+    </script>
+  </body>
+</html>

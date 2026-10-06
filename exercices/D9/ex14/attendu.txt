@@ -1,0 +1,10 @@
+Boutique de Port-Soleil
+Produits
+Pain : 3 € (reste 1) Quantité Ajouter Ajouté : 2
+Eau : 2 € (reste 8) Quantité Ajouter Au moins 1, s'il te plaît.
+Lampe : 25 € (reste 2) Quantité Ajouter Il n'en reste que 2.
+Corde : 12 € (reste 3) Quantité Ajouter Écris un nombre entier.
+Panier
+Pain × 4 = 12 €
+Total : 12 €
+Vider le panier

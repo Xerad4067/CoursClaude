@@ -1,0 +1,4 @@
+Annulé : poser fenêtre
+Annulé : poser porte
+Annulé : poser mur
+Rien à annuler

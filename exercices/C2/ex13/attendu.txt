@@ -1,0 +1,10 @@
+> /solde
+Solde : 100 €
+> /acheter 30
+Achat de 30 €, il reste 70 €
+> /acheter beaucoup
+Erreur : montant invalide
+> /danser
+Erreur : commande inconnue
+> /solde
+Solde : 70 €

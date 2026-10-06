@@ -1,0 +1,325 @@
+---
+title: "X4 · Fonctions, portée et récursivité"
+description: 19 exercices courts et testés pour maîtriser les fonctions Lua, la portée des variables, les arguments variables et la récursivité.
+parcours: X
+module: X4
+duree: 3 h
+ou: les-deux
+prerequis: Modules B5 (fonctions) et B6 (tables). La série 3 utilise aussi les tables imbriquées de B7 (étape 1).
+resultat: 19 exercices de fonctions réussis, jusqu'à un parcours récursif de sacs imbriqués.
+objectifs:
+  - Écrire des fonctions avec paramètres, valeur par défaut et plusieurs valeurs de retour
+  - Expliquer pourquoi une variable globale oubliée peut fausser un autre calcul
+  - Utiliser les trois points, select, table.pack et table.unpack pour un nombre variable d'arguments
+  - Écrire une fonction récursive avec son cas de base
+sidebar:
+  order: 4
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Lis « L'essentiel en 10 lignes », puis fais les exercices 1 à 3."
+  quarante="La série 1 en entier (6 exercices)."
+  deuxh="Les séries 1 et 2, puis l'exercice 14 (lecture de la récursivité)."
+/>
+
+**Pourquoi c'est utile ?** Sur un serveur roleplay, presque tout est une fonction : calculer une taxe, verser une paie, parcourir l'inventaire d'un joueur, réagir à un événement. Ici, tu t'entraînes jusqu'à ce que écrire une fonction devienne un réflexe. Ce n'est pas un cours : si une notion te manque, reprends le module [B5 · Fonctions et portée](/parcours-b/b5-fonctions/).
+
+## L'essentiel en 10 lignes
+
+1. **Définir** : `local function nom(param1, param2) … end`. La fonction doit exister **avant** l'appel (Lua lit de haut en bas).
+2. **`return`** renvoie une valeur à celui qui appelle. Sans `return`, la fonction renvoie `nil`. `print` affiche, il ne renvoie rien.
+3. **Plusieurs valeurs** : `return a, b`, reçues avec `local x, y = f()`. Valeur en trop : ignorée ; valeur manquante : `nil`.
+4. **Paramètre optionnel** : un argument non donné vaut `nil`, donc `p = p or valeur` fixe une valeur par défaut (piège : `false or valeur` donne `valeur`).
+5. **Portée** : `local` limite une variable à son bloc ; sans `local`, la variable est **globale**, partagée par tout le programme. Mets `local` partout.
+6. **Arguments variables** : `function f(...)`. Dans la fonction, `{ ... }` range tous les arguments dans une liste, `select("#", ...)` les compte (les `nil` aussi) et `table.pack(...)` donne une liste avec un champ `n`.
+7. **`table.unpack(liste)`** fait l'inverse : il transforme une liste en valeurs séparées, par exemple `math.max(table.unpack(prix))`.
+8. Une fonction est une **valeur** : on la range dans une variable ou on la passe en paramètre. `f` (sans parenthèses) désigne la fonction, `f(2)` désigne son résultat.
+9. **Fonction pure** : mêmes arguments, même résultat, rien d'autre n'est modifié. **Effet de bord** : elle modifie une globale ou une table reçue, ou elle affiche.
+10. **Récursivité** : une fonction qui s'appelle elle-même. Il lui faut un **cas de base** (qui arrête tout) et un appel sur un problème **plus petit**.
+
+```lua title="x4/memo-arguments.lua"
+local function moyenne(...)
+  local n = select("#", ...)            -- combien d'arguments ?
+  local total = 0
+  for _, v in ipairs({ ... }) do        -- { ... } : les arguments dans une liste
+    total = total + v
+  end
+  return total / n, n                   -- deux valeurs renvoyées
+end
+
+local m, n = moyenne(10, 12, 14)
+print(m, n)                             --> 12.0   3
+```
+
+```lua title="x4/memo-portee.lua"
+local function compter()
+  total = 5                             -- sans local : globale, visible partout
+  local prive = 7                       -- local : n'existe que dans la fonction
+end
+
+compter()
+print(total, prive)                     --> 5   nil
+```
+
+```lua title="x4/memo-recursion.lua"
+local function somme(n)                 -- somme de 1 à n
+  if n == 0 then return 0 end           -- cas de base : on s'arrête
+  return n + somme(n - 1)               -- appel sur un problème plus petit
+end
+
+print(somme(4))                         --> 10
+```
+
+<Encadre type="piege" titre="⚠️ local function, pas local f = function">
+Pour une fonction récursive, écris `local function f(n) … end`. Avec `local f = function(n) … end`, le nom `f` n'existe pas encore à l'intérieur de la fonction : Lua cherche une globale `f` et plante avec `attempt to call a nil value (global 'f')`.
+</Encadre>
+
+## Exercices
+
+Pour chaque exercice : crée le fichier indiqué dans VS Code, écris ta solution, lance `lua nom.lua` dans le terminal et compare avec le résultat attendu. Ouvre les indices **un par un**, seulement si tu es bloqué. Les solutions sont testées automatiquement avec Lua 5.4.6 sous Linux (non testé sur Windows).
+
+### Série 1 · 🟢 Échauffement
+
+<Exercice id="X4-ex01" titre="Le tarif du taxi" niveau="vert" dossier="X4/ex01" fichier="taxi.lua">
+Un taxi facture 3 € de prise en charge, puis 2 € par kilomètre. Écris `prixCourse(km)` qui **renvoie** le prix, puis affiche une ligne par course pour 1 km, 5 km et 12 km (`Course de 5 km : 13 €`).
+
+<div slot="indice1">La fonction calcule et renvoie ; c'est l'appel qui affiche.</div>
+<div slot="indice2">Le calcul est `3 + km * 2`, avec `return` devant.</div>
+<div slot="indice3">`print("Course de 5 km : " .. prixCourse(5) .. " €")` : la valeur renvoyée se colle dans le texte avec `..`.</div>
+<div slot="solution">`prixCourse` n'affiche rien : elle renvoie un nombre que l'appelant colle dans une phrase. Un nombre renvoyé peut aussi être additionné ou comparé, ce que `print` dans la fonction ne permettrait pas.</div>
+</Exercice>
+
+<Exercice id="X4-ex02" titre="Lecture : print ou return ?" niveau="vert" type="lecture" dossier="X4/ex02" fichier="lecture.lua">
+Prédis les cinq lignes affichées par ce programme, **sans le lancer**. Deux fonctions se ressemblent, mais l'une **affiche** et l'autre **renvoie**.
+
+<div slot="indice1">Repère tous les `print`, y compris ceux qui sont dans les fonctions.</div>
+<div slot="indice2">`afficherPrix` n'a pas de `return` : que reçoit la variable `a` ?</div>
+<div slot="indice3">`doublerPrix(20)` seul sur sa ligne calcule 40, mais personne n'utilise ce résultat : rien ne s'affiche.</div>
+<div slot="solution">Une fonction sans `return` renvoie `nil` : `a` vaut `nil`. Et un résultat renvoyé que personne ne récupère est simplement perdu. Pour voir une valeur, il faut l'afficher (`print`) ; pour la réutiliser, il faut la renvoyer (`return`).</div>
+</Exercice>
+
+<Exercice id="X4-ex03" titre="Rentable ou pas ?" niveau="vert" dossier="X4/ex03" fichier="bilan.lua">
+Écris `bilan(recettes, depenses)` qui renvoie **deux valeurs** : le bénéfice, puis `true` si ce bénéfice est positif. Affiche le bilan d'une boutique à 500 € de recettes et 380 € de dépenses, puis d'une autre à 200 € et 260 €.
+
+<div slot="indice1">`return` accepte plusieurs valeurs séparées par des virgules.</div>
+<div slot="indice2">`return benefice, benefice > 0` : une comparaison est elle-même une valeur (un booléen).</div>
+<div slot="indice3">`local benefice, rentable = bilan(500, 380)` ; pour coller un booléen dans un texte, passe par `tostring(rentable)`.</div>
+<div slot="solution">Les valeurs sont rangées dans l'ordre de `return`. Si tu n'as besoin que de la première, `local b = bilan(500, 380)` ignore la seconde. `tostring` est nécessaire : `..` sait coller des nombres et des textes, pas des booléens.</div>
+</Exercice>
+
+<Exercice id="X4-ex04" titre="Présenter un joueur" niveau="vert" dossier="X4/ex04" fichier="presenter.lua">
+Écris `presenter(nom, metier)` qui renvoie `Sam est taxi`. Quand le métier n'est pas donné, le joueur est un `citoyen`. Affiche la présentation de Sam (taxi), de Kim (sans métier) et d'Alex (mécanicien).
+
+<div slot="indice1">Un argument qu'on ne fournit pas vaut `nil`.</div>
+<div slot="indice2">Première ligne de la fonction : `metier = metier or "citoyen"`.</div>
+<div slot="indice3">Pour Kim, appelle simplement `presenter("Kim")`, sans deuxième argument.</div>
+<div slot="solution">`a or b` donne `a` s'il vaut autre chose que `nil` ou `false`, sinon `b`. C'est la valeur par défaut la plus courante en Lua. Piège : si `false` est une réponse volontaire, `or` l'écrase (voir le quiz).</div>
+</Exercice>
+
+<Exercice id="X4-ex05" titre="Le prix final" niveau="vert" dossier="X4/ex05" fichier="prix-final.lua">
+Écris `retirerRemise(prix)` (10 % de remise) et `ajouterTaxe(prix)` (20 % de taxe), puis `prixFinal(prix)` qui **utilise les deux** : la remise d'abord, la taxe ensuite. Affiche le prix final pour 200 € et pour 50 €.
+
+<div slot="indice1">Une fonction peut en appeler une autre, à condition que celle-ci soit définie plus haut.</div>
+<div slot="indice2">Le résultat d'une fonction peut servir directement d'argument à une autre : `f(g(x))`.</div>
+<div slot="indice3">`return ajouterTaxe(retirerRemise(prix))`.</div>
+<div slot="solution">Chaque petite fonction fait une seule chose et se teste seule ; `prixFinal` ne fait que les assembler. Si la taxe passe à 25 %, tu ne modifies qu'une ligne.</div>
+</Exercice>
+
+<Exercice id="X4-ex06" titre="Débogage : l'amende négative" niveau="vert" type="debug" dossier="X4/ex06" fichier="amende.lua">
+Ce programme calcule l'amende de trois conducteurs sur une route limitée à 50 km/h, à 5 € par km/h de trop. L'une des amendes est **négative**, et pourtant Lua n'affiche aucune erreur. Corrige **un seul appel**.
+
+<div slot="indice1">Compare les trois appels : lequel est écrit différemment des autres ?</div>
+<div slot="indice2">Dans `calculerAmende(vitesse, limite)`, quel paramètre vient en premier ?</div>
+<div slot="indice3">L'appel de Kim passe `50, 70` : inverse les deux arguments.</div>
+<div slot="solution">Lua ne peut pas deviner l'intention : les arguments sont rangés **dans l'ordre** des paramètres. Aucune erreur, juste un mauvais résultat, ce qui est le plus difficile à repérer. Réflexe : relis chaque appel en prononçant le nom des paramètres.</div>
+</Exercice>
+
+<FinEtape id="X4-e1" titre="Série 1 : échauffement" victoire="tu as réussi 6 exercices de fonctions sans regarder d'indice." prochaine="la série 2, en commençant par l'exercice 7 (les arguments variables)." />
+
+### Série 2 · 🟡 Application
+
+<Exercice id="X4-ex07" titre="Les pourboires du taxi" niveau="jaune" dossier="X4/ex07" fichier="pourboires.lua">
+Écris `additionner(...)` qui additionne **autant de nombres qu'on veut**. Affiche le total des pourboires `5, 10, 2`, puis celui d'un matin sans pourboire (aucun argument), puis celui d'un pourboire unique de 40 €.
+
+<div slot="indice1">Mets trois points dans les parenthèses de la définition : `local function additionner(...)`.</div>
+<div slot="indice2">À l'intérieur, `{ ... }` range tous les arguments dans une liste que tu parcours avec `ipairs`.</div>
+<div slot="indice3">Sans argument, la liste est vide : la boucle ne tourne pas, le total reste à 0.</div>
+<div slot="solution">`{ ... }` fabrique une liste avec les arguments reçus. Limite : si un argument vaut `nil`, la liste a un trou et `ipairs` s'arrête avant la fin (voir les exercices 8 et 12).</div>
+</Exercice>
+
+<Exercice id="X4-ex08" titre="Combien d'articles ?" niveau="jaune" dossier="X4/ex08" fichier="caisse.lua">
+Écris `compterArticles(...)` qui renvoie le **nombre d'arguments reçus**, même si certains valent `nil` : `compterArticles("pain", nil, "lampe", nil)` doit donner 4. Affiche trois paniers : trois articles, aucun, puis le panier avec les `nil`.
+
+<div slot="indice1">Une fonction de base de Lua sait compter les arguments : cherche `select`.</div>
+<div slot="indice2">Le premier argument de `select` est le **texte** `"#"`.</div>
+<div slot="indice3">`return select("#", ...)`.</div>
+<div slot="solution">`select("#", ...)` compte **tous** les arguments, `nil` compris. Avec `#{ ... }`, le résultat n'est pas garanti dès qu'il y a des `nil` : Lua peut s'arrêter au premier trou.</div>
+</Exercice>
+
+<Exercice id="X4-ex09" titre="Une liste devient des arguments" niveau="jaune" dossier="X4/ex09" fichier="unpack.lua">
+`math.max` attend des nombres **séparés**, pas une liste. Avec `prix = { 12, 7, 25, 18 }`, affiche la course la plus chère. Ensuite, à partir de `{ "Gare", "Parc", 4 }` et de `string.format`, affiche `Gare -> Parc (4 km)`.
+
+<div slot="indice1">`math.max(12, 7, 25, 18)` marche, `math.max(prix)` non : il faut transformer la liste en arguments.</div>
+<div slot="indice2">`table.unpack(liste)` renvoie les éléments de la liste, l'un après l'autre.</div>
+<div slot="indice3">`math.max(table.unpack(prix))` et `string.format("%s -> %s (%d km)", table.unpack(trajet))`.</div>
+<div slot="solution">`table.unpack` est l'inverse de `{ ... }` : de la liste vers les valeurs séparées. Il ne donne toutes ses valeurs que s'il est le **dernier** argument d'un appel ; au milieu, Lua n'en garde qu'une.</div>
+</Exercice>
+
+<Exercice id="X4-ex10" titre="Les tarifs de la piscine" niveau="jaune" dossier="X4/ex10" fichier="tarifs.lua">
+Le code de départ contient trois règles de prix (`plein`, `etudiant`, `enfant`). Écris `afficherTarif(nom, prix, regle)` qui affiche `nom : prix calculé €` en appelant `regle`, une **fonction reçue en paramètre**. Appelle-la avec les trois règles pour un billet de 20 €.
+
+<div slot="indice1">Un paramètre peut contenir une fonction : on l'appelle comme toute fonction, `regle(prix)`.</div>
+<div slot="indice2">À l'appel, donne le nom de la fonction **sans parenthèses**.</div>
+<div slot="indice3">`afficherTarif("Enfant", 20, enfant)`.</div>
+<div slot="solution">Sans parenthèses, `enfant` est la fonction elle-même ; avec parenthèses, `enfant(20)` est son résultat. Passer une fonction en paramètre est ce que tu feras avec les événements de Nanos World : tu donnes une fonction que le jeu appellera plus tard.</div>
+</Exercice>
+
+<Exercice id="X4-ex11" titre="Lecture : pure ou effet de bord ?" niveau="jaune" type="lecture" dossier="X4/ex11" fichier="lecture.lua">
+Prédis les six lignes affichées. Une fonction est **pure** quand elle calcule un résultat à partir de ses arguments sans rien modifier d'autre ; elle a un **effet de bord** quand elle change autre chose (une table reçue, une globale).
+
+<div slot="indice1">Une table passée à une fonction n'est pas copiée : la fonction travaille sur la même table.</div>
+<div slot="indice2">`offrirBonus` modifie `sam` ; `avecBonus` crée une **nouvelle** table.</div>
+<div slot="indice3">Suis `sam.argent` au fil du programme : 500, puis 600, inchangé par `avecBonus`, puis 700.</div>
+<div slot="solution">`doubler(50)` donne toujours 100 : c'est une fonction pure, facile à tester. `offrirBonus` a un effet de bord (voulu ici, car on veut vraiment créditer le joueur), mais il faut le savoir en l'appelant. `avecBonus` laisse `sam` intact et renvoie une copie modifiée.</div>
+</Exercice>
+
+<Exercice id="X4-ex12" titre="Les places vides du bus" niveau="jaune" dossier="X4/ex12" fichier="places.lua">
+Écris `compterVides(...)` qui renvoie **deux valeurs** : le nombre de places vides (les arguments `nil`) et le nombre total de places. Appelle-la pour trois bus et affiche `Bus 1 : 2 place(s) vide(s) sur 5`.
+
+<div slot="indice1">`{ ... }` ne convient pas ici : les `nil` créent des trous. Cherche une fonction de la bibliothèque `table`.</div>
+<div slot="indice2">`table.pack(...)` renvoie une liste avec un champ `n` : le nombre total d'arguments.</div>
+<div slot="indice3">`for i = 1, args.n do`, puis `if args[i] == nil then …`.</div>
+<div slot="solution">`table.pack(...)` fait la même chose que `{ ... }` et ajoute le champ `n`. On boucle de 1 à `n` avec un `for` numérique : `ipairs` s'arrêterait au premier trou.</div>
+</Exercice>
+
+<Exercice id="X4-ex13" titre="Débogage : la paie qui se trompe" niveau="jaune" type="debug" dossier="X4/ex13" fichier="paie.lua">
+La paie de Sam devrait être 35 h × 12 € + 3 ans d'ancienneté × 50 € = 570 €, mais le programme affiche **300 €** (et 100 € au lieu de 350 € pour Kim). Aucune erreur n'apparaît. Trouve l'oubli.
+
+<div slot="indice1">Les deux fonctions utilisent une variable nommée `total`. Est-elle déclarée avec `local` ?</div>
+<div slot="indice2">Sans `local`, `total` est **globale** : `calculerPrime` écrase le `total` de `calculerPaie`.</div>
+<div slot="indice3">Ajoute `local` devant les deux `total =` qui créent la variable.</div>
+<div slot="solution">Sans `local`, la variable est partagée par tout le programme : en appelant `calculerPrime`, tu as écrasé le `total` de `calculerPaie`. Aucun message d'erreur, c'est ce qui rend les globales dangereuses. Règle : `local` partout, sauf raison précise.</div>
+</Exercice>
+
+<FinEtape id="X4-e2" titre="Série 2 : application" victoire="tu as réussi 7 exercices (arguments variables, fonctions en valeur, globales) sans indice." prochaine="la série 3 : commence par l'exercice 14 (lecture) pour comprendre la récursivité." />
+
+### Série 3 · 🔴 Défis
+
+<Exercice id="X4-ex14" titre="Lecture : descendre dans la grotte" niveau="rouge" type="lecture" dossier="X4/ex14" fichier="lecture.lua">
+Cette fonction **s'appelle elle-même** : c'est de la **récursivité**. Prédis les sept lignes affichées par `descendre(3)`, dans l'ordre. Chaque appel attend la fin du suivant avant de continuer.
+
+<div slot="indice1">`descendre(3)` affiche une ligne, lance `descendre(2)`, et ne continue qu'au retour de celui-ci.</div>
+<div slot="indice2">Note la liste des appels : 3, 2, 1, 0. Le dernier (0) est le **cas de base** : il ne s'appelle plus.</div>
+<div slot="indice3">Les lignes « Je remonte » viennent **après** l'appel récursif : elles s'affichent dans l'ordre inverse (1, puis 2, puis 3).</div>
+<div slot="solution">Chaque appel est mis en attente (on parle de **pile d'appels**). Quand le niveau 0 se termine, les appels en attente reprennent un par un, du plus récent au plus ancien : c'est pourquoi on remonte 1, 2, puis 3.</div>
+</Exercice>
+
+<Exercice id="X4-ex15" titre="Les ordres de livraison" niveau="rouge" dossier="X4/ex15" fichier="livraisons.lua">
+Livrer `n` colis dans un ordre quelconque donne `n!` ordres possibles (`n! = n × (n-1) × … × 1`, et `0! = 1`). Écris `factorielle(n)` **sans boucle**, en t'appelant toi-même. Affiche le résultat pour 3, 5, 10, puis 0 colis.
+
+<div slot="indice1">Cherche d'abord le **cas de base** : le plus petit `n` dont tu connais la réponse sans calcul.</div>
+<div slot="indice2">`n!` vaut `n` fois `(n-1)!`. Pour `n` égal à 0 ou 1, la réponse est 1.</div>
+<div slot="indice3">`if n <= 1 then return 1 end`, puis `return n * factorielle(n - 1)`.</div>
+<div slot="solution">Deux ingrédients : un cas de base qui arrête, et un appel sur un problème plus petit (`n - 1`). `local function` est indispensable : avec `local f = function …`, la fonction ne se connaîtrait pas elle-même.</div>
+</Exercice>
+
+<Exercice id="X4-ex16" titre="Débogage : la puissance sans fin" niveau="rouge" type="debug" dossier="X4/ex16" fichier="puissance.lua">
+`puissance(2, 10)` doit renvoyer 1024, mais le programme plante avec `stack overflow` : la fonction s'appelle sans jamais s'arrêter. Répare-la.
+
+<div slot="indice1">Quand une récursion ne s'arrête jamais, Lua finit par manquer de place : c'est le `stack overflow`.</div>
+<div slot="indice2">Il manque le **cas de base** : pour quel exposant connais-tu la réponse sans calcul ?</div>
+<div slot="indice3">N'importe quel nombre puissance 0 vaut 1 : ajoute `if exposant == 0 then return 1 end` en première ligne.</div>
+<div slot="solution">Chaque appel en attente occupe un peu de mémoire (la pile). Sans cas de base, elle se remplit jusqu'à l'erreur `stack overflow`. Avant d'écrire l'appel récursif, demande-toi toujours : « quand est-ce que je m'arrête ? ».</div>
+</Exercice>
+
+<Exercice id="X4-ex17" titre="Les plaques palindromes" niveau="rouge" dossier="X4/ex17" fichier="plaques.lua">
+Un **palindrome** se lit pareil dans les deux sens (`RADAR`). Écris `estPalindrome(mot)` **récursive** : si la première et la dernière lettre diffèrent, c'est faux ; sinon, on teste le mot privé de ses deux bouts. Teste `ABBA`, `TAXI`, `RADAR`, `GARAGE` et `A`.
+
+<div slot="indice1">Cas de base : un mot de 0 ou 1 lettre est toujours un palindrome.</div>
+<div slot="indice2">`string.sub(mot, 1, 1)` donne la première lettre, `string.sub(mot, -1, -1)` la dernière.</div>
+<div slot="indice3">L'appel récursif : `estPalindrome(string.sub(mot, 2, -2))`.</div>
+<div slot="solution">À chaque appel, le mot raccourcit de deux lettres : on se rapproche forcément du cas de base. L'idée « je traite les deux bouts, puis je confie le milieu à moi-même » est typique de la récursivité.</div>
+</Exercice>
+
+<Exercice id="X4-ex18" titre="Les caisses du parc" niveau="rouge" dossier="X4/ex18" fichier="caisses.lua">
+Trois piquets A, B, C. Trois caisses sont empilées sur A (la 1 est la plus petite, au sommet). Il faut les amener sur C, **une à la fois**, sans jamais poser une grande caisse sur une plus petite. Écris `deplacer(n, depart, arrivee, aide)` qui **affiche** chaque déplacement, puis le total.
+
+<div slot="indice1">Pour déplacer `n` caisses : 1) dégage les `n-1` du dessus vers le piquet d'aide, 2) déplace la plus grande, 3) remets les `n-1` par-dessus.</div>
+<div slot="indice2">Cas de base : 0 caisse, rien à faire (`return`). La fonction s'appelle **deux fois**.</div>
+<div slot="indice3">`deplacer(n - 1, depart, aide, arrivee)`, puis l'affichage, puis `deplacer(n - 1, aide, arrivee, depart)`.</div>
+<div slot="solution">C'est le célèbre jeu des **tours de Hanoï**. Pour `n` caisses il faut `2^n - 1` déplacements : 7 pour 3 caisses, 15 pour 4. Le piquet d'aide change de rôle à chaque appel, ce qui rend l'exercice difficile : fais un dessin au brouillon avec trois pièces de monnaie.</div>
+</Exercice>
+
+<Exercice id="X4-ex19" titre="Mini-défi : les sacs imbriqués" niveau="rouge" type="projet" dossier="X4/ex19" fichier="sacs.lua">
+Un sac contient des objets **et** d'autres contenants (trousse, caisse à outils…), qui peuvent en contenir d'autres. Chaque contenant est une table `{ nom, objets, contenants }` ; le code de départ fournit le sac. Écris `compter(contenant)` (nombre total d'objets, contenants intérieurs compris) et `afficher(contenant, niveau)` (arbre décalé de deux espaces par niveau), puis affiche le sac et le total.
+
+<div slot="validation">L'arbre s'affiche exactement comme dans le résultat attendu, avec `Total : 9 objets` à la fin ; `compter` et `afficher` s'appellent elles-mêmes pour les contenants intérieurs.</div>
+<div slot="indice1">Pour chaque contenant : traite ses `objets`, puis, pour chaque contenant intérieur, **rappelle la même fonction**.</div>
+<div slot="indice2">`compter` : `local total = #contenant.objets`, puis ajoute `compter(interieur)` pour chaque contenant intérieur.</div>
+<div slot="indice3">`afficher` reçoit `niveau` (0 au départ) et le passe augmenté de 1 à ses appels ; `string.rep("  ", niveau)` fabrique la marge.</div>
+<div slot="solution">Une table imbriquée est une structure **récursive** : un contenant contient des contenants. La fonction suit la forme des données et n'a pas besoin de savoir combien de niveaux existent. Le cas de base est discret : un contenant sans contenant intérieur ne déclenche aucun appel. Tu retrouveras ce schéma pour des menus, des dossiers ou des coffres dans des coffres.</div>
+</Exercice>
+
+<FinEtape id="X4-e3" titre="Série 3 : défis" victoire="tu as réussi 6 défis de récursivité sans indice, jusqu'au parcours d'une structure imbriquée." prochaine="le quiz du module, puis la salle X5 sur les listes." />
+
+## Erreurs fréquentes
+
+| Message ou symptôme | Cause | Solution |
+|---|---|---|
+| `attempt to call a nil value (global 'prixCourse')` | Nom mal écrit, ou fonction définie après l'appel | Vérifie l'orthographe et place la définition plus haut |
+| `attempt to perform arithmetic on a nil value (local 'taux')` | Un argument n'a pas été donné à l'appel | Passe tous les arguments, ou donne une valeur par défaut avec `or` |
+| `attempt to concatenate a nil value (local 'total')` | La fonction n'a pas de `return` : elle renvoie `nil` | Ajoute `return valeur` |
+| `attempt to call a nil value (global 'fact')` | Récursivité écrite avec `local fact = function …` | Écris `local function fact(n) … end` |
+| `stack overflow` | Récursivité sans cas de base, ou qui ne s'en approche jamais | Ajoute le cas de base et vérifie que l'argument diminue |
+| Résultat faux, aucun message | Variable globale écrasée (oubli de `local`) ou arguments dans le désordre | `local` partout ; relis chaque appel paramètre par paramètre |
+| `ipairs` s'arrête trop tôt sur `{ ... }` | Un argument vaut `nil` : la liste a un trou | Utilise `select("#", ...)` ou `table.pack(...)` et son champ `n` |
+
+## Quiz du module X4
+
+<Quiz id="X4-quiz" questions={[
+  { q: "Que se passe-t-il avec `local function f(a, b) return a + b end` puis `print(f(2))` ?", choix: ["Affiche `2`", "Affiche `nil`", "Erreur : `attempt to perform arithmetic on a nil value (local 'b')`", "Affiche `0`"], ok: 2, pourquoi: "`b` n'a reçu aucun argument : il vaut `nil`, et on ne peut pas additionner `nil`." },
+  { q: "Si `f` fait `return 4, 9`, que vaut `x` après `local x = f()` ?", choix: ["`4`", "`9`", "`13`", "`nil`"], ok: 0, pourquoi: "Les valeurs sont rangées dans l'ordre ; avec une seule variable, seule la première est gardée." },
+  { q: "On écrit `p = p or 10`. Que vaut `p` si l'appel a donné `false` ?", choix: ["`false`", "`10`", "`nil`", "Une erreur"], ok: 1, pourquoi: "`or` renvoie le côté droit quand le côté gauche est `nil` **ou** `false`." },
+  { q: "Une fonction contient `total = 5` (sans `local`). Après son appel, `print(total)` affiche…", choix: ["`nil`", "Une erreur", "`0`", "`5`"], ok: 3, pourquoi: "Sans `local`, `total` est une variable globale : elle reste visible partout." },
+  { q: "Que renvoie `select(\"#\", 1, nil, nil)` ?", choix: ["`1`", "`2`", "`3`", "`0`"], ok: 2, pourquoi: "`select(\"#\", ...)` compte tous les arguments, les `nil` compris." },
+  { q: "Que vaut `math.max(table.unpack({ 4, 8, 6 }))` ?", choix: ["`8`", "`6`", "`18`", "Une erreur"], ok: 0, pourquoi: "`table.unpack` transforme la liste en trois arguments : `math.max(4, 8, 6)`." },
+  { q: "Quelle fonction est **pure** ?", choix: ["`function f(x) compteur = compteur + 1 return x end`", "`function f(x) print(x) return x end`", "`function f(t) t[1] = 0 return t end`", "`function f(x) return x * 2 end`"], ok: 3, pourquoi: "Elle calcule à partir de son argument sans rien modifier ni afficher : mêmes arguments, même résultat." },
+  { q: "Que manque-t-il à `local function f(n) return n + f(n - 1) end` ?", choix: ["Le mot `global`", "Un cas de base qui arrête les appels", "Un deuxième paramètre", "Un `print`"], ok: 1, pourquoi: "Sans cas de base, les appels s'enchaînent jusqu'à l'erreur `stack overflow`." },
+  { q: "Pourquoi `local fact = function(n) … fact(n - 1) … end` donne-t-il `attempt to call a nil value (global 'fact')` ?", choix: ["Lua interdit la récursivité", "`n` doit être global", "À l'intérieur de la fonction, la variable locale `fact` n'existe pas encore", "`function` est un mot réservé"], ok: 2, pourquoi: "Avec `local function fact(n) …`, le nom existe déjà à l'intérieur de la fonction." },
+  { q: "Dans `afficherTarif(\"Enfant\", 20, enfant)`, que représente `enfant` (sans parenthèses) ?", choix: ["Le résultat de `enfant(20)`", "La fonction elle-même, passée comme une valeur", "Une chaîne de caractères", "Une erreur de syntaxe"], ok: 1, pourquoi: "Avec des parenthèses on appelle la fonction ; sans, on désigne la fonction elle-même." },
+]} />
+
+## Récapitulatif
+
+- Une fonction se définit avant son appel ; `return` renvoie (une ou plusieurs valeurs), `print` affiche.
+- Sans `return`, une fonction renvoie `nil` ; un argument non donné vaut `nil` (valeur par défaut : `p = p or valeur`).
+- `local` partout : une globale oubliée est partagée par tout le programme et peut fausser un autre calcul sans aucune erreur.
+- `{ ... }` range les arguments variables dans une liste ; `select("#", ...)` et `table.pack(...)` les comptent, `nil` compris.
+- `table.unpack(liste)` transforme une liste en arguments séparés.
+- Une fonction est une valeur : on la passe en paramètre sans parenthèses.
+- Fonction pure : elle calcule et renvoie ; effet de bord : elle modifie ou affiche autre chose.
+- Récursivité : un cas de base qui arrête, un appel sur un problème plus petit, `local function` pour que le nom soit connu.
+
+## Je suis bloqué, que faire ?
+
+1. **Lis l'erreur** en entier : le fichier, la ligne et le nom entre parenthèses (`local 'taux'`, `global 'prixCourse'`) disent où chercher.
+2. **Teste la fonction seule** avec des valeurs simples : `print(prixCourse(1))`.
+3. **Affiche ce que la fonction reçoit** : un `print` au début de la fonction montre les arguments.
+4. Pour la récursivité, **déroule sur papier** avec un tout petit nombre (`n = 2`) et écris la liste des appels.
+5. Demande des indices à une IA avec le prompt de la page [Une IA comme tuteur](/outils/ia-tuteur/), jamais la solution complète.
+
+<Videos recherche="Lua fonctions arguments variables récursivité tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : définitions de fonctions et arguments variables](https://www.lua.org/manual/5.4/manual.html#3.4.11)
+- [Manuel Lua 5.4 : règles de visibilité (local et portée)](https://www.lua.org/manual/5.4/manual.html#3.5)
+- [Manuel Lua 5.4 : la bibliothèque table (pack et unpack)](https://www.lua.org/manual/5.4/manual.html#6.6)
+- [Doc Nanos World : guide des événements (des fonctions appelées par le jeu)](https://docs.nanos-world.com/docs/core-concepts/scripting/events-guide)

@@ -1,0 +1,7 @@
+taxi] puis [bus] puis [parc
+taxi
+taxi
+taxi
+bus
+parc
+<taxi> puis <bus> puis <parc>	3

@@ -1,0 +1,6 @@
+OK : Sam a 100 €
+Refusé : titulaire invalide
+Refusé : solde invalide
+OK : Sam a 70 €
+Refusé : solde insuffisant
+Refusé : montant invalide

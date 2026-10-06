@@ -1,0 +1,4 @@
+Sam peut faire 3 pleins
+Il lui reste 10 €
+La moitié de son argent : 65.0
+3

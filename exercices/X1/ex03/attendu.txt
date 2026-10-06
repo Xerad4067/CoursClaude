@@ -1,0 +1,2 @@
+Port-Lune : 9 caractères
+48250 : 5 chiffres
