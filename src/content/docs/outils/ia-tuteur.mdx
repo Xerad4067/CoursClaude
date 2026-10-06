@@ -1,0 +1,81 @@
+---
+title: Une IA comme tuteur (sans tricher)
+description: Prompts modèles pour obtenir des indices et des explications, pas les solutions.
+sidebar:
+  order: 6
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+Une IA (Claude, ou une autre) peut être un excellent **tuteur**… ou une machine à copier-coller qui t'empêche d'apprendre. La différence tient à **ce que tu lui demandes**.
+
+<Encadre type="retenir">
+Règle d'or : **demande des questions et des indices, pas des réponses.** Et vérifie toujours ce qu'elle dit : une IA peut se tromper avec beaucoup d'assurance (fonctions qui n'existent pas, commandes inventées).
+</Encadre>
+
+## Les prompts modèles
+
+Copie, remplis les `[crochets]`, colle.
+
+### 1. Je suis bloqué sur un exercice
+```text
+Je suis débutant en Lua 5.4. Je fais cet exercice : [énoncé].
+Voici mon code : [code].
+Voici ce que j'obtiens : [message d'erreur ou sortie exacte].
+Ne me donne PAS la solution. Donne-moi UN seul indice, puis pose-moi
+une question qui m'aide à trouver moi-même.
+```
+
+### 2. Je ne comprends pas un message d'erreur
+```text
+Explique-moi ce message d'erreur Lua comme à un débutant, en français :
+[message exact].
+Dis-moi à quelle ligne regarder et quelles sont les 2 causes les plus
+probables, sans corriger mon code à ma place.
+```
+
+### 3. Je veux comprendre une notion
+```text
+Explique-moi [la portée des variables / les closures / ...] en Lua
+avec une analogie de la vie réelle, puis un exemple de 5 lignes maximum
+commenté en français. Termine par une question pour vérifier que j'ai compris.
+```
+
+### 4. Relis mon code (après avoir réussi)
+```text
+J'ai réussi cet exercice : [énoncé]. Voici ma solution : [code].
+Fais-moi une relecture de débutant : lisibilité, noms de variables,
+cas oubliés. Ne réécris pas tout : liste 3 améliorations maximum,
+de la plus importante à la moins importante.
+```
+
+### 5. Prépare-moi un quiz de révision
+```text
+Pose-moi 5 questions de révision sur [notion], une par une.
+Attends ma réponse avant de passer à la suivante, et explique
+mes erreurs.
+```
+
+### 6. Traduis et explique une page de documentation
+```text
+Voici un extrait de la documentation officielle (en anglais) : [extrait].
+Résume-le en français en 5 phrases simples et donne-moi un lexique
+anglais/français des mots techniques.
+```
+
+## Bien poser une question (à une IA comme à un humain)
+
+Une bonne question contient toujours :
+1. **Le contexte** : langage et version (Lua 5.4), machine (Windows 11), outil (VS Code).
+2. **Ce que tu voulais faire.**
+3. **Ce que tu as fait** : le code ou la commande, copiés (pas recopiés à la main).
+4. **Ce qui s'est passé** : le message d'erreur **exact** et complet.
+5. **Ce que tu as déjà essayé.**
+
+<Encadre type="piege">
+Ne colle **jamais** de mot de passe, de jeton (token) ou d'information personnelle dans une IA ou sur Discord. Si une commande affichée contient un jeton, masque-le avant de copier.
+</Encadre>
+
+## Avec Claude Code
+
+Si tu utilises Claude Code dans ce dépôt, le fichier `CLAUDE.md` lui rappelle déjà ton profil et la règle des indices. Tu peux commencer une session par : « Je travaille sur l'exercice B3-ex05. Guide-moi avec des indices, ne modifie aucun fichier. »

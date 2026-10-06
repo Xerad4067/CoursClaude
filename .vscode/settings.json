@@ -1,0 +1,22 @@
+{
+  "editor.fontSize": 16,
+  "editor.tabSize": 2,
+  "editor.wordWrap": "on",
+  "editor.renderWhitespace": "boundary",
+  "files.autoSave": "afterDelay",
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
+  "Lua.runtime.version": "Lua 5.4",
+  "Lua.diagnostics.globals": [],
+  "cSpell.language": "fr,en",
+  "cSpell.words": ["Nanos", "Starlight", "winget", "noreply", "roleplay", "SLAM"],
+  "search.exclude": {
+    "node_modules": true,
+    "dist": true,
+    ".astro": true
+  }
+}

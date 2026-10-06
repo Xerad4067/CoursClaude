@@ -1,0 +1,66 @@
+---
+// Bloc repliable « Pas compris ? Regarde ça ». Les vidéos ne se chargent qu'au clic
+// (youtube-nocookie.com), avec un lien direct de secours et un lien de recherche YouTube.
+// Les vidéos ont été trouvées par recherche web, PAS visionnées (voir SOURCES.md).
+interface Video {
+	titre: string;
+	id: string;
+	duree?: string;
+	couvre: string;
+}
+interface Props {
+	liste?: Video[];
+	recherche: string;
+}
+const { liste = [], recherche } = Astro.props;
+const lienRecherche = `https://www.youtube.com/results?search_query=${encodeURIComponent(recherche)}`;
+---
+
+<div class="videos">
+	<details>
+		<summary>🎥 Pas compris ? Regarde ça</summary>
+		{
+			liste.map((v) => (
+				<div class="carte">
+					<p>
+						<strong>{v.titre}</strong>
+						<br />
+						<span class="discret">
+							Durée : {v.duree ?? 'non indiquée'} · Langue : français · Couvre (d'après son titre/résumé) : {v.couvre}
+						</span>
+					</p>
+					<button type="button" class="bouton" data-video={v.id}>
+						▶️ Charger la vidéo ici
+					</button>{' '}
+					<a href={`https://www.youtube.com/watch?v=${v.id}`} target="_blank" rel="noopener noreferrer">
+						Ouvrir sur YouTube
+					</a>
+					<div class="video-cadre" hidden />
+				</div>
+			))
+		}
+		<p>
+			🔎 <a href={lienRecherche} target="_blank" rel="noopener noreferrer">Chercher d'autres vidéos : « {recherche} »</a>
+		</p>
+		<p class="discret">Vidéos trouvées par recherche web le 06/10/2026, non visionnées par l'auteur du cours : si l'une ne correspond pas, passe à la suivante. Hors ligne, les vidéos ne se chargent pas, le cours écrit suffit.</p>
+	</details>
+</div>
+
+<script>
+	document.querySelectorAll<HTMLButtonElement>('button[data-video]').forEach((b) => {
+		b.addEventListener('click', () => {
+			const cadre = b.parentElement!.querySelector<HTMLElement>('.video-cadre')!;
+			if (!cadre.firstChild) {
+				const iframe = document.createElement('iframe');
+				iframe.src = `https://www.youtube-nocookie.com/embed/${b.dataset.video}`;
+				iframe.title = 'Vidéo YouTube';
+				iframe.loading = 'lazy';
+				iframe.allow = 'accelerometer; encrypted-media; picture-in-picture';
+				iframe.allowFullscreen = true;
+				cadre.appendChild(iframe);
+			}
+			cadre.hidden = false;
+			b.hidden = true;
+		});
+	});
+</script>

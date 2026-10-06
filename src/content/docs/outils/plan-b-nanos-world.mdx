@@ -1,0 +1,40 @@
+---
+title: Plan B si l'accès à Nanos World tarde
+description: Ce que dit la doc officielle sur l'accès, quoi faire en attendant, et une alternative signalée.
+sidebar:
+  order: 4
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+## Où en est l'accès (vérifié le 6 octobre 2026)
+
+D'après la [page officielle « Alpha Testing »](https://docs.nanos-world.com/docs/signing-up-alpha) :
+- Nanos World est en **Closed Testing** (test fermé) : il faut candidater via https://tester.nanos-world.com.
+- Les réponses doivent être **en anglais** et **écrites par toi** : les réponses génériques générées par une IA sont rejetées.
+- Les **membres actifs du Discord** sont prioritaires. Les candidatures sont examinées chaque semaine et jamais supprimées ; tu peux recandidater **après un mois**.
+- Il existe des **playtests publics** sans candidature, via la page Steam. Le [blog officiel d'août 2026](https://docs.nanos-world.com/blog/august-2026) annonce un **playtest public d'Halloween du 30 octobre au 1er novembre 2026** (à reconfirmer sur Discord).
+
+<Encadre type="piege">
+Je ne peux rien te promettre sur ton accès : ni délai, ni sélection. Ce plan B est fait pour que ce ne soit **jamais** bloquant.
+</Encadre>
+
+## En attendant : rien ne t'arrête
+
+1. **Les parcours A à D n'ont besoin d'aucun accès** : c'est aussi le cœur de ta préparation SLAM. C'est ta priorité jusqu'en janvier.
+2. **Prépare une bonne candidature** : quand tu auras fini le parcours B, tu pourras écrire (en anglais, avec tes mots) ce que tu sais faire et montrer ton dépôt GitHub. C'est un vrai argument.
+3. **Sois actif sur le Discord** : https://discord.nanos-world.com (présente-toi, pose des questions de scripting, aide quand tu peux).
+4. **Le playtest d'Halloween** (si les dates sont confirmées) : l'occasion d'installer le client sur le PC fixe et de jouer à des modes de jeu de la communauté.
+5. **Le serveur dédié sans le jeu** : d'après la doc officielle, le serveur se télécharge avec **SteamCMD en connexion anonyme** (identifiant d'application `1936830`). Tu pourrais donc, sur le portable, lancer un serveur et tester des scripts **côté serveur** (messages `Console.Log` dans la console) avant même d'avoir le jeu. ⚠️ Non testé : c'est ce que dit la doc, je ne l'ai pas vérifié en conditions réelles. Procédure : [tutoriel, section 14](/installer/tutoriel/#14-serveur-dédié-nanos-world).
+6. **L'extension VS Code officielle** `go-horse-studios.nanos-world` fonctionne sans le jeu : elle te montre déjà toute l'API (classes, événements) avec l'autocomplétion.
+
+## Si l'accès devient impossible ou très long : alternative signalée
+
+<Encadre type="analogie" titre="🔀 Alternative, pas une obligation">
+Ce qui suit est une **piste de remplacement**, pas le cours principal. Je ne la développerai que si tu me le demandes (décision notée dans l'état d'avancement), après une vérification complète de sa documentation officielle.
+</Encadre>
+
+- **LÖVE** (https://love2d.org) : un framework gratuit pour créer des jeux **2D** en **Lua**. Tout ce que tu apprends au parcours B s'y applique directement (variables, tables, fonctions, modules). Il tourne sans problème sur le portable. Point à vérifier avant de s'y lancer : la version de Lua qu'il utilise (différente de Lua 5.4 sur quelques détails).
+- **Le parcours D** (POO, SQL, Web) et le **projet fil rouge en mode texte** (mini serveur roleplay simulé dans le terminal, construit avec les mini-projets du parcours B) gardent tout leur intérêt.
+
+Les compétences restent les mêmes : penser en développeur, découper un problème, utiliser Git, lire une documentation. Le moteur change, pas ce que tu sais faire.

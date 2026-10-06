@@ -1,0 +1,20 @@
+---
+// Encadrés pédagogiques : À retenir, Piège à éviter, Astuce de pro, Si tu es bloqué, Analogie.
+interface Props {
+	type: 'retenir' | 'piege' | 'astuce' | 'bloque' | 'analogie';
+	titre?: string;
+}
+const { type, titre } = Astro.props;
+const defauts = {
+	retenir: '📌 À retenir',
+	piege: '⚠️ Piège à éviter',
+	astuce: '💡 Astuce de pro',
+	bloque: '🆘 Si tu es bloqué',
+	analogie: '🧩 Analogie',
+};
+---
+
+<aside class={`encadre ${type}`} aria-label={titre ?? defauts[type]}>
+	<p class="titre-encadre">{titre ?? defauts[type]}</p>
+	<slot />
+</aside>

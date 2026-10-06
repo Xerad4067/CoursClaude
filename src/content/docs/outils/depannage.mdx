@@ -1,0 +1,75 @@
+---
+title: Dépannage
+description: Les vraies erreurs (installation Windows, Git, Lua, Node.js) et comment les corriger.
+sidebar:
+  order: 3
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+<Encadre type="bloque" titre="🆘 La méthode en 5 étapes, quand rien ne marche">
+
+1. **Lis le message en entier**, en particulier la **première** ligne d'erreur : elle dit *où* (fichier, ligne) et *quoi*.
+2. **Isole** : refais l'action la plus simple possible (une seule commande, un fichier de 3 lignes).
+3. **Cherche** le message exact (entre guillemets) sur cette page, puis dans la doc officielle, puis sur un moteur de recherche.
+4. **Demande à une IA** avec le [modèle de question](/outils/ia-tuteur/) : message exact, ce que tu as essayé, ce que tu attendais.
+5. **Demande à un humain** (prof, Discord) avec les mêmes informations. Note la solution dans ton [journal](/moi/journal/).
+</Encadre>
+
+Les commandes Windows de cette page viennent des documentations officielles et ne sont **pas testées sur Windows**. Les messages Lua ont été produits en exécutant **Lua 5.4.6**.
+
+## Installation sous Windows
+
+| Ce que tu vois | Cause | Solution |
+|---|---|---|
+| `git : Le terme « git » n'est pas reconnu…` (ou `The term 'git' is not recognized…`) — même chose pour `code`, `lua`, `node` | Programme pas installé, ou terminal ouvert **avant** l'installation (le PATH n'est relu qu'à l'ouverture) | Ferme **tous** les terminaux et VS Code, rouvre, réessaie. Vérifie l'installation : `winget list --id Git.Git` (adapte l'identifiant). Réinstalle si absent |
+| Fenêtre « Voulez-vous autoriser cette application à apporter des modifications à votre appareil ? » | Contrôle de compte d'utilisateur (droits administrateur) | Vérifie que l'**éditeur** affiché est le bon (Microsoft, The Git Development Community…), puis **Oui** |
+| `Access is denied` / `Accès refusé` pendant une installation | Droits insuffisants | Réessaie ; si besoin, ouvre le Terminal **en tant qu'administrateur** (clic droit) pour l'installation uniquement, jamais pour travailler au quotidien |
+| `npm.ps1 cannot be loaded because running scripts is disabled on this system` | Politique d'exécution **Restricted** (défaut sur Windows client) | `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser` (doc Microsoft), puis rouvre le terminal |
+| Le pare-feu Windows demande d'autoriser `NanosWorldServer.exe` ou `node.exe` | Le programme ouvre un port réseau | Autorise sur les **réseaux privés** seulement |
+| `winget` n'est pas reconnu | App Installer absent ou ancien | Installe/mets à jour **App Installer** : https://apps.microsoft.com/detail/9nblggh4nns1 |
+| `lua` installé avec winget mais non reconnu | PATH pas à jour | Rouvre le terminal ; sinon `Get-ChildItem -Path "C:\Program Files" -Filter lua.exe -Recurse -ErrorAction SilentlyContinue` pour trouver le dossier, puis ajoute-le au PATH : **Paramètres** → rechercher « variables d'environnement » → **Modifier les variables d'environnement pour votre compte** → `Path` → **Nouveau** |
+
+## Git et GitHub
+
+| Ce que tu vois | Cause | Solution |
+|---|---|---|
+| `Author identity unknown` · `Please tell me who you are.` | Identité Git non configurée | `git config --global user.name "TonPseudo"` puis `git config --global user.email "ID+PSEUDO@users.noreply.github.com"` |
+| `remote: error: GH007: Your push would publish a private email address.` | Ton commit contient ta vraie adresse et GitHub te protège | Configure l'adresse noreply, puis `git commit --amend --reset-author --no-edit` et `git push` |
+| `remote: Repository not found.` | Faute dans l'adresse, ou dépôt privé avec un compte non connecté | Vérifie l'adresse (bouton **Code** sur GitHub). Si c'est privé : voir ligne suivante |
+| `Authentication failed` / la fenêtre de connexion ne s'ouvre plus | Identifiants enregistrés incorrects ou périmés | **Panneau de configuration** → **Gestionnaire d'identification** → **Informations d'identification Windows** → supprime `git:https://github.com` → refais la commande et connecte-toi par le navigateur |
+| `! [rejected] main -> main (fetch first)` | GitHub a des commits que tu n'as pas (oubli de `git pull`) | `git pull` puis `git push` |
+| `CONFLICT (content): Merge conflict in fichier.lua` | La même zone a changé des deux côtés | Ouvre le fichier dans VS Code, choisis (**Accept Current / Incoming / Both**), supprime les marqueurs `<<<<<<<`, `=======`, `>>>>>>>` s'il en reste, enregistre, `git add fichier.lua`, `git commit`, `git push` |
+| `fatal: not a git repository (or any of the parent directories): .git` | Tu n'es pas dans le dossier du dépôt | `cd ~\Dev\mon-apprentissage` |
+| `warning: in the working copy of 'x', LF will be replaced by CRLF` | Conversion de fins de ligne (réglage `core.autocrlf`) | Ce n'est qu'un avertissement |
+| `error: pathspec 'x' did not match any file(s) known to git` | Nom de fichier mal tapé | `git status` pour voir le nom exact |
+| Un éditeur bizarre s'ouvre (Vim) | `core.editor` non configuré | `Échap`, `:q!`, **Entrée** ; puis `git config --global core.editor "code --wait"` |
+
+## Lua (messages réels de Lua 5.4)
+
+| Message | Ce qu'il veut dire | Piste |
+|---|---|---|
+| `lua: cannot open bonjour.lua` | Le fichier n'est pas dans le dossier courant | `dir`, puis `cd` vers le bon dossier |
+| `attempt to call a nil value (global 'prnt')` | Tu appelles une fonction qui n'existe pas | Faute de frappe (`print`) ou fonction définie **après** l'appel |
+| `attempt to perform arithmetic on a nil value (global 'argent')` | Un calcul avec une variable vide | Variable jamais remplie, ou faute dans son nom |
+| `attempt to concatenate a nil value (local 'nom')` | `..` avec une valeur `nil` | Vérifie que la variable a une valeur ; utilise `tostring` |
+| `attempt to index a nil value (global 'joueur')` | `joueur.nom` alors que `joueur` vaut `nil` | La table n'a pas été créée, ou nom mal écrit |
+| `attempt to compare number with nil` | Comparaison `<`, `>` avec une valeur vide | Vérifie les deux côtés de la comparaison |
+| `attempt to compare number with string` | Comparer `5 < "10"` | Convertis avec `tonumber` |
+| `'end' expected (to close 'if' at line 3) near <eof>` | Il manque un `end` | Chaque `if`, `for`, `while`, `function` se ferme par `end` ; indente ton code pour le voir |
+| `'then' expected near 'print'` | Il manque `then` après une condition | `if condition then` |
+| `unexpected symbol near` … | Caractère inattendu (souvent un symbole oublié ou en trop) | Regarde juste **avant** l'endroit indiqué |
+| `bad argument #1 to 'insert' (table expected, got nil)` | Mauvais argument donné à une fonction de la bibliothèque | Le premier argument de `table.insert` doit être une table |
+
+Le numéro après le nom du fichier (`bonjour.lua:3:`) est la **ligne** de l'erreur. L'erreur réelle est souvent sur cette ligne **ou juste au-dessus**.
+
+## Node.js et le site du cours
+
+| Ce que tu vois | Solution |
+|---|---|
+| `npm ERR! enoent ... package.json` | Tu n'es pas dans le dossier `CoursClaude` : `cd ~\Dev\CoursClaude` |
+| `EBADENGINE` | Ta version de Node.js est trop ancienne : installe la LTS (24) |
+| Le port 4321 est déjà utilisé | Un autre `npm run dev` tourne déjà : ferme-le (`Ctrl+C`) ou utilise l'adresse que propose Astro |
+| La recherche ne fonctionne pas en `npm run dev` | Normal : la recherche est générée au build. Fais `npm run build` puis `npm run preview` |
+| Ouvrir `dist/index.html` en double-cliquant affiche une page sans style | Normal : utilise `npm run preview` |
+| La progression a disparu | Elle est stockée par navigateur : importe ton dernier export (voir [Ma progression](/moi/progression/)) |

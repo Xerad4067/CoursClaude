@@ -1,0 +1,14 @@
+# Généré par le build
+dist/
+.astro/
+node_modules/
+
+# Fichiers locaux à ne jamais publier
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# Réglages personnels de Claude Code (les réglages partagés sont dans .claude/settings.json)
+.claude/settings.local.json

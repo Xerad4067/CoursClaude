@@ -1,0 +1,42 @@
+---
+// Remplace le ThemeProvider de Starlight pour que le thème SOMBRE soit le thème par défaut
+// (Starlight suit sinon le réglage du système). Applique aussi la taille de texte et le mode
+// concentration avant l'affichage, pour éviter un « flash ».
+import { Icon } from '@astrojs/starlight/components';
+---
+
+<script is:inline>
+	window.StarlightThemeProvider = (() => {
+		let storedTheme = null;
+		try {
+			storedTheme = localStorage.getItem('starlight-theme');
+		} catch {}
+		const theme = storedTheme || 'dark';
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		try {
+			const taille = localStorage.getItem('cours-taille-texte');
+			if (taille) document.documentElement.style.setProperty('--taille-texte', taille);
+			if (localStorage.getItem('cours-concentration') === 'on') document.documentElement.dataset.concentration = 'on';
+		} catch {}
+		return {
+			updatePickers(theme = storedTheme || 'dark') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+					}
+				});
+			},
+		};
+	})();
+</script>
+
+<template id="theme-icons">
+	<Icon name="sun" class="light" />
+	<Icon name="moon" class="dark" />
+	<Icon name="laptop" class="auto" />
+</template>

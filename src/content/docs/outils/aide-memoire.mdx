@@ -1,0 +1,144 @@
+---
+title: Aide-mémoire
+description: "L'essentiel en une page : Terminal, Lua, Git, Nanos World, Unreal."
+sidebar:
+  order: 2
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+Une page à garder ouverte dans un onglet. Les commandes Windows viennent de la documentation officielle (**non testées sur Windows**) ; le code Lua a été exécuté avec Lua 5.4.
+
+## Terminal (PowerShell)
+
+| Je veux… | Commande |
+|---|---|
+| Savoir où je suis | `pwd` |
+| Voir le contenu du dossier | `dir` (ou `ls`) |
+| Entrer dans un dossier / remonter | `cd NomDuDossier` · `cd ..` · `cd ~` |
+| Créer un dossier | `mkdir NomDuDossier` |
+| Créer un fichier vide | `New-Item notes.txt` |
+| Afficher un fichier | `Get-Content notes.txt` (ou `cat notes.txt`) |
+| Effacer l'écran | `cls` |
+| Ouvrir le dossier courant dans VS Code | `code .` |
+| Exécuter un script Lua | `lua bonjour.lua` |
+| Arrêter une commande | `Ctrl+C` |
+| Rappeler la commande précédente / compléter un nom | `↑` · `Tab` |
+
+## Lua 5.4
+
+```lua title="aide-memoire.lua"
+-- Commentaire sur une ligne
+--[[ Commentaire
+     sur plusieurs lignes ]]
+
+local nom = "Léo"            -- string (chaîne)
+local argent = 150           -- number (nombre)
+local estAdmin = false       -- boolean (vrai/faux)
+local rien = nil             -- nil : absence de valeur
+print(type(argent))          --> number
+
+-- Opérateurs : + - * / // (division entière) % (reste) ^ (puissance)
+-- Comparaison : == ~= < > <= >=      Logique : and or not
+-- Concaténation : ..     Longueur : #
+print("Bonjour " .. nom .. " (" .. #nom .. " octets)")
+
+if argent >= 100 then
+  print("Tu peux acheter le vélo")
+elseif argent >= 50 then
+  print("Encore un effort")
+else
+  print("Pas assez d'argent")
+end
+
+for i = 1, 3 do print("Tour " .. i) end     -- de 1 à 3 inclus
+local n = 0
+while n < 3 do n = n + 1 end
+repeat n = n - 1 until n == 0
+
+local function salaire(heures, tauxHoraire)
+  return heures * tauxHoraire
+end
+print(salaire(35, 12))       --> 420
+
+local inventaire = { "pain", "eau" }          -- liste (indices 1, 2…)
+table.insert(inventaire, "lampe")
+for i, objet in ipairs(inventaire) do print(i, objet) end
+
+local joueur = { nom = "Léo", argent = 150 }  -- dictionnaire
+joueur.metier = "taxi"
+for cle, valeur in pairs(joueur) do print(cle, valeur) end
+
+local ok, err = pcall(function() error("Solde insuffisant") end)
+print(ok, err)               --> false   ...: Solde insuffisant
+```
+
+| Fonction utile | Exemple | Résultat |
+|---|---|---|
+| `tostring` / `tonumber` | `tonumber("42")` | `42` |
+| `string.upper` / `lower` | `string.upper("taxi")` | `TAXI` |
+| `string.format` | `string.format("%.2f €", 3.5)` | `3.50 €` |
+| `string.sub` | `string.sub("Bonjour", 1, 3)` | `Bon` |
+| `table.concat` | `table.concat({"a","b"}, ", ")` | `a, b` |
+| `table.remove` | `table.remove(liste)` | retire le dernier élément |
+| `table.sort` | `table.sort(liste)` | trie la liste |
+| `math.floor` / `math.max` | `math.floor(3.7)` | `3` |
+
+## Git
+
+| Je veux… | Commande |
+|---|---|
+| Récupérer un dépôt GitHub | `git clone https://github.com/Pseudo/depot.git` |
+| Voir l'état (modifié, non suivi…) | `git status` |
+| Préparer des fichiers | `git add fichier.lua` · `git add .` (tout) |
+| Enregistrer une version | `git commit -m "Ajoute le calcul du salaire"` |
+| Envoyer sur GitHub | `git push` |
+| Récupérer depuis GitHub | `git pull` |
+| Voir l'historique | `git log --oneline` |
+| Voir ce qui a changé | `git diff` |
+| Annuler les modifications d'un fichier non commité | `git restore fichier.lua` (⚠️ les changements sont perdus) |
+
+Bons messages de commit : un verbe à l'impératif présent et ce qui change (« Ajoute… », « Corrige… », « Renomme… »).
+
+## Nanos World (les bases vérifiées)
+
+<Encadre type="piege" titre="⚠️ Non testé en jeu">
+Résumé de la documentation officielle (consultée le 06/10/2026). Le détail, avec des exemples testés quand ton accès sera ouvert, viendra au parcours E.
+</Encadre>
+
+- **Lua 5.4**, avec la plupart des bibliothèques standard, plus l'API Nanos World.
+- **Créer un package** : `NanosWorldServer.exe --cli add package mon-package`.
+- **Structure d'un package** :
+  ```text
+  Packages/mon-package/
+  ├── Package.toml   ← titre, auteur, version, type (script, game-mode, map, loading-screen)
+  ├── Server/Index.lua   ← code exécuté par le serveur
+  ├── Client/Index.lua   ← code exécuté chez chaque joueur
+  └── Shared/Index.lua   ← code exécuté des deux côtés
+  ```
+- **Charger un package** : dans `Config.toml`, section `[game]`, ajouter son nom dans `packages = [ ... ]`.
+- **Ports** du serveur : `7777` TCP/UDP et `7778` UDP.
+- **API souvent utilisée** (noms vérifiés dans la doc) : `Console.Log` (écrire dans la console), `Events.Subscribe` / `Events.Call` / `Events.CallRemote` (événements, y compris entre client et serveur), `Player.Subscribe` et `Character.Subscribe` (réagir aux joueurs et personnages), `Timer.SetTimeout` / `Timer.SetInterval` (minuteries), `Chat.BroadcastMessage` (message à tout le monde), `Package.Require` (charger un autre fichier Lua du package).
+- **Exemple officiel (Quick Start)** :
+  ```lua title="Packages/my-awesome-package/Server/Index.lua"
+  -- Print a message to the server console
+  Console.Log("Loading some Props =D")
+  -- Spawn some props in the game world
+  local prop_table = Prop(Vector(200, 0, 0), Rotator(0, 0, 0), "nanos-world::SM_WoodenTable")
+  ```
+- Documentation : https://docs.nanos-world.com/docs/getting-started/quick-start
+
+## Unreal Engine 5.7 (mapping, PC fixe)
+
+<Encadre type="piege" titre="⚠️ Non testé dans Unreal">
+Les raccourcis ci-dessous sont les raccourcis par défaut de l'éditeur Unreal, à confirmer dans ta version (menu **Edit → Editor Preferences → Keyboard Shortcuts**). Le parcours F les reprendra pas à pas.
+</Encadre>
+
+| Je veux… | Dans l'éditeur |
+|---|---|
+| Me déplacer dans la vue 3D | Maintenir le **clic droit** + `Z` `Q` `S` `D` (ou `W` `A` `S` `D` selon la disposition clavier) |
+| Centrer la vue sur l'objet sélectionné | `F` |
+| Déplacer / tourner / redimensionner | `W` / `E` / `R` (selon la disposition du clavier) |
+| Sauvegarder | `Ctrl+S` (souvent !) |
+
+Règles officielles Nanos World pour une map (doc « Creating Custom Maps », marquée comme ancienne) : pas d'objets avec physique dans la map (ils se créent par script, en `Prop`) ; ajouter le tag d'acteur `Sun` aux lumières et au ciel ; mettre à `None` les remplacements de *GameMode* dans les *World Settings*.

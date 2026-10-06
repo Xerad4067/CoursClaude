@@ -1,0 +1,55 @@
+---
+title: Synchroniser ma progression
+description: Exporter et importer ta progression entre le portable et le PC fixe, honnêtement expliqué.
+sidebar:
+  order: 1
+---
+
+import OutilsProgression from '../../../components/OutilsProgression.astro';
+import Encadre from '../../../components/Encadre.astro';
+
+## Le problème, expliqué honnêtement
+
+Ce site est **statique** : il n'a ni serveur ni base de données, et il ne te demande aucun compte. Tes cases cochées, ton XP, tes scores de quiz et ton journal sont donc enregistrés **dans le navigateur** (une petite mémoire appelée *localStorage*).
+
+Conséquence : la progression est **propre à chaque navigateur de chaque machine**. Ce que tu coches sur le portable n'apparaît pas tout seul sur le PC fixe. Et si tu effaces les données de navigation, elle disparaît.
+
+La solution : un **fichier** que tu transportes toi-même.
+
+<OutilsProgression />
+
+## Méthode simple (dès maintenant)
+
+1. Sur la machine où tu as travaillé : **💾 Exporter ma progression**. Un fichier `progression-cours.json` arrive dans tes Téléchargements.
+2. Sur l'autre machine : ouvre ce site → **📂 Importer un fichier…** → choisis le fichier.
+3. L'import **fusionne** : tout ce qui est coché sur l'une **ou** l'autre machine reste coché, et le meilleur score de chaque quiz est gardé. Rien n'est perdu.
+
+Pour transporter le fichier : clé USB, ou… Git (méthode suivante).
+
+## Méthode Git (après le module A4)
+
+Une fois que tu sais faire `push` et `pull`, range le fichier dans ton dépôt `mon-apprentissage` :
+
+```powershell
+# Sur la machine où tu as travaillé (après avoir exporté)
+cd ~\Dev\mon-apprentissage
+Move-Item -Force ~\Downloads\progression-cours.json .
+git add progression-cours.json
+git commit -m "Met à jour ma progression"
+git push
+```
+
+```powershell
+# Sur l'autre machine
+cd ~\Dev\mon-apprentissage
+git pull
+```
+Puis importe `progression-cours.json` depuis ce dossier avec le bouton **📂 Importer**.
+
+<Encadre type="retenir">
+Aucun jeton, aucun mot de passe, aucun compte dans cette synchronisation : c'est un simple fichier texte (JSON) qui ne contient que tes cases cochées, tes scores, tes dates de travail et ton journal. Si ton dépôt est **public**, ton journal le sera aussi : garde-le privé ou n'y écris rien de personnel.
+</Encadre>
+
+<Encadre type="piege">
+Si tu importes, puis exportes **sur la même machine** sans avoir importé le fichier le plus récent de l'autre, tu risques de transporter une ancienne version. Prends l'habitude : *importer en arrivant, exporter en partant* (comme `pull` et `push`).
+</Encadre>
