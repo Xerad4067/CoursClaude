@@ -1,0 +1,4 @@
+1 ligne(s) modifiée(s)
+
+pseudo | metier | argent | niveau | ville
+Sacha | NULL | 0 | 1 | NULL

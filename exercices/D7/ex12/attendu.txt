@@ -1,0 +1,11 @@
+pseudo | nb_commandes
+Kim | 3
+Sam | 3
+Alex | 2
+Lou | 2
+Eli | 1
+Max | 1
+Noa | 1
+Tom | 1
+Ravi | 0
+Zoe | 0

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Fiche du joueur</title>
+  </head>
+  <body>
+    <h1>Fiche du joueur</h1>
+    <p id="accueil"></p>
+    <label for="pseudo">Ton pseudo</label>
+    <input id="pseudo" type="text">
+    <button id="enregistrer" type="button">Enregistrer</button>
+
+    <script>
+      // 1. lireFiche() : localStorage.getItem puis JSON.parse (renvoie null s'il n'y a rien ou si ça échoue).
+      // 2. sauverFiche(fiche) : localStorage.setItem avec JSON.stringify.
+      // 3. Au chargement : pas de fiche -> « Bienvenue, nouveau joueur ! » ; sinon visites + 1, sauvegarde et « Bon retour… ».
+      // 4. Clic sur « Enregistrer » : sauve { pseudo, visites: 1 } (refuse un pseudo vide) et affiche « Enregistré : … ».
+    </script>
+  </body>
+</html>

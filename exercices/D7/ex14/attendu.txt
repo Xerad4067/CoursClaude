@@ -1,0 +1,5 @@
+Sam -> Kim, 150 : True
+Sam -> Kim, 1000 : False
+Sam -> Fantome, 50 : False
+Sam : 350
+Kim : 350

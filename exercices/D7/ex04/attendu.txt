@@ -1,0 +1,8 @@
+2 ligne(s) modifiée(s)
+
+plaque | modele | proprietaire_id
+MD-777-RP | SUV Orion | 2
+PO-911-RP | Camion Titan | 7
+
+nb_vehicules
+14

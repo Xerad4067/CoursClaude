@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Boutique de Port-Soleil</title>
+    <style>
+      body {
+        background: #14161a;
+        color: #e8eaed;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.6;
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      h1, h2 { color: #ffcc66; }
+      ul { padding-left: 1rem; }
+      li { margin-bottom: 0.5rem; }
+      input { width: 4rem; margin-left: 0.4rem; font: inherit; padding: 0.2rem; }
+      button { font: inherit; padding: 0.3rem 0.8rem; background: #f5a524; color: #14161a; border: 0; border-radius: 6px; }
+      .msg { color: #8ab4f8; }
+    </style>
+  </head>
+  <body>
+    <h1>Boutique de Port-Soleil</h1>
+
+    <h2>Produits</h2>
+    <ul id="produits"></ul>
+
+    <h2>Panier</h2>
+    <ul id="panier"></ul>
+    <p>Total : <span id="total">0</span> €</p>
+    <button id="vider" type="button">Vider le panier</button>
+
+    <script>
+      // ---------- Les données (l'état) ----------
+      const catalogue = [
+        { id: "pain", nom: "Pain", prix: 3, stock: 5 },
+        { id: "eau", nom: "Eau", prix: 2, stock: 8 },
+        { id: "lampe", nom: "Lampe", prix: 25, stock: 2 },
+        { id: "corde", nom: "Corde", prix: 12, stock: 3 },
+      ];
+      let panier = {};   // identifiant du produit -> quantité dans le panier
+
+      // Crée un élément avec son texte (évite de répéter createElement + textContent)
+      function creer(balise, texte = "") {
+        const element = document.createElement(balise);
+        element.textContent = texte;
+        return element;
+      }
+
+      // À toi, dans cet ordre :
+      // 1. restant(produit) : stock moins ce qui est déjà dans le panier.
+      // 2. verifierQuantite(texte, produit) : renvoie un message d'erreur, ou "" si la quantité est valide.
+      // 3. creerLigne(produit) : une ligne avec le nom, le prix, un champ quantité, un bouton « Ajouter » et un message.
+      // 4. afficherPanier() : liste du panier, total et « reste » de chaque produit.
+      // 5. Le bouton « Vider le panier ».
+      // Les id à respecter : reste-pain, qte-pain, ajout-pain, msg-pain (idem pour eau, lampe, corde).
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+README bon : 6/6
+README pressé : 1/6
+  manque : une description
+  manque : une section Installation
+  manque : une section Utilisation avec un bloc de code
+  manque : une licence
+  manque : aucune adresse e-mail

@@ -1,4 +1,8 @@
-Mon portefeuille
-Argent : 30 €
-Pas assez d'argent
-Gagner 50 € Dépenser 40 €
+{"pain":3,"eau":2,"lampe":1}
+string
+2 3
+{
+  "nom": "Sam",
+  "argent": 1500
+}
+Lecture impossible : SyntaxError

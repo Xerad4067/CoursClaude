@@ -1,0 +1,6 @@
+3 ligne(s) modifiée(s)
+
+id | adresse | prix | proprietaire
+1 | 12 rue des Pins | 85000 | Kim
+2 | 3 impasse du Lac | 120000 | Sam
+3 | 7 avenue du Port | 64000 | NULL

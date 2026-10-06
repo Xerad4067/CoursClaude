@@ -8,7 +8,7 @@ local function log(niveau, message)
     return                   -- les lignes DEBUG sont coupées d'un seul endroit
   end
   numero = numero + 1
-  print(string.format("[%03d] %-5s %s", numero, niveau, message))
+  print(string.format("[%03d] %-6s %s", numero, niveau, message))
 end
 
 -- Un petit scénario : payer trois employés avec la caisse du bar.

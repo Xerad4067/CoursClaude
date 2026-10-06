@@ -1,0 +1,4 @@
+OK     # Mini boutique
+OK     ## Installation
+OK     ## Utilisation
+OK     ## Licence (MIT)

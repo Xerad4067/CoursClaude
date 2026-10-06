@@ -1,0 +1,18 @@
+# Mini boutique en texte
+
+Une supérette jouable dans le terminal : on achète avec des commandes de chat.
+
+## Installation
+
+1. Installe Lua 5.4.
+2. Clone le dépôt avec `git clone`.
+
+## Utilisation
+
+```text
+lua boutique.lua
+```
+
+## Licence
+
+Projet sous licence MIT.

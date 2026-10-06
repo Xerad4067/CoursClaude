@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Candidatures</title>
+    <style>
+      li { cursor: pointer; }
+      .accepte { text-transform: uppercase; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <h1>Candidatures</h1>
+    <label for="pseudo">Pseudo du candidat</label>
+    <input id="pseudo" type="text">
+    <button id="ajouter" type="button">Ajouter</button>
+    <p id="info"></p>
+    <p>Candidats : <span id="compteur">0</span></p>
+    <ul id="liste"></ul>
+
+    <script>
+      // L'état : const candidats = [];  (une liste d'objets { nom, accepte })
+      // 1. afficher() : vide la liste, recrée un <li> par candidat (createElement), pose la classe « accepte » si besoin.
+      // 2. Clic sur un <li> : inverse candidat.accepte, puis rappelle afficher().
+      // 3. Clic sur « Ajouter » : refuse un pseudo vide (message dans #info), sinon ajoute le candidat et vide le champ.
+    </script>
+  </body>
+</html>

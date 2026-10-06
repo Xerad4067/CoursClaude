@@ -1,0 +1,9 @@
+nom | categorie | stock
+boussole | divers | 12
+tente | camping | 0
+
+nom | prix
+tente | 70
+trousse de soin | 40
+essence | 30
+lampe | 25

@@ -1,0 +1,315 @@
+---
+title: "X7 · Chaînes et motifs"
+description: Dix-neuf exercices courts pour manier le texte en Lua - découper, chercher, valider, remplacer et mettre en forme, avec les motifs de string.match, gmatch et gsub.
+parcours: X
+module: X7
+duree: 3 h
+ou: les-deux
+prerequis: Modules B2 et B8 du parcours B (chaînes, string.format, premiers motifs).
+resultat: Un modérateur de chat qui lit les commandes des joueurs et masque les mots interdits.
+objectifs:
+  - Extraire, chercher et remplacer du texte avec string.sub, find, match, gmatch et gsub
+  - Écrire des motifs Lua avec classes, ensembles, quantificateurs, ancres et captures
+  - Valider un format (code postal, pseudo, plaque d'immatriculation)
+  - Aligner et centrer du texte avec string.format et string.rep
+sidebar:
+  order: 7
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Lis la fiche mémo, puis fais les exercices 1 à 3."
+  quarante="La série 1 en entier (exercices 1 à 6)."
+  deuxh="Les séries 1 et 2 (exercices 1 à 13), puis le début de la série 3. Le reste une autre fois."
+/>
+
+**Pourquoi c'est utile ?** Sur ton serveur roleplay, tout passe par du texte : les commandes du chat (`/give Sam 50`), les pseudos, les plaques d'immatriculation, les tickets de caisse. Savoir **lire, vérifier et remettre en forme** un texte, c'est le geste du quotidien. Et les motifs de Lua sont un petit cousin des *expressions régulières* (regex) que tu croiseras dans beaucoup d'autres langages.
+
+Cette page est une **salle d'entraînement** : peu de théorie, beaucoup de pratique. Le cours complet est dans [B2 · Opérateurs et chaînes](/parcours-b/b2-operateurs-chaines/) et [B8 · Objets, erreurs et chaînes avancées](/parcours-b/b8-objets-erreurs/).
+
+## L'essentiel en 10 lignes
+
+1. **Mesurer et extraire.** `#texte` donne la longueur (en octets : un accent compte pour 2). `string.sub(s, i, j)` extrait du i-ème au j-ème caractère ; un indice négatif compte depuis la fin (`-1` = le dernier). Aussi : `string.upper`, `string.lower`, `string.reverse`, `string.rep(s, n)`.
+2. **Codes.** `string.byte("A")` donne le code de la lettre (`65`) ; `string.char(65)` fait l'inverse.
+3. **Mettre en forme.** `string.format` : `%s` texte, `%d` entier, `%.2f` décimal, `%5d` entier aligné à droite sur 5, `%-8s` texte aligné à gauche sur 8, `%03d` zéros devant, `%%` un vrai `%`.
+4. **Quatre fonctions utilisent des motifs.** `find(s, motif)` renvoie les positions de début et de fin (ou `nil`). `match(s, motif)` renvoie ce qui a été capturé (ou `nil`). `gmatch(s, motif)` donne les morceaux un par un dans un `for … in`. `gsub(s, motif, remplacement)` renvoie le nouveau texte **et** le nombre de remplacements. Le remplacement peut être un texte (avec `%1`, `%2` pour les captures) ou une fonction (si elle ne renvoie rien, le morceau reste tel quel).
+5. **Classes.** `%a` lettre, `%d` chiffre, `%w` lettre ou chiffre, `%s` espace, `%u` majuscule, `%l` minuscule, `.` n'importe quel caractère. La majuscule inverse : `%S` = tout sauf un espace. Ensembles : `[abc]`, `[a-f]`, `[%w_]` ; avec `^` dedans, le contraire : `[^%d]` = tout sauf un chiffre.
+6. **Quantificateurs** (juste après une classe) : `+` un ou plusieurs, `*` zéro ou plusieurs (le plus possible), `-` zéro ou plusieurs (le moins possible), `?` zéro ou un. Pour « trois chiffres », on répète : `%d%d%d`.
+7. **Ancres.** `^` au début du motif : « le texte commence ici ». `$` à la fin : « le texte finit ici ». Sans elles, le motif peut se trouver n'importe où dans le texte.
+8. **Captures.** Ce qui est entre parenthèses est renvoyé par `match` : `string.match("/give Sam 50", "^/(%a+) (%a+) (%d+)$")` renvoie trois textes (même les nombres sont des **textes** : `tonumber` pour calculer).
+9. **Échapper.** Les caractères spéciaux `^ $ ( ) % . [ ] * + - ?` perdent leur pouvoir derrière un `%` : `%.` est un vrai point, `%-` un vrai tiret, `%%` un vrai `%`.
+10. **Pas de regex complète.** Pas de `|` pour « ou », pas de `{3}` pour « trois fois », pas de quantificateur sur un groupe comme `(ab)+`. Pour un « ou », fais deux tests (ou une table).
+
+```lua title="x7/memo.lua"
+-- 1. Extraire avec des captures
+local cmd, cible, montant = string.match("/give Sam 50", "^/(%a+) (%a+) (%d+)$")
+print(cmd, cible, montant)                       --> give   Sam   50
+
+-- 2. Parcourir chaque mot
+for mot in string.gmatch("le taxi roule", "%a+") do
+  print(mot)                                     --> le, puis taxi, puis roule
+end
+
+-- 3. Remplacer (le point est échappé avec %)
+print(string.gsub("a.b.c", "%.", "-"))           --> a-b-c   2
+```
+
+<Encadre type="piege" titre="⚠️ Un motif Lua n'est pas une regex">
+Si tu as déjà vu des expressions régulières ailleurs, oublie les réflexes : `^(aide|help)$` **ne marche pas** en Lua (la barre `|` y est un simple caractère). Il n'y a pas non plus de `{3}`. Un motif Lua est plus simple, mais suffit pour lire les commandes d'un chat, valider un pseudo ou nettoyer un texte.
+</Encadre>
+
+<Encadre type="astuce">
+Teste un motif **seul**, dans un petit fichier `essai.lua` : `print(string.match("ton texte", "ton motif"))`. Ajoute les morceaux du motif un par un : dès que le résultat devient `nil`, tu sais quel morceau est fautif.
+</Encadre>
+
+## Exercices
+
+### Série 1 · 🟢 Échauffement
+
+Six exercices sans motif : extraire, mesurer, chercher, comparer, coder, aligner.
+
+<Exercice id="X7-ex01" titre="Découper un pseudo" niveau="vert" dossier="X7/ex01" fichier="pseudo.lua">
+Le pseudo est `"SamTaxi42"`. Affiche sur trois lignes : ses 3 premières lettres (`Sam`), les 4 suivantes (`Taxi`), puis ses 2 derniers caractères (`42`), ces derniers **sans** calculer la longueur du pseudo.
+
+<div slot="indice1">`string.sub(texte, debut, fin)` extrait du `debut`-ième au `fin`-ième caractère, le premier étant le numéro 1.</div>
+<div slot="indice2">Un indice **négatif** compte depuis la fin : `-1` est le dernier caractère, `-2` l'avant-dernier.</div>
+<div slot="indice3">Sans 3e argument, `string.sub` va jusqu'à la fin : `string.sub(pseudo, -2)`.</div>
+<div slot="solution">`string.sub(pseudo, 4, 7)` prend les caractères 4 à 7, bornes incluses. L'indice négatif évite de calculer `#pseudo - 1` : pratique quand la longueur varie (un code qui finit toujours par deux chiffres, par exemple).</div>
+</Exercice>
+
+<Exercice id="X7-ex02" titre="Le panneau du garage" niveau="vert" dossier="X7/ex02" fichier="panneau.lua">
+Écris `encadrer(texte)` qui affiche le texte entre deux bordures dont la largeur s'adapte à sa longueur (voir le résultat). Appelle-la avec `"Garage de Sam"` puis avec `"Parc"`.
+
+<div slot="indice1">La bordure est une ligne de tirets : `string.rep("-", n)` répète le `-` n fois.</div>
+<div slot="indice2">Combien de tirets ? La longueur du texte (`#texte`), plus un espace de chaque côté.</div>
+<div slot="indice3">`"+" .. string.rep("-", #texte + 2) .. "+"`, affichée avant et après la ligne `"| " .. texte .. " |"`.</div>
+<div slot="solution">La bordure se calcule à partir de `#texte` : le panneau s'adapte tout seul. Avec des accents, `#` compte des octets (voir B2) et le cadre serait trop large : ici, les textes n'ont pas d'accents.</div>
+</Exercice>
+
+<Exercice id="X7-ex03" titre="Chercher dans un message" niveau="vert" dossier="X7/ex03" fichier="chercher.lua">
+Dans `"Le taxi de Kim attend devant le parc"`, affiche les positions de début et de fin de `taxi`, puis de `parc`. Ensuite, pour chaque mot de `{ "taxi", "bus", "parc" }`, affiche `présent` ou `absent`.
+
+<div slot="indice1">`string.find(texte, morceau)` renvoie **deux** nombres : le début et la fin. On les récupère avec `local debut, fin = …`.</div>
+<div slot="indice2">Si le morceau est absent, `find` renvoie `nil`, ce qui compte comme « faux » dans un `if`.</div>
+<div slot="indice3">`if string.find(message, mot) then … else … end` dans une boucle `for _, mot in ipairs(…)`.</div>
+<div slot="solution">`find` répond à deux questions : **où** (les positions) et **si** (le `nil`). Attention : son 2e argument est un *motif*. Avec des mots simples, aucun souci ; mais un `.` ou un `-` dans le mot aurait un sens spécial (série 2). Pour chercher du texte brut, ajoute `1, true` : `string.find(texte, "a.b", 1, true)`.</div>
+</Exercice>
+
+<Exercice id="X7-ex04" titre="La commande reconnue" niveau="vert" dossier="X7/ex04" fichier="commandes.lua">
+Un joueur peut taper `/AIDE`, `/Aide` ou `/aide`. Pour chaque saisie de la liste, affiche `reconnue` si elle correspond à `/aide` sans tenir compte des majuscules, sinon `inconnue`.
+
+<div slot="indice1">Les majuscules comptent pour `==` : `"/AIDE"` n'est pas égal à `"/aide"`.</div>
+<div slot="indice2">Mets la saisie sous une forme unique avant de comparer : `string.lower`.</div>
+<div slot="indice3">`if string.lower(saisie) == "/aide" then`.</div>
+<div slot="solution">On **normalise** (tout en minuscules) avant de comparer : c'est le réflexe pour toute commande de chat. Rappel du module B2 : `lower` ne touche pas aux lettres accentuées.</div>
+</Exercice>
+
+<Exercice id="X7-ex05" titre="Les codes des lettres" niveau="vert" dossier="X7/ex05" fichier="codes.lua">
+Affiche le code de `"A"`, puis celui de `"a"`. Fabrique le mot `Lua` à partir des codes 76, 117 et 97. Enfin, affiche la lettre qui suit `"C"` dans l'alphabet, sans écrire `"D"` toi-même.
+
+<div slot="indice1">Chaque caractère a un code numérique : `string.byte("A")` donne `65`.</div>
+<div slot="indice2">`string.char(…)` fait l'inverse et accepte plusieurs codes à la fois.</div>
+<div slot="indice3">La lettre suivante : `string.char(string.byte("C") + 1)`.</div>
+<div slot="solution">Les lettres se suivent dans la table des codes (le code ASCII, pour les lettres sans accent) : ajouter 1 donne la lettre suivante. C'est la base du chiffrement de César, qui décale chaque lettre. `A` (65) et `a` (97) ont des codes différents : voilà pourquoi `"A" ~= "a"`.</div>
+</Exercice>
+
+<Exercice id="X7-ex06" titre="Le tableau des richesses" niveau="vert" dossier="X7/ex06" fichier="tableau.lua">
+Affiche trois joueurs sur des lignes alignées : le nom à gauche sur 8 caractères, une barre `|`, puis l'argent à droite sur 6 caractères suivi de ` €` (voir le résultat).
+
+<div slot="indice1">`string.format` prend un modèle ; un nombre entre `%` et la lettre fixe la largeur de la colonne.</div>
+<div slot="indice2">`%6d` : entier aligné à **droite** sur 6 caractères. Pour aligner à gauche, ajoute un `-` : `%-8s`.</div>
+<div slot="indice3">`string.format("%-8s|%6d €", j.nom, j.argent)` dans une boucle `ipairs`.</div>
+<div slot="solution">`%-8s` complète le nom avec des espaces à droite, `%6d` complète le nombre à gauche : des colonnes parfaites sans compter les espaces. Si un nom dépasse 8 caractères, il n'est pas coupé et la colonne se décale : l'exercice 18 règle ce problème.</div>
+</Exercice>
+
+<FinEtape id="X7-e1" titre="Série 1 · échauffement" victoire="tu as réussi 6 exercices sans indice (ou avec très peu) : sub, find, lower, byte et format n'ont plus de secret." prochaine="la série 2 : tes premiers motifs avec match, gmatch et gsub." />
+
+### Série 2 · 🟡 Application
+
+Sept exercices avec de vrais motifs : valider, découper, compter, remplacer. Relis la fiche mémo (points 4 à 9) avant de commencer.
+
+<Exercice id="X7-ex07" titre="Valider un code postal" niveau="jaune" dossier="X7/ex07" fichier="codepostal.lua">
+Un code postal français a exactement 5 chiffres. Pour chaque saisie de la liste, affiche `valide` ou `refusé` en utilisant `string.match` et un motif.
+
+<div slot="indice1">Un chiffre se note `%d`. Il en faut cinq : écris-le cinq fois.</div>
+<div slot="indice2">Sans ancres, `"750011"` (6 chiffres) contient bien 5 chiffres d'affilée. Il faut dire « le texte commence **et** finit par ces 5 chiffres ».</div>
+<div slot="indice3">`^%d%d%d%d%d$` : `^` au début, `$` à la fin.</div>
+<div slot="solution">`^` et `$` forcent le motif à couvrir **tout** le texte. `"75O01"` est refusé car son `O` est une lettre, pas un zéro : une erreur de saisie très courante. Lua n'a pas de `%d{5}` : on répète la classe.</div>
+</Exercice>
+
+<Exercice id="X7-ex08" titre="Lecture : que renvoie match ?" niveau="jaune" type="lecture" dossier="X7/ex08" fichier="lecture-match.lua">
+Lis le programme ci-dessous **sans l'exécuter** et écris les 7 lignes qu'il affiche (`nil` compte comme une ligne). Vérifie ensuite en l'exécutant.
+
+<div slot="indice1">`%a+` est le premier groupe de lettres ; `^` impose que le texte **commence** par le motif.</div>
+<div slot="indice2">`find` renvoie deux nombres, `match` avec deux captures renvoie deux textes : `print` les sépare par une tabulation.</div>
+<div slot="indice3">`%-?` veut dire « un tiret, mais facultatif » (`?` : zéro ou un).</div>
+<div slot="solution">Ligne 3 : `nil`, car la plaque ne **commence** pas par un chiffre. Ligne 4 : deux captures, donc deux valeurs. Ligne 5 : `find` donne les positions 4 et 6 (le `123`). Ligne 6 : le `$` et la capture isolent les lettres de la fin. Ligne 7 : les deux tirets sont facultatifs, donc la plaque écrite sans tirets est reconnue aussi.</div>
+</Exercice>
+
+<Exercice id="X7-ex09" titre="Découper une commande" niveau="jaune" dossier="X7/ex09" fichier="commande.lua">
+Avec `io.read()`, lis **trois** lignes tapées au clavier. Pour chacune, extrais commande, pseudo et montant d'un `/give pseudo montant` et affiche `give -> Sam_42 : 50 €` ; si le format est mauvais, affiche `commande invalide : …`. Pour tester, tape `/give Sam_42 50`, puis `/give   Kim    7` (espaces en trop), puis `/give Sam`.
+
+<div slot="indice1">Trois captures : la commande, le pseudo, le montant. Le pseudo peut contenir `_` et des chiffres, donc `%a+` ne suffit pas.</div>
+<div slot="indice2">`%S+` = un groupe de caractères qui ne sont pas des espaces ; `%s+` = un ou plusieurs espaces ; `%d+` = des chiffres.</div>
+<div slot="indice3">`string.match(message, "^/(%S+)%s+(%S+)%s+(%d+)$")` ; si le résultat est `nil`, la commande est invalide.</div>
+<div slot="solution">Les captures arrivent dans l'ordre des parenthèses. `%s+` absorbe les espaces en trop. Quand le motif ne correspond pas, **toutes** les captures valent `nil` : teste-en une (`if cmd then`) avant de les utiliser, sinon tu obtiens `attempt to concatenate a nil value`. Le montant est capturé comme **texte** : `tonumber` le transforme en nombre pour calculer. Le testeur simule le clavier ; dans ton terminal, tu tapes les lignes toi-même.</div>
+</Exercice>
+
+<Exercice id="X7-ex10" titre="Compter les mots" niveau="jaune" dossier="X7/ex10" fichier="mots.lua">
+Avec la phrase `"le taxi de Sam roule vers le parc"`, affiche chaque mot précédé de son numéro (`1. le`, `2. taxi`…), puis `Total : 8 mots`. Le total doit venir d'un compteur dans la boucle.
+
+<div slot="indice1">`gmatch` s'utilise dans une boucle : `for mot in string.gmatch(phrase, motif) do … end`.</div>
+<div slot="indice2">Un mot, c'est un ou plusieurs caractères qui sont des lettres : `%a+`.</div>
+<div slot="indice3">Un compteur initialisé avant la boucle, `nombre = nombre + 1` à chaque tour.</div>
+<div slot="solution">`gmatch` ne renvoie pas une liste : il fournit les morceaux **un par un**, à chaque tour de boucle. Les lettres accentuées ne sont pas des lettres pour `%a` : « été » serait coupé en morceaux (voir B2).</div>
+</Exercice>
+
+<Exercice id="X7-ex11" titre="Débogage : le symbole % qui plante" niveau="jaune" type="debug" dossier="X7/ex11" fichier="promo.lua">
+Ce programme veut afficher `Promo : -20 pour cent`, mais il s'arrête avec `malformed pattern (ends with '%')`. Corrige-le.
+
+<div slot="indice1">Le message parle d'un **motif** mal formé qui finit par `%`. Quel est le motif de ce programme ?</div>
+<div slot="indice2">Dans un motif, `%` introduit une classe (`%d`) ou protège un caractère spécial. Seul, il attend quelque chose derrière lui.</div>
+<div slot="indice3">Pour désigner un vrai `%`, il faut l'écrire deux fois : `%%`.</div>
+<div slot="solution">`%` est le caractère d'échappement des motifs, donc pour chercher le symbole lui-même on l'**échappe avec lui-même**. Même règle pour le remplacement de `gsub` : un `%` isolé y provoque l'erreur `invalid use of '%' in replacement string`.</div>
+</Exercice>
+
+<Exercice id="X7-ex12" titre="Un identifiant propre" niveau="jaune" dossier="X7/ex12" fichier="slug.lua">
+Transforme le titre `"Garage de   Sam"` (trois espaces au milieu) en identifiant `garage-de-sam` : tout en minuscules, chaque groupe d'espaces remplacé par **un seul** tiret. Affiche ensuite `2 remplacements`, nombre obtenu par `gsub`.
+
+<div slot="indice1">`string.gsub(texte, motif, remplacement)` renvoie **deux** valeurs : le nouveau texte et le nombre de remplacements.</div>
+<div slot="indice2">`%s+` désigne un ou plusieurs espaces d'affilée.</div>
+<div slot="indice3">`local slug, nombre = string.gsub(string.lower(titre), "%s+", "-")`.</div>
+<div slot="solution">Avec `%s+`, les trois espaces comptent pour **un** seul remplacement. Avec `%s` tout seul, tu aurais obtenu `garage-de---sam` et 4 remplacements. Ce genre d'identifiant (un *slug*) sert pour des noms de fichiers ou des adresses.</div>
+</Exercice>
+
+<Exercice id="X7-ex13" titre="Une majuscule à chaque mot" niveau="jaune" dossier="X7/ex13" fichier="majuscules.lua">
+Transforme `"le grand parc de la ville"` en `Le Grand Parc De La Ville` : découpe en mots, mets la première lettre de chacun en majuscule, puis recolle avec des espaces.
+
+<div slot="indice1">`for mot in string.gmatch(phrase, "%a+")` donne un mot à la fois.</div>
+<div slot="indice2">La première lettre : `string.sub(mot, 1, 1)`. Le reste : `string.sub(mot, 2)` (sans 3e argument, jusqu'à la fin).</div>
+<div slot="indice3">Range chaque mot transformé dans une table avec `table.insert`, puis `table.concat(mots, " ")`.</div>
+<div slot="solution">« Découper, transformer, recoller » : une technique qui sert tout le temps. Il existe une version en une seule ligne avec `gsub` et une fonction : tu la rencontreras dans le dernier exercice.</div>
+</Exercice>
+
+<FinEtape id="X7-e2" titre="Série 2 · application" victoire="tu as réussi 7 exercices sans indice (ou avec très peu) : tu lis, valides et transformes du texte avec des motifs." prochaine="la série 3 : les défis (pseudos, plaques, tableau des scores, modérateur de chat)." />
+
+### Série 3 · 🔴 Défis
+
+Six exercices qui combinent deux ou trois idées : prends ton temps, et ouvre les indices un par un.
+
+<Exercice id="X7-ex14" titre="Un pseudo en règle" niveau="rouge" dossier="X7/ex14" fichier="pseudos.lua">
+Un pseudo est valide s'il a entre 3 et 12 caractères, commence par une lettre et ne contient que des lettres, des chiffres ou `_`. Écris `verifierPseudo(pseudo)` qui renvoie `true`, ou `false` accompagné de la raison du refus (trois raisons possibles, voir le résultat).
+
+<div slot="indice1">Trois tests, dans l'ordre : la longueur (avec `#`), la première lettre, puis les caractères autorisés. Renvoie dès qu'un test échoue.</div>
+<div slot="indice2">Première lettre : `^%a`. Caractères autorisés : l'ensemble `[%w_]` répété du début à la fin du texte.</div>
+<div slot="indice3">`string.match(pseudo, "^[%w_]+$")` vaut `nil` dès qu'un caractère interdit s'y glisse.</div>
+<div slot="solution">Chaque test a sa propre raison, donc on garde des `if` séparés plutôt qu'un gros motif unique : `^%a[%w_]+$` vérifierait la forme mais ne dirait pas **pourquoi** on refuse. La longueur se teste avec `#`, car Lua n'a pas de `{3,12}`.</div>
+</Exercice>
+
+<Exercice id="X7-ex15" titre="Lecture : glouton ou paresseux ?" niveau="rouge" type="lecture" dossier="X7/ex15" fichier="lecture-glouton.lua">
+Prédis les 7 lignes affichées (le dernier `print` en produit une seule, avec deux valeurs). Les crochets sont spéciaux dans un motif, d'où les `%[` et `%]`. Vérifie ensuite en exécutant.
+
+<div slot="indice1">`.*` prend le plus de caractères possible, `.-` le moins possible.</div>
+<div slot="indice2">`%a+` ne peut pas traverser un `]` : il s'arrête à la fin du premier mot.</div>
+<div slot="indice3">Dans le remplacement de `gsub`, `%1` désigne la première capture.</div>
+<div slot="solution">`.*` est **glouton** : il avance jusqu'au **dernier** `]` possible, d'où le texte capturé trop long. `.-` est **paresseux** : il s'arrête au premier `]`. Avec `gmatch`, chaque tour de boucle donne le morceau suivant. Dernière ligne : chaque `[mot]` devient `<mot>`, avec 3 remplacements.</div>
+</Exercice>
+
+<Exercice id="X7-ex16" titre="Débogage : la plaque refusée" niveau="rouge" type="debug" dossier="X7/ex16" fichier="plaque.lua">
+Cette fonction doit valider les plaques au format `AB-123-CD` (2 majuscules, un tiret, 3 chiffres, un tiret, 2 majuscules). Mais elle refuse **toutes** les plaques, même les bonnes. Aucun message d'erreur : à toi de trouver pourquoi.
+
+<div slot="indice1">Teste le motif par morceaux : garde le début, supprime la fin, et vois à partir de quand le résultat devient `nil`.</div>
+<div slot="indice2">Le tiret `-` est un **quantificateur** (« zéro ou plusieurs, le moins possible »), pas un simple tiret.</div>
+<div slot="indice3">Pour un vrai tiret, écris `%-`.</div>
+<div slot="solution">`%u%u-` ne veut pas dire « deux majuscules puis un tiret » mais « une majuscule, puis zéro ou plusieurs majuscules (le moins possible) ». Pas d'erreur, juste un motif qui ne correspond jamais : c'est le piège classique. Tous les caractères spéciaux (`.`, `%`, `[`, `-`…) se protègent avec `%`.</div>
+</Exercice>
+
+<Exercice id="X7-ex17" titre="Palindromes" niveau="rouge" dossier="X7/ex17" fichier="palindromes.lua">
+Un palindrome se lit pareil dans les deux sens, sans tenir compte des espaces ni des majuscules (`Kayak`). Écris `estPalindrome(texte)` et teste les quatre phrases du résultat attendu.
+
+<div slot="indice1">Nettoie d'abord le texte : ne garde que les lettres, en minuscules.</div>
+<div slot="indice2">`string.gsub(texte, "[^%a]", "")` supprime tout ce qui n'est pas une lettre (le `^` placé dans les crochets signifie « sauf »).</div>
+<div slot="indice3">Compare ensuite le texte nettoyé avec `string.reverse(texte_nettoye)`.</div>
+<div slot="solution">`gsub` renvoie deux valeurs : avec `local x = …`, on ne garde que la première (le texte). Reste sans accents (voir B2) : « Ésope » avec un accent ne serait pas reconnu, d'où `Esope` dans la phrase de test.</div>
+</Exercice>
+
+<Exercice id="X7-ex18" titre="Le tableau des scores" niveau="rouge" dossier="X7/ex18" fichier="scores.lua">
+Affiche le tableau ci-dessous (la liste est déjà triée dans le code de départ). La colonne des noms a la largeur du **plus long** nom, le score est aligné à droite sur 5 caractères, et le titre `SCORES` est centré au-dessus. Lua n'accepte pas `%*s` : construis le modèle avec `..`.
+
+<div slot="indice1">Cherche d'abord la largeur du plus long nom avec une boucle (comme pour chercher un maximum).</div>
+<div slot="indice2">Modèle : `"%-" .. largeur .. "s | %5d"`. Largeur totale : largeur du nom, plus 3 (le ` | `), plus 5.</div>
+<div slot="indice3">Titre centré : `string.rep(" ", (largeurTotale - #titre) // 2) .. titre`.</div>
+<div slot="solution">Trois idées assemblées : un maximum (boucle), un modèle de `string.format` construit à la volée, et le centrage (la moitié de la place libre en marge, `//` pour rester entier). Remplace `"Alexandre"` par `"Alexandrine"` : tout se réaligne tout seul. Essayer `%*s` donne l'erreur `invalid conversion '%*' to 'format'`.</div>
+</Exercice>
+
+<Exercice id="X7-ex19" titre="Mini-projet : le modérateur du chat" niveau="rouge" type="projet" dossier="X7/ex19" fichier="moderateur.lua">
+Chaque message du chat est soit une commande (`/give`, `/msg`, `/aide`, `/help`), soit un message normal dont les mots interdits sont masqués par des `*`. Écris le modérateur qui affiche le résultat attendu pour la liste de messages du code de départ.
+
+<div slot="validation">Une commande inconnue est signalée sans planter ; `/aide` et `/help` partagent la même fonction ; ajouter une commande revient à ajouter une ligne dans la table `commandes` ; les mots interdits sont masqués quelle que soit leur casse.</div>
+<div slot="indice1">Sépare d'abord la commande du reste : `string.match(texte, "^/(%S+)%s*(.*)$")` vaut `nil` pour un message normal.</div>
+<div slot="indice2">Range les commandes dans une table `commandes[nom] = function(auteur, reste) … end` (comme au module B7) et cherche la bonne avec `commandes[string.lower(nom)]`.</div>
+<div slot="indice3">Pour masquer : `string.gsub(texte, "%a+", function(mot) … end)`. Si la fonction ne renvoie rien, le mot reste tel quel ; sinon elle renvoie les étoiles (`string.rep("*", #mot)`).</div>
+<div slot="solution">Tu as réuni `match` avec captures, une table de fonctions et `gsub` avec une fonction. Comme les motifs n'ont pas de « ou », `aide` et `help` pointent vers la **même** fonction. C'est l'architecture d'un vrai gestionnaire de commandes de chat, que tu retrouveras en écrivant tes scripts de serveur.</div>
+</Exercice>
+
+<FinEtape id="X7-e3" titre="Série 3 · défis" victoire="tu as réussi 6 défis sans indice (ou avec très peu) : ton modérateur de chat tourne." prochaine="le quiz du module, puis la salle X8 sur les algorithmes classiques." />
+
+## Erreurs fréquentes
+
+| Message ou symptôme | Cause | Solution |
+|---|---|---|
+| `attempt to concatenate a nil value (local 'cmd')` | `match` n'a rien trouvé (il renvoie `nil`) et tu utilises quand même la capture | Teste avant : `if cmd then … end` |
+| `malformed pattern (ends with '%')` | Un `%` seul dans le motif | Écris `%%` pour un vrai `%` |
+| `malformed pattern (missing ']')` | Un `[` jamais refermé | Ferme-le avec `]`, ou écris `%[` pour un vrai crochet |
+| `invalid capture index %2` | `%2` dans le remplacement, mais une seule paire de parenthèses dans le motif | Compte les parenthèses : une par capture |
+| `bad argument #1 to 'match' (string expected, got nil)` | La variable passée à `match` vaut `nil` | `print(variable)` juste avant pour voir ce qu'elle contient |
+| `invalid conversion '%*' to 'format'` | `%*s` n'existe pas en Lua | Construis le modèle : `"%-" .. largeur .. "s"` |
+| `bad argument #2 to 'format' (number has no integer representation)` | `%d` avec un nombre décimal (`3.5`) | `%.2f`, ou `math.floor` avant |
+| Aucune erreur, mais `nil` ou un résultat étrange | `.` ou `-` non échappés, ou une barre verticale utilisée comme « ou » | Échappe avec `%` ; pour un « ou », fais deux tests |
+| `string.upper("café")` donne `CAFé` | Les fonctions `string` travaillent sur des octets, pas sur les lettres accentuées | Textes sans accents pour ces traitements |
+
+## Quiz du module X7
+
+<Quiz id="X7-quiz" questions={[
+  { q: "Que donne `string.sub(\"garagiste\", -3)` ?", choix: ["`gar`", "`ste`", "`iste`", "`gara`"], ok: 1, pourquoi: "Un indice négatif compte depuis la fin : `-3` désigne le 3e caractère avant la fin, et sans 3e argument on va jusqu'au bout. Les 3 derniers caractères sont `ste`." },
+  { q: "Quel motif accepte exactement un code postal de 5 chiffres, et rien d'autre ?", choix: ["`%d+`", "`%d{5}`", "`^%d%d%d%d%d$`", "`^%a%a%a%a%a$`"], ok: 2, pourquoi: "Il faut 5 fois `%d` entre les ancres `^` et `$`. Lua n'a pas de répétition avec accolades, et `%d+` accepterait n'importe quel nombre de chiffres." },
+  { q: "Que renvoie `string.gsub(\"aaa\", \"a\", \"b\")` ?", choix: ["`bbb` puis le nombre `3`", "`bbb` seulement", "`3` seulement", "`aaa`"], ok: 0, pourquoi: "`gsub` renvoie toujours deux valeurs : le nouveau texte et le nombre de remplacements." },
+  { q: "Dans un motif, que signifie `-` placé après une classe (comme `%a-`) ?", choix: ["Un tiret", "Un ou plusieurs, le plus possible", "Une lettre sauf celle-là", "Zéro ou plusieurs, le moins possible"], ok: 3, pourquoi: "`-` est le quantificateur « paresseux ». Pour un vrai tiret, il faut écrire `%-`." },
+  { q: "Pourquoi `string.gsub(\"a.b\", \".\", \"/\")` donne-t-il `///` ?", choix: ["`gsub` remplace toujours tout le texte", "Le point est spécial : il représente n'importe quel caractère, il faut écrire `%.`", "Le 3e argument est faux", "Lua remplace chaque lettre"], ok: 1, pourquoi: "Dans un motif, `.` représente n'importe quel caractère. Pour un vrai point : `%.`." },
+  { q: "Quelle fonction te permet de parcourir tous les mots d'une phrase dans un `for … in` ?", choix: ["`string.find`", "`string.match`", "`string.gmatch`", "`string.sub`"], ok: 2, pourquoi: "`gmatch` fournit les morceaux qui correspondent au motif, un par tour de boucle." },
+  { q: "Comment reconnaître « aide » ou « help » ?", choix: ["Avec le motif `^(aide|help)$`", "Avec le motif `^aide,help$`", "Avec le motif `^[aide][help]$`", "Il n'y a pas de barre verticale en Lua : on fait deux tests, ou on range les noms dans une table"], ok: 3, pourquoi: "Les motifs Lua ne sont pas des regex complètes : pas de « ou ». On teste deux fois, ou on associe les deux noms à la même fonction." },
+  { q: "Que donne `string.format(\"%-6s|\", \"Sam\")` ?", choix: ["`Sam   |`", "`   Sam|`", "`Sam|`", "`-Sam   |`"], ok: 0, pourquoi: "`%-6s` aligne à gauche sur 6 caractères : `Sam` suivi de 3 espaces, puis la barre." },
+  { q: "`string.match(\"750011\", \"%d%d%d%d%d\")` accepte 6 chiffres. Pourquoi ?", choix: ["`%d` accepte aussi les lettres", "Sans `^` et `$`, le motif peut se trouver n'importe où dans le texte", "`match` ne vérifie jamais rien", "Lua arrondit le nombre"], ok: 1, pourquoi: "Le motif trouve 5 chiffres au début du texte et s'arrête là. Les ancres `^` et `$` imposent de couvrir tout le texte." },
+  { q: "Quelle est la valeur de `type(string.match(\"Sam a 250 euros\", \"%d+\"))` ?", choix: ["`\"number\"`", "`\"nil\"`", "`\"table\"`", "`\"string\"`"], ok: 3, pourquoi: "Une capture est toujours du texte. Pour calculer avec, il faut `tonumber`." },
+]} />
+
+## Récapitulatif
+
+- Extraire : `string.sub(s, i, j)` (indices négatifs depuis la fin), `#s`, `upper`, `lower`, `reverse`, `rep`.
+- Mettre en forme : `string.format` avec `%s`, `%d`, `%.2f`, largeur `%6d`, alignement à gauche `%-8s`. Largeur variable : construis le modèle avec `..`.
+- Quatre fonctions à motifs : `find` (positions), `match` (captures), `gmatch` (un par un), `gsub` (remplacer, avec nombre de remplacements).
+- Motifs : classes `%a %d %w %s %u`, ensembles `[...]`, quantificateurs `+ * - ?`, ancres `^ $`, captures `( )`, échappement `%`.
+- Un motif Lua n'est pas une regex : pas de `|`, pas de `{n}`. Teste `nil` avant d'utiliser une capture.
+- Valider = ancres `^ $` ; découper une commande = captures ; masquer ou transformer = `gsub` avec une fonction.
+
+## Je suis bloqué, que faire ?
+
+1. Affiche ce que tu manipules : `print(texte)`, `print(string.match(texte, motif))`.
+2. Teste le motif **seul**, sur une phrase très simple, dans un fichier à part. Construis-le morceau par morceau.
+3. Le résultat est `nil` ? Enlève `^` et `$`, puis remets-les un par un. Cherche un `.`, un `-` ou un `%` à protéger.
+4. Compare ton motif avec la fiche mémo ci-dessus, ligne 5 à 10.
+5. Demande à une IA des **indices**, pas la réponse : « Je m'entraîne aux motifs Lua (pas aux regex). Voici mon motif, mon texte et le résultat obtenu. Dis-moi seulement quelle partie du motif pose problème, sans écrire la solution complète. »
+
+<Videos recherche="Lua string.match motifs patterns tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : les motifs (patterns)](https://www.lua.org/manual/5.4/manual.html#6.4.1)
+- [Manuel Lua 5.4 : la bibliothèque string](https://www.lua.org/manual/5.4/manual.html#6.4)
+- [Doc Nanos World : bibliothèque string (celle de Lua, complétée par des fonctions propres à Nanos World)](https://docs.nanos-world.com/docs/scripting-reference/standard-libraries/string)

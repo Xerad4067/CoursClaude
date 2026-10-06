@@ -1,0 +1,7 @@
+pseudo | produit | quantite | prix | total_ligne
+Sam | eau | 4 | 2 | 8
+Sam | pain | 4 | 3 | 12
+Sam | sandwich | 1 | 6 | 6
+
+commande | total
+4 | 26

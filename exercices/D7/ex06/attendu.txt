@@ -1,0 +1,11 @@
+2 ligne(s) modifiée(s)
+
+3 ligne(s) modifiée(s)
+
+id | adresse | quartier_id
+1 | 12 rue des Pins | 1
+2 | 3 impasse du Lac | 2
+3 | 7 avenue du Port | 1
+
+id | seq | table | from | to | on_update | on_delete | match
+0 | 0 | quartiers | quartier_id | id | NO ACTION | NO ACTION | NONE

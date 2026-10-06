@@ -95,7 +95,7 @@ Règles documentées :
 * Seul le fichier **`Index.lua`** de chaque dossier (`Server/`, `Client/`, `Shared/`) est lancé automatiquement ; il importe les autres avec `Package.Require` `[D core-concepts/packages/package-loading-and-lua-environment.mdx]`.
 * Seuls les packages de type `script`, `game-mode` et `map` ont cette structure `Server/Client/Shared` `[D getting-started/essential-concepts.mdx]`.
 * **Nom du dossier d'un package = son identifiant** : minuscules, chiffres et `-` uniquement, 64 caractères max `[D core-concepts/packages/packages-guide.mdx]`.
-* Un dossier à ignorer côté clients (par exemple `node_modules`) : y mettre un fichier `.ignore` `[D core-concepts/packages/packages-guide.mdx]`.
+* Un dossier à ne pas envoyer aux clients (la doc cite les dossiers auto-générés par Node.js pour les pages HTML) : y mettre un fichier `.ignore` `[D core-concepts/packages/packages-guide.mdx]`.
 * Image du package dans le Vault : `Package.jpg` à côté de `Package.toml` (300x150 conseillé), inutile sinon `[D core-concepts/packages/packages-guide.mdx]`.
 * Création guidée : `./NanosWorldServer.exe --cli add package mon-package` (demande titre, auteur, type) `[D getting-started/quick-start.mdx]`.
 
@@ -409,7 +409,7 @@ Sources : `[D core-concepts/scripting/events-guide.mdx]`, `[D core-concepts/scri
 
 | Forme | Effet | Premier argument du callback |
 |---|---|---|
-| `Classe.Subscribe("Event", callback)` | tous les entités de la classe | l'entité (`self`) |
+| `Classe.Subscribe("Event", callback)` | toutes les entités de la classe | l'entité (`self`) |
 | `entite:Subscribe("Event", callback)` | cette entité seulement ; désabonnement **automatique** à sa destruction | l'entité (`self`) |
 | `Classe.Unsubscribe("Event")` | enlève **tous** les callbacks de ce package pour cet événement | |
 | `Classe.Unsubscribe("Event", callback)` | enlève ce callback seulement | |
@@ -637,7 +637,7 @@ Les « Key Bindings » nommés (`Input.Register` puis `Input.Bind(nom, InputEven
 
 ### 2.6 Événements non utiles au parcours (pour mémoire)
 
-`Level` (`StreamLevelLoad`, `StreamLevelUnload`, `StreamLevelShow`, `StreamLevelHide`, `StreamLevelBeginPause`, `StreamLevelEndPause`), `Console "LogEntry"`, événements de `Sound`/`Light`/`Particle` : aucun. `Light`, `Sound`, `Particle`, `StaticMesh`, `Text3D`, `TextRender`, `Billboard` n'ont **aucun événement** propre dans les JSON (hormis ceux hérités d'`Entity` et d'`Actor`).
+`Level` (client seulement) : `StreamLevelLoad`, `StreamLevelUnload`, `StreamLevelShow`, `StreamLevelHide` (argument `level_name`), `StreamLevelBeginPause`, `StreamLevelEndPause`. `Light`, `Sound`, `Particle`, `StaticMesh`, `Text3D`, `TextRender`, `Billboard` n'ont **aucun événement** propre dans les JSON (hormis ceux hérités d'`Entity` et d'`Actor`).
 
 ---
 

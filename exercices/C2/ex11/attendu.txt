@@ -1,5 +1,5 @@
-[001] INFO  Début de la paie (caisse : 100 €)
-[002] INFO  Sam payé : 50 €
-[003] INFO  Kim payé : 40 €
-[004] WARN  Caisse insuffisante pour Alex (reste 10 €, salaire 30 €)
-[005] INFO  Fin de la paie (caisse : 10 €)
+[001] INFO   Début de la paie (caisse : 100 €)
+[002] INFO   Sam payé : 50 €
+[003] INFO   Kim payé : 40 €
+[004] WARN   Caisse insuffisante pour Alex (reste 10 €, salaire 30 €)
+[005] INFO   Fin de la paie (caisse : 10 €)

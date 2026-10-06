@@ -2,27 +2,22 @@
 <html lang="fr">
   <head>
     <meta charset="utf-8">
-    <title>Bienvenue en direct</title>
+    <title>Joueurs en ligne</title>
   </head>
   <body>
-    <h1>Bienvenue en direct</h1>
-    <label for="pseudo">Ton pseudo</label>
-    <input id="pseudo" type="text">
-    <p id="accueil">Bienvenue, voyageur !</p>
+    <h1>Joueurs en ligne</h1>
+    <p>Connectés : <span id="compteur">0</span></p>
+    <button id="connexion" type="button">Un joueur se connecte</button>
 
+    <!-- Le script est après les éléments : quand il les cherche, ils existent déjà -->
     <script>
-      const champ = document.querySelector("#pseudo");
-      const accueil = document.querySelector("#accueil");
+      let joueurs = 0;
+      const compteur = document.querySelector("#compteur");
+      const bouton = document.querySelector("#connexion");
 
-      // L'événement « input » se déclenche à CHAQUE modification du champ
-      champ.addEventListener("input", () => {
-        // champ.value : le texte actuellement tapé ; trim() retire les espaces autour
-        const pseudo = champ.value.trim();
-        if (pseudo === "") {
-          accueil.textContent = "Bienvenue, voyageur !";
-        } else {
-          accueil.textContent = `Bienvenue, ${pseudo} !`;
-        }
+      bouton.addEventListener("click", () => {
+        joueurs = joueurs + 1;
+        compteur.textContent = joueurs;
       });
     </script>
   </body>
