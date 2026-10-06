@@ -742,7 +742,7 @@ Méthodes d'instance :
 
 | Signature | Côté | Retour / notes |
 |---|---|---|
-| `entity:GetID()` | S+C | identifiant réseau universel (le même côtés serveur et client) |
+| `entity:GetID()` | S+C | identifiant réseau universel (le même côté serveur et côté client) |
 | `entity:IsValid()` | S+C | `false` si détruite |
 | `entity:IsA(class: table)` | S+C | **passer la classe, pas une chaîne** : `entity:IsA(Weapon)` ; vrai aussi pour les classes filles |
 | `entity:GetClass()` | S+C | |
@@ -833,9 +833,9 @@ Exemple copié de `[D getting-started/quick-start.mdx]` : `Character(Vector(0, 0
 | `c:AddSkeletalMeshAttached(id, skeletal_mesh_path, socket = "", relative_location, relative_rotation, use_parent_bounds, use_base_leader_pose_component, animation_path, attachable_id)` | S+C | vêtements ; **ordre des paramètres changé en 1.144** |
 | `c:AddStaticMeshAttached(id, static_mesh_path, socket = "", relative_location, relative_rotation, use_parent_bounds, attachable_id)` | S+C | cheveux, barbe, objets |
 | `c:PlayAnimation(animation_path, slot_type = AnimationSlotType.FullBody, loop_indefinitely = false, blend_in_time = 0.25, blend_out_time = 0.25, play_rate = 1.0, stop_all_montages = false)` | S+C | |
-| `c:LookAt(location: Vector)`, `c:MoveTo(location, acceptance_radius = 50)`, `c:Follow(actor, acceptance_radius = 50, stop_on_succeed, stop_on_fail, update_rate = 0.25)`, `c:StopMovement(stops_velocity = false)` | S (`LookAt`), Auth | IA : ne marche que si un joueur est connecté (la physique/IA est calculée par un client) |
+| `c:LookAt(location: Vector)`, `c:MoveTo(location, acceptance_radius = 50)`, `c:Follow(actor, acceptance_radius = 50, stop_on_succeed, stop_on_fail, update_rate = 0.25)`, `c:StopMovement(stops_velocity = false)` | `LookAt` : S ; `MoveTo`, `Follow`, `StopMovement` : Auth | IA : ne marche que si un joueur est connecté (la physique/IA est calculée par un client) |
 
-**Téléportation : NON DOCUMENTÉ comme fonction dédiée.** Aucun fichier JSON ne contient « Teleport ». La seule méthode documentée pour placer un personnage est `SetLocation` (côté qui l'a créé), et `Respawn(location, rotation)` pour un personnage mort ou à remettre à une position `[A Classes/BaseActor.json]`, `[A Classes/BaseDamageable.json]`.
+**Téléportation : NON DOCUMENTÉ comme fonction dédiée.** Aucun fichier JSON ne contient « Teleport ». Les méthodes documentées pour placer un personnage sont `SetLocation` (côté qui l'a créé) et `Respawn(location, rotation)` (« filling its Health and moving it ») `[A Classes/BaseActor.json]`, `[A Classes/BaseDamageable.json]`. Si `Respawn` est utilisable sur un personnage vivant : NON DOCUMENTÉ.
 
 **Objets portés** :
 

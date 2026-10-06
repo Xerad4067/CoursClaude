@@ -1,0 +1,6 @@
+Closes #12 -> ferme 12
+Corrige le prix négatif. Fixes: #7 -> ferme 7
+Resolves #10, resolves #123 -> ferme 10, 123
+Voir aussi #5 pour le contexte -> ne ferme rien
+Closes #3 et #4 -> ferme 3
+Ajoute le préfixe : prefixes #9 dans les noms -> ne ferme rien

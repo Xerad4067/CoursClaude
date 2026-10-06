@@ -1,0 +1,3 @@
+Le prix négatif est accepté à la caisse : complète
+ça marche pas : incomplète, manque ## Étapes pour reproduire ; ## Résultat attendu ; ## Résultat obtenu ; ## Version et environnement
+L'inventaire n'est pas trié : incomplète, manque ## Résultat attendu ; ## Version et environnement
