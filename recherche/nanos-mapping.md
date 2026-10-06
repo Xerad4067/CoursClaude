@@ -172,6 +172,26 @@ Exemple dérivé (**non testé**), cohérent avec `getting-started/essential-con
 27. Diagnostic : logs serveur dans `.logs/` (`NanosWorldCore.log`), logs client dans `%LocalAppData%\NanosWorld\Saved\Logs\` [DOC `troubleshooting.mdx`]. Corrections génériques : recooker avec un ADK à jour ; supprimer `Saved/`, `Intermediate/` et `DerivedDataCache/` du projet pour un recook complet ; vérifier l'installation d'Unreal dans le Launcher [DOC `importing-assets.mdx`, « Troubleshooting »].
 28. (Facultatif) Publier sur la Vault : `--cli upload assets <nom>` exige un **`token`** : ne **jamais** le mettre dans le dépôt [DOC `command-line-interface.mdx`, `vault-and-store/store.mdx`].
 
+**Arborescence attendue côté serveur** (**dérivée** des schémas de `importing-assets.mdx`, `core-concepts/assets.mdx` et `packages-guide.mdx` ; non testée) :
+
+```folder-structure
+nanos-world/Server/            (ou nanos-world-server/)
+├── NanosWorldServer.exe
+├── Config.toml                ([game] map = "mon-village-map")
+├── Assets/
+│   └── mon-pack/              (kebab-case)
+│       ├── Assets.toml
+│       └── MonVillage/        (dossier cooké copié tel quel)
+│           ├── Maps/Village.umap
+│           └── ... (.uasset, .uexp, .ubulk)
+└── Packages/
+    └── mon-village-map/       (type map, kebab-case)
+        ├── Package.toml
+        └── Server/Index.lua   (facultatif)
+```
+
+**Liste de contrôle du premier export** (chaque point vient d'une étape ci-dessus) : (1) la map est dans un dossier de `Content/` qui n'est pas `NanosWorld/` ; (2) R1 à R3 appliquées ; (3) cooking terminé sans erreur ; (4) tous les dossiers cookés copiés, aucun renommé ; (5) `unreal_folders` = noms exacts des dossiers copiés ; (6) la clé de `[assets.maps]` pointe vers `Dossier/.../NomDeLaMap` sans extension ; (7) `map_asset = "mon-pack::Clé"` correspond au dossier du pack et à cette clé ; (8) `map = "mon-village-map"` dans `Config.toml` ; (9) même application Steam pour le jeu et le serveur ; (10) en cas d'échec : journaux (étape 27).
+
 ### 1.3 Variante « Forge » (cooking automatisé)
 
 Forge est un plugin Unreal **expérimental**, communautaire (auteur : NegativeName), endossé par Nanos, « actively developed ... occasional bugs may occur » ; inclus dans l'ADK de GitHub et dans l'ADK Steam [DOC `assets-modding/forge/setup.mdx`, BLOG `blog/2026-03-04-february.mdx`]. Fenêtre : **Window > Nanos World Forge**. Le **Cook Handler** copie le contenu cooké vers `ServerPath/Assets/` (repli : `YourProject/ForgeCooked/`) et écrit un `Assets.toml` par pack. Réglages : `Nanos World Server Path`, `Enable Cook Handler`, `Write Assets Toml` [DOC `forge/setup.mdx`].
@@ -319,6 +339,19 @@ Utilisables par `"nanos-world::<clé>"` ; leur taille, leur collision et leur re
 | Effets | `nanos-world::P_Fire` (particule), lumière via classe `Light` |
 
 Ces clés ne sont **pas** des acteurs placés dans l'éditeur Unreal : le dossier de contenu `NanosWorldMaps/...` n'est pas décrit dans l'ADK (NON DOCUMENTÉ : présence dans le projet ADK).
+
+Exemple Lua **dérivé de l'API** (signatures de `StaticMesh`, `Light`, `Trigger` vérifiées dans EXT-API ; clés vérifiées dans EXT-SRV ; **non testé**, positions arbitraires, orientation et taille des meshes NON DOCUMENTÉES, à ajuster en jeu) :
+
+```lua
+-- Server/Index.lua d'un package "script" ou "map" (côté serveur : tout est synchronisé aux joueurs)
+local maison = StaticMesh(Vector(0, 0, 0), Rotator(0, 0, 0), "nanos-world::SM_House_01")
+local banc   = StaticMesh(Vector(800, 0, 0), Rotator(0, 90, 0), "nanos-world::SM_Bench")
+local lampe  = Light(Vector(800, 200, 250), Rotator(), Color(1, 0.9, 0.7), LightType.Point, 100, 400)
+local zone   = Trigger(Vector(0, 0, 100), Rotator(), 300, TriggerType.Sphere, true)  -- true = visible (débogage)
+zone:Subscribe("BeginOverlap", function(trigger, actor)
+    if (actor:IsA(Character)) then Console.Log("Un personnage entre dans la zone") end
+end)
+```
 
 ### 5.2 Intérieurs (maisons)
 

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Fiche du serveur Port-Soleil RP</title>
+    <style>
+      /* 1. Page sombre lisible : fond très foncé, texte presque blanc */
+      body {
+        background: #14161a;
+        color: #e8eaed;
+        font-family: Roboto, Arial, sans-serif;
+        font-size: 18px;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      /* 2. Une colonne de lecture centrée, avec de l'air autour */
+      header, main, footer {
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 1rem;
+      }
+      header { border-bottom: 2px solid #f5a524; }
+      footer { border-top: 1px solid #3c4350; font-size: 0.9rem; }
+
+      /* 3. Titres et liens colorés (toujours bien contrastés avec le fond) */
+      h1, h2, h3 { color: #ffcc66; line-height: 1.2; }
+      a { color: #8ab4f8; }
+
+      /* 4. Les métiers : des cartes alignées avec flex, qui passent à la ligne si besoin */
+      .metiers {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        list-style: none;
+        padding: 0;
+      }
+      .metiers li {
+        background: #20242b;
+        border: 1px solid #3c4350;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        width: 12rem;
+        box-sizing: border-box;
+      }
+      .metiers h3 { margin: 0.25rem 0; font-size: 1.1rem; }
+      .metiers p { margin: 0.25rem 0; }
+
+      /* 5. Le formulaire */
+      label { display: block; margin-top: 0.75rem; }
+      input, select, textarea { font: inherit; padding: 0.4rem; }
+      .case label { display: inline; }
+      button {
+        font: inherit;
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        background: #f5a524;
+        color: #14161a;
+        border: 0;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Port-Soleil RP</h1>
+      <p>Serveur roleplay francophone · <a href="#candidature">Candidater</a></p>
+    </header>
+
+    <main>
+      <section>
+        <h2>Les règles</h2>
+        <ol>
+          <li>Respecte les autres joueurs.</li>
+          <li>Joue ton personnage : pas de vol de véhicule sans scénario.</li>
+          <li>Écoute le staff.</li>
+        </ol>
+      </section>
+
+      <section>
+        <h2>Les métiers</h2>
+        <ul class="metiers">
+          <li><h3>Taxi</h3><p>12 € de l'heure</p></li>
+          <li><h3>Médecin</h3><p>18 € de l'heure</p></li>
+          <li><h3>Mécanicien</h3><p>15 € de l'heure</p></li>
+          <li><h3>Policier</h3><p>16 € de l'heure</p></li>
+        </ul>
+      </section>
+
+      <section id="candidature">
+        <h2>Candidature</h2>
+        <form>
+          <label for="pseudo">Pseudo</label>
+          <input id="pseudo" name="pseudo" type="text">
+
+          <label for="metier">Métier souhaité</label>
+          <select id="metier" name="metier">
+            <option>Taxi</option>
+            <option>Médecin</option>
+            <option>Mécanicien</option>
+            <option>Policier</option>
+          </select>
+
+          <label for="motivation">Pourquoi toi ?</label>
+          <textarea id="motivation" name="motivation" rows="3" cols="40"></textarea>
+
+          <p class="case">
+            <input id="regles" name="regles" type="checkbox">
+            <label for="regles">J'ai lu les règles</label>
+          </p>
+
+          <!-- type="button" : formulaire factice, rien n'est envoyé -->
+          <button type="button">Envoyer ma candidature</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <p>Page d'entraînement : aucune donnée n'est envoyée. Contact : contact@exemple.fr</p>
+    </footer>
+  </body>
+</html>
