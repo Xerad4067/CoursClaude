@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "sumneko.lua",
+    "go-horse-studios.nanos-world",
+    "MS-CEINTL.vscode-language-pack-fr",
+    "streetsidesoftware.code-spell-checker",
+    "streetsidesoftware.code-spell-checker-french",
+    "usernamehw.errorlens",
+    "mhutchie.git-graph",
+    "astro-build.astro-vscode"
+  ],
+  "unwantedRecommendations": [
+    "Derpius.nanosworld"
+  ]
+}

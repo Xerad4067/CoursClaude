@@ -1,0 +1,6 @@
+=== Annuaire des métiers ===
+taxi : 12 €/h, véhicule Taxi
+mecanicien : 14 €/h, véhicule Dépanneuse
+livreur : 11 €/h, véhicule Camionnette
+Trouvé : taxi (Taxi)
+Métier inconnu : pilote

@@ -1,0 +1,59 @@
+---
+title: Où travailler
+description: Quelle machine pour quelle activité, et comment ranger tes dossiers.
+sidebar:
+  order: 4
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+Chaque leçon indique où la faire : **💻 portable**, **🖥️ PC fixe** ou **🔀 les deux**. Voici la logique.
+
+## Quelle machine pour quoi ?
+
+| Activité | 💻 Portable HP | 🖥️ PC fixe | Pourquoi |
+|---|---|---|---|
+| Lire le cours, faire les quiz | ✅ idéal | ✅ | Le portable est parfait pour se concentrer, n'importe où |
+| Parcours A à D (Lua, Git, SQL, Web) | ✅ idéal | ✅ | Aucun besoin de carte graphique |
+| Écrire des scripts Nanos World | ✅ | ✅ | C'est du texte : VS Code suffit |
+| Lancer un serveur Nanos World de test | ✅ possible d'après la doc | ✅ | Le serveur est très léger (50 Mo de RAM minimum) ; non testé |
+| Jouer / tester en jeu (client Nanos World) | ❌ | ✅ | Carte graphique dédiée nécessaire |
+| Unreal Engine (mapping) | ❌ **jamais** | ✅ | GPU intégré et 512 Go : trop juste |
+| Blender | ❌ | ✅ | Même raison |
+| Claude Code | ✅ | ✅ | Les deux conviennent (abonnement requis) |
+
+## Comment ranger tes dossiers
+
+Sur **les deux machines**, utilise la même organisation (ça évite de se perdre) :
+
+```text
+C:\Users\TonNom\Dev\
+├── mon-apprentissage\   ← ton dépôt : exercices, journal, progression (synchronisé avec GitHub)
+└── CoursClaude\         ← le site du cours (pour le lancer en local)
+```
+
+Dans `mon-apprentissage`, une proposition :
+
+```text
+mon-apprentissage\
+├── README.md
+├── journal.md
+├── progression-cours.json   ← export de ta progression (voir « Ma progression »)
+├── parcours-a\
+└── parcours-b\
+    ├── b1\
+    └── b2\
+```
+
+## La règle d'or de la synchronisation
+
+<Encadre type="retenir">
+**En t'asseyant** devant une machine : `git pull`.
+**Avant de te lever** : `git add .`, `git commit -m "message clair"`, `git push`.
+</Encadre>
+
+Si tu oublies, ce n'est pas grave : la page [Dépannage](/outils/depannage/) explique comment réparer un `push` refusé ou un conflit.
+
+## Où lancer Claude Code ?
+
+Là où tu codes, dans le dossier du projet (`cd ~\Dev\CoursClaude` puis `claude`). Le fichier `CLAUDE.md` du dépôt lui donne le contexte. Il fonctionne aussi bien sur le portable que sur le PC fixe ; il ne remplace pas ta compréhension : demande-lui des indices, pas des solutions.

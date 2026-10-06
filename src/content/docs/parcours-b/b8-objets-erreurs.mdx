@@ -1,0 +1,239 @@
+---
+title: "B8 · Objets, erreurs et chaînes avancées"
+description: Créer des objets simples avec les métatables, gérer les erreurs avec error et pcall, analyser du texte et sérialiser une table.
+parcours: B
+module: B8
+duree: 3 h
+ou: les-deux
+prerequis: Module B7.
+resultat: Une mini boutique en texte, avec des objets, des commandes analysées et des erreurs gérées proprement.
+objectifs:
+  - "Écrire des méthodes avec : et self"
+  - Créer une « classe » simple avec setmetatable et __index
+  - Lever une erreur avec error et la rattraper avec pcall
+  - Analyser une commande avec string.match et des motifs
+  - Transformer une table en texte (sérialisation) et inversement
+sidebar:
+  order: 8
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : les méthodes avec `:`."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Tout le module jusqu'à la mini boutique."
+/>
+
+**Pourquoi c'est utile ?** Les classes de Nanos World (`Player`, `Character`, `Vehicle`…) s'utilisent avec des **méthodes** (`player:GetName()`). Un serveur doit aussi **survivre aux erreurs** (une commande mal tapée ne doit pas tout faire planter) et **analyser du texte** (les commandes du chat).
+
+## Étape 1 · Méthodes, `:` et self (20 min)
+
+```lua title="b8/compte.lua"
+local compte = { solde = 100 }
+
+function compte:deposer(montant)     -- le : ajoute un paramètre caché : self
+  self.solde = self.solde + montant  -- self = la table sur laquelle on appelle
+end
+
+compte:deposer(50)                   -- équivaut à compte.deposer(compte, 50)
+print(compte.solde)                  --> 150
+```
+
+`compte:deposer(50)` est un raccourci pour `compte.deposer(compte, 50)` : la table est passée automatiquement comme premier argument, nommé `self`.
+
+<FinEtape id="B8-e1" titre="Méthodes et self" victoire="tu écris et appelles des méthodes comme celles des classes Nanos World." prochaine="créer une classe avec une métatable (étape 2)." />
+
+## Étape 2 · Une classe simple avec les métatables (25 min)
+
+Une **métatable** change le comportement d'une table. Avec la clé spéciale `__index`, si une clé est absente d'une table, Lua va la chercher **ailleurs** : c'est ainsi qu'on partage des méthodes entre plusieurs objets.
+
+```lua title="b8/vehicule.lua"
+local Vehicule = {}
+Vehicule.__index = Vehicule          -- « si une clé manque, cherche dans Vehicule »
+
+function Vehicule.nouveau(nom, vitesse)
+  local v = setmetatable({}, Vehicule)   -- v utilise Vehicule comme métatable
+  v.nom = nom
+  v.vitesse = vitesse
+  return v
+end
+
+function Vehicule:decrire()
+  return self.nom .. " roule à " .. self.vitesse .. " km/h"
+end
+
+local taxi = Vehicule.nouveau("Taxi", 120)
+print(taxi:decrire())                --> Taxi roule à 120 km/h
+```
+
+<Encadre type="analogie">
+`Vehicule` est le **plan** (la classe) ; `taxi` est **une voiture construite** avec ce plan (un objet, une *instance*). La voiture n'a pas de copie du mode d'emploi : quand elle en a besoin, elle consulte le plan grâce à `__index`. Au parcours D, tu retrouveras ces notions (classe, objet, méthode) en programmation orientée objet.
+</Encadre>
+
+<FinEtape id="B8-e2" titre="Classes avec métatables" victoire="tu crées plusieurs objets qui partagent les mêmes méthodes." prochaine="gérer les erreurs (étape 3)." />
+
+## Étape 3 · error et pcall (20 min)
+
+`error(message)` **lève** une erreur : le programme s'arrête… sauf si on l'appelle via `pcall` (*protected call*), qui l'**attrape**.
+
+```lua title="b8/retrait.lua"
+local function retirer(solde, montant)
+  if montant > solde then
+    error("Solde insuffisant", 0)    -- 0 : message sans numéro de ligne
+  end
+  return solde - montant
+end
+
+local ok, resultat = pcall(retirer, 100, 500)
+print(ok, resultat)                  --> false   Solde insuffisant
+```
+
+`pcall(f, arg1, arg2)` renvoie `true` + les résultats si tout va bien, ou `false` + le message d'erreur. Le second argument de `error` (le **niveau**) : sans lui, Lua ajoute le fichier et la ligne au message ; avec `0`, le message reste tel quel (pratique pour l'afficher au joueur).
+
+<FinEtape id="B8-e3" titre="error et pcall" victoire="ton programme survit à une erreur et l'explique proprement." prochaine="analyser du texte et sérialiser (étape 4)." />
+
+## Étape 4 · Motifs de chaînes et sérialisation (25 min)
+
+Les **motifs** (*patterns*) de Lua décrivent la forme d'un texte : `%a` une lettre, `%d` un chiffre, `%s` un espace, `+` « un ou plusieurs », `*` « zéro ou plusieurs », `^` début, `$` fin, et les parenthèses **capturent**.
+
+```lua title="b8/commande.lua"
+local message = "/donner Sam 250"
+local cmd, cible, montant = string.match(message, "^/(%a+) (%a+) (%d+)$")
+print(cmd, cible, montant)           --> donner   Sam   250
+print(string.find("Bienvenue au garage", "garage"))   --> 14   19
+print(string.gsub("bonjour", "o", "0"))               --> b0nj0ur   2
+```
+
+**Sérialiser**, c'est transformer une table en **texte** pour la sauvegarder (fichier, base de données) ; **désérialiser**, c'est l'inverse. Pour une table simple, on peut produire du code Lua et le recharger avec `load` (à réserver à **tes** données : ne charge jamais du texte venant d'un joueur, il pourrait contenir du code). Le format standard d'échange sur le web est le **JSON** ; Nanos World propose ses propres outils de sauvegarde, vus au parcours E.
+
+<Encadre type="piege" titre="⚠️ Sécurité">
+`load` exécute du code. Ne l'utilise jamais sur une chaîne fournie par un joueur ou téléchargée : c'est une faille. Pour des données externes, utilise un format de données (JSON) et un lecteur dédié.
+</Encadre>
+
+<FinEtape id="B8-e4" titre="Motifs et sérialisation" victoire="tu analyses une commande de chat et tu sais transformer une table en texte." prochaine="les exercices, puis la mini boutique en texte." />
+
+## Erreurs fréquentes
+
+| Message | Cause | Solution |
+|---|---|---|
+| `attempt to index a number value (local 'self')` | Méthode appelée avec `.` au lieu de `:` | `objet:methode(...)` |
+| `attempt to call a nil value (method 'decrir')` | Méthode inexistante (faute, ou `__index` oublié) | Vérifie le nom et `Classe.__index = Classe` |
+| `string.match` renvoie `nil` | Le texte ne correspond pas au motif | Teste le motif sur un exemple simple |
+| Programme arrêté par une erreur prévue | `error` appelé hors `pcall` | Appelle la fonction risquée via `pcall` |
+
+## Exercices
+
+<Exercice id="B8-ex01" titre="La méthode deposer" niveau="vert" dossier="B8/ex01" fichier="compte.lua">
+Écris la méthode `compte:deposer(montant)` et utilise-la deux fois.
+
+<div slot="indice1">`function compte:deposer(montant) … end`.</div>
+<div slot="indice2">Dans la méthode, la table s'appelle `self`.</div>
+<div slot="indice3">`self.solde = self.solde + montant`.</div>
+<div slot="solution">Le `:` évite de répéter le nom de la table à chaque appel.</div>
+</Exercice>
+
+<Exercice id="B8-ex02" titre="Attraper une erreur" niveau="vert" dossier="B8/ex02" fichier="retrait.lua">
+Écris `retirer(solde, montant)` qui lève l'erreur `Solde insuffisant` (niveau 0) si besoin, puis appelle-la avec `pcall` pour un retrait possible et un retrait impossible.
+
+<div slot="indice1">`error("Solde insuffisant", 0)`.</div>
+<div slot="indice2">`local ok, resultat = pcall(retirer, 100, 30)`.</div>
+<div slot="indice3">Affiche `ok` et `resultat` avec un seul `print`.</div>
+<div slot="solution">Sans `pcall`, le second retrait aurait arrêté tout le programme.</div>
+</Exercice>
+
+<Exercice id="B8-ex03" titre="Analyser une commande" niveau="jaune" dossier="B8/ex03" fichier="commande.lua">
+Découpe `/donner Sam 250` en commande, cible et montant avec `string.match`, puis montre `string.find` et `string.gsub`.
+
+<div slot="indice1">Un motif avec trois captures entre parenthèses.</div>
+<div slot="indice2">`%a+` pour un mot, `%d+` pour un nombre.</div>
+<div slot="indice3">`"^/(%a+) (%a+) (%d+)$"`.</div>
+<div slot="solution">`montant` est capturé comme **texte** : utilise `tonumber(montant)` avant de calculer (et vérifie `nil`).</div>
+</Exercice>
+
+<Exercice id="B8-ex04" titre="Débogage : point ou deux-points ?" niveau="jaune" type="debug" dossier="B8/ex04" fichier="banque.lua">
+Ce programme plante avec `attempt to index a number value (local 'self')`. Corrige l'appel.
+
+<div slot="indice1">La méthode a été définie avec `:`.</div>
+<div slot="indice2">Avec `.`, le premier argument (50) devient `self`.</div>
+<div slot="indice3">Appelle `compte:deposer(50)`.</div>
+<div slot="solution">Règle simple : **défini avec `:` → appelé avec `:`**.</div>
+</Exercice>
+
+<Exercice id="B8-ex05" titre="Lecture : la métatable" niveau="jaune" type="lecture" dossier="B8/ex05" fichier="vehicule.lua">
+Prédis les quatre lignes.
+
+<div slot="indice1">`taxi` n'a pas de clé `decrire` à lui : Lua la trouve via `__index`.</div>
+<div slot="indice2">`rawget` lit une table **sans** passer par la métatable.</div>
+<div slot="indice3">`getmetatable(taxi)` renvoie la table donnée à `setmetatable`.</div>
+<div slot="solution">La méthode n'existe qu'une fois, dans `Vehicule` : tous les véhicules la partagent.</div>
+</Exercice>
+
+<Exercice id="B8-ex06" titre="La classe CompteBancaire" niveau="jaune" dossier="B8/ex06" fichier="compte-bancaire.lua">
+Crée une classe `CompteBancaire` (constructeur `nouveau(titulaire, solde)`, méthodes `deposer`, `retirer` qui lève une erreur si le solde est insuffisant, `afficher`). Crée deux comptes et gère un retrait impossible avec `pcall`.
+
+<div slot="indice1">Même structure que `Vehicule` : `CompteBancaire.__index = CompteBancaire`.</div>
+<div slot="indice2">Pour appeler une méthode avec `pcall` : `pcall(compte.retirer, compte, 500)`.</div>
+<div slot="indice3">Le premier argument passé à `pcall` après la fonction devient `self`.</div>
+<div slot="solution">Les deux comptes ont chacun leur solde, mais partagent les méthodes : c'est l'intérêt d'une classe.</div>
+</Exercice>
+
+<Exercice id="B8-ex07" titre="Défi : sauvegarder une fiche en texte" niveau="rouge" dossier="B8/ex07" fichier="serialiser.lua">
+Écris `serialiser(t)` qui transforme une fiche **plate** (texte, nombres, booléens) en texte Lua, avec les clés **triées**. Puis recharge ce texte avec `load` et affiche un champ.
+
+<div slot="indice1">Collecte les clés, trie-les, puis construis une liste de morceaux `cle = valeur`.</div>
+<div slot="indice2">Pour les chaînes, `string.format("%q", v)` ajoute les guillemets (et protège les caractères spéciaux).</div>
+<div slot="indice3">`load("return " .. texte)()` renvoie la table reconstruite.</div>
+<div slot="solution">Ce mécanisme est pratique pour **tes propres** fichiers ; pour des données venant de l'extérieur, utilise un format de données (JSON) et jamais `load`.</div>
+</Exercice>
+
+<Exercice id="B8-ex08" titre="Mini-projet : mini boutique en texte" niveau="rouge" type="projet" dossier="B8/ex08" fichier="boutique.lua">
+Crée une classe `Boutique` (stock : prix et quantité par produit) avec une méthode `acheter(client, produit, quantite)` qui lève une erreur claire (produit inconnu, stock insuffisant, argent insuffisant) ou renvoie le coût. Rejoue la liste de commandes de chat attendue : chaque commande est analysée avec `string.match` et exécutée avec `pcall`.
+
+<div slot="validation">Aucune commande ne fait planter le programme ; chaque refus est expliqué ; le solde final est juste (30 − 4 − 15 = 11 €).</div>
+<div slot="indice1">Reprends la structure de la classe `Vehicule` ; `self.stock[produit] = { prix = …, quantite = … }`.</div>
+<div slot="indice2">Motif pour `/acheter pain 2` et `/solde` : `"^/(%a+)%s*(%a*)%s*(%d*)$"`.</div>
+<div slot="indice3">`pcall(superette.acheter, superette, client, produit, tonumber(quantite))`.</div>
+<div slot="solution">Tu as maintenant toutes les briques du parcours B dans un seul programme : variables, conditions, boucles, fonctions, tables, objets, erreurs et texte. C'est la base de la boutique de ton serveur roleplay (parcours G).</div>
+</Exercice>
+
+## Quiz du module B8
+
+<Quiz id="B8-quiz" questions={[
+  { q: "`compte:deposer(50)` équivaut à…", choix: ["`compte.deposer(50)`", "`compte.deposer(compte, 50)`", "`deposer(compte)`", "`compte[deposer](50)`"], ok: 1, pourquoi: "Le `:` passe la table comme premier argument (self)." },
+  { q: "Dans une méthode, `self` désigne…", choix: ["Le fichier", "La table sur laquelle la méthode est appelée", "La classe toujours", "Le joueur"], ok: 1, pourquoi: "self = l'objet devant le `:`." },
+  { q: "À quoi sert `Classe.__index = Classe` ?", choix: ["À compter les objets", "À chercher dans Classe les clés absentes des objets (méthodes partagées)", "À trier", "À rien"], ok: 1, pourquoi: "C'est le mécanisme qui partage les méthodes." },
+  { q: "Que renvoie `pcall(f)` si f lève une erreur ?", choix: ["Rien, le programme s'arrête", "`false` et le message d'erreur", "`true`", "`nil`"], ok: 1, pourquoi: "pcall attrape l'erreur." },
+  { q: "Que fait le `0` dans `error(\"msg\", 0)` ?", choix: ["Il annule l'erreur", "Il n'ajoute pas le fichier et la ligne au message", "Il met la priorité à 0", "Il arrête Lua"], ok: 1, pourquoi: "Niveau 0 : message brut, pratique pour l'afficher." },
+  { q: "Dans un motif Lua, `%d+` signifie…", choix: ["Une lettre", "Un ou plusieurs chiffres", "Exactement un chiffre", "Un espace"], ok: 1, pourquoi: "%d = chiffre, + = un ou plusieurs." },
+  { q: "`string.match(\"/aide\", \"^/(%a+)$\")` renvoie…", choix: ["`/aide`", "`aide`", "`nil`", "`true`"], ok: 1, pourquoi: "La capture entre parenthèses est renvoyée." },
+  { q: "Pourquoi ne jamais utiliser `load` sur un texte venant d'un joueur ?", choix: ["C'est lent", "Il exécuterait le code que le joueur a écrit", "Ça ne marche pas", "Lua l'interdit"], ok: 1, pourquoi: "Faille de sécurité : exécution de code arbitraire." },
+  { q: "Sérialiser une table, c'est…", choix: ["La trier", "La transformer en texte pour la sauvegarder ou l'envoyer", "La supprimer", "La copier"], ok: 1, pourquoi: "Et désérialiser, l'inverse." },
+  { q: "Erreur `attempt to index a number value (local 'self')` : cause probable ?", choix: ["Une méthode appelée avec `.` au lieu de `:`", "Un module sans return", "Une boucle infinie", "Un fichier introuvable"], ok: 0, pourquoi: "Le premier argument (un nombre) est devenu self." },
+]} />
+
+## Récapitulatif
+
+- Méthodes : `function T:m() … self … end`, appel `obj:m()`.
+- Classe : `C.__index = C`, `setmetatable({}, C)` dans un constructeur.
+- Erreurs : `error(msg, 0)` pour lever, `pcall(f, ...)` pour attraper.
+- Texte : `string.match`, `find`, `gsub` avec motifs (`%a %d %s + * ^ $` et captures).
+- Sérialiser : table → texte ; `load` seulement pour tes propres données.
+
+## Je suis bloqué, que faire ?
+
+Pour un motif, teste-le dans un fichier à part sur une seule phrase et affiche le résultat de `string.match`. Pour une classe, vérifie dans l'ordre : `__index`, `setmetatable`, le `:` à la définition **et** à l'appel.
+
+<Videos recherche="Lua métatables programmation orientée objet tutoriel" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : métatables](https://www.lua.org/manual/5.4/manual.html#2.4)
+- [Manuel Lua 5.4 : motifs (patterns)](https://www.lua.org/manual/5.4/manual.html#6.4.1)
+- [Manuel Lua 5.4 : gestion des erreurs (pcall, error)](https://www.lua.org/manual/5.4/manual.html#2.3)
+- [Doc Nanos World : données persistantes](https://docs.nanos-world.com/docs/core-concepts/scripting/persistent-data)

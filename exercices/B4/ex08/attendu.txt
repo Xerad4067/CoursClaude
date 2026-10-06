@@ -1,0 +1,13 @@
+J'ai choisi un nombre entre 1 et 100. À toi de deviner !
+Ton nombre : 50
+C'est moins !
+Ton nombre : abc
+Ce n'est pas un nombre, réessaie.
+Ton nombre : 25
+C'est plus !
+Ton nombre : 37
+C'est moins !
+Ton nombre : 31
+C'est plus !
+Ton nombre : 34
+Bravo, trouvé en 5 essais !

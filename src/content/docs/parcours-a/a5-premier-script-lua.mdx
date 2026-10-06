@@ -1,0 +1,275 @@
+---
+title: "A5 · Premier script Lua, erreurs, recherche et IA tuteur"
+description: Écrire et exécuter tes premiers programmes Lua, lire une erreur, chercher dans la doc en anglais et utiliser une IA sans tricher.
+parcours: A
+module: A5
+duree: 1 h 30
+ou: les-deux
+prerequis: Lua 5.4 installé (module A2) et ton dépôt mon-apprentissage (module A4).
+resultat: Plusieurs scripts Lua exécutés dans le terminal et versionnés sur GitHub.
+objectifs:
+  - Créer un fichier .lua dans VS Code et l'exécuter avec lua
+  - Utiliser print et les commentaires
+  - Lire un message d'erreur Lua (fichier, ligne, message)
+  - Chercher efficacement et lire une documentation en anglais
+  - Poser une bonne question à une IA sans qu'elle fasse le travail
+sidebar:
+  order: 5
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : ton tout premier programme Lua."
+  quarante="Étapes 1 à 3 + exercices 1 à 4."
+  deuxh="Tout le module, les 9 exercices et le quiz."
+/>
+
+**Pourquoi c'est utile ?** Tout script Nanos World est un fichier Lua. Savoir créer un fichier, l'exécuter et **lire ses erreurs**, c'est la boucle que tu répéteras des milliers de fois.
+
+## Étape 1 · Hello World en Lua (15 min)
+
+1. Dans le terminal :
+```powershell
+cd ~\Dev\mon-apprentissage
+mkdir parcours-a
+code parcours-a\bonjour.lua
+```
+(Si `parcours-a` existe déjà, `mkdir` le signale : ce n'est pas grave.)
+
+2. Dans VS Code, écris et enregistre :
+```lua title="parcours-a/bonjour.lua"
+-- Mon premier programme Lua
+print("Bonjour, j'apprends Lua !")
+```
+3. Exécute-le :
+```powershell
+lua parcours-a\bonjour.lua
+```
+Résultat attendu :
+```text
+Bonjour, j'apprends Lua !
+```
+
+Ligne par ligne :
+- `-- Mon premier programme Lua` : un **commentaire**. Tout ce qui suit `--` sur la ligne est ignoré par Lua ; c'est une note pour les humains.
+- `print("...")` : `print` est une **fonction** fournie par Lua qui affiche ce qu'on lui donne entre parenthèses, puis passe à la ligne. Le texte entre guillemets est une **chaîne de caractères** (*string*).
+
+<Encadre type="astuce">
+Le terminal intégré de VS Code (**Terminal → Nouveau terminal**) s'ouvre directement dans le dossier du projet : tu écris en haut, tu exécutes en bas, sans changer de fenêtre.
+</Encadre>
+
+<FinEtape id="A5-e1" titre="Hello World" victoire="ton premier programme Lua s'exécute." prochaine="découvrir print avec plusieurs valeurs et les commentaires (étape 2)." />
+
+## Étape 2 · print, commentaires et un peu de collage (15 min)
+
+`print` accepte **plusieurs valeurs** séparées par des virgules : il les affiche sur la même ligne, séparées par une **tabulation**. Il sait aussi afficher des nombres et le résultat d'un calcul :
+
+```lua title="essais.lua"
+print("Argent :", 150)   -- deux valeurs : un texte et un nombre
+print(10 + 5)            -- affiche 15 : Lua calcule d'abord
+print("Je code en " .. _VERSION)  -- .. colle deux textes
+```
+
+- `..` (deux points) **colle** deux textes bout à bout (on l'étudiera en détail au module B2).
+- `_VERSION` est une valeur fournie par Lua qui contient sa version : ici `Lua 5.4`.
+
+Les **commentaires sur plusieurs lignes** s'écrivent entre `--[[` et `]]` :
+
+```lua title="commentaires.lua"
+--[[
+  Ce bloc entier est ignoré par Lua.
+  Pratique pour désactiver plusieurs lignes d'un coup.
+]]
+print("Seule cette ligne s'affiche")
+```
+
+<FinEtape id="A5-e2" titre="print et commentaires" victoire="tu sais afficher du texte, des nombres et commenter ton code." prochaine="provoquer et lire une erreur Lua (étape 3)." />
+
+## Étape 3 · Lire une erreur Lua (15 min)
+
+Écris volontairement une faute de frappe :
+
+```lua title="erreur.lua"
+print("Ligne 1")
+prnt("Ligne 2")
+```
+
+Exécute `lua erreur.lua`. Lua 5.4 affiche (vérifié) :
+
+```text
+Ligne 1
+lua: erreur.lua:2: attempt to call a nil value (global 'prnt')
+stack traceback:
+        ...
+```
+
+Comment le lire :
+1. `Ligne 1` s'est affichée : Lua exécute **dans l'ordre** et s'arrête à la première erreur.
+2. `erreur.lua:2:` : le **fichier** et la **ligne** (2).
+3. `attempt to call a nil value (global 'prnt')` : « tentative d'appeler une valeur nil (la variable globale `prnt`) ». Traduction : *tu appelles une fonction `prnt` qui n'existe pas*.
+4. Le `stack traceback` (la pile d'appels) sert pour les gros programmes : ignore-le pour l'instant.
+
+Autre erreur classique, le guillemet oublié : `print("Bonjour)` donne une erreur de syntaxe **avant même** d'exécuter la moindre ligne (le message parle de chaîne non terminée, *unfinished string*).
+
+<Encadre type="retenir">
+Une erreur Lua = **fichier : ligne : message**. Va à la ligne indiquée, et si tu n'y vois rien, regarde **la ligne juste au-dessus**.
+</Encadre>
+
+<FinEtape id="A5-e3" titre="Lire une erreur Lua" victoire="tu sais trouver le fichier, la ligne et le sens d'une erreur." prochaine="apprendre à chercher et à lire une doc en anglais (étape 4)." />
+
+## Étape 4 · Chercher, lire l'anglais, demander à une IA (20 min)
+
+### Chercher efficacement
+- Copie le **message exact** (sans le nom de ton fichier) et ajoute le langage : `lua "attempt to call a nil value"`.
+- Préfère les sources **officielles** (manuel Lua 5.4, docs Nanos World), puis les réponses récentes.
+- Vérifie la **version** : beaucoup de tutoriels « Lua » parlent de Roblox (Luau) ou de Lua 5.1.
+
+### Lire une documentation en anglais
+1. Lis d'abord les **titres** et les **exemples de code** : le code est international.
+2. Utilise le traducteur de ton navigateur (clic droit → **Traduire en français**), mais **garde les mots techniques en anglais** : ce sont ceux des messages d'erreur.
+3. Note les mots nouveaux dans ton journal (lexique perso). Le [glossaire](/outils/glossaire/) donne déjà les principaux.
+
+### Une IA comme tuteur
+Utilise les [prompts modèles](/outils/ia-tuteur/) : contexte, code, erreur exacte, et la consigne **« ne me donne pas la solution, donne-moi un indice »**. Vérifie toujours ce qu'elle affirme : elle peut inventer des fonctions.
+
+### Et Claude Code ?
+C'est **optionnel** (abonnement payant requis). Si tu l'utilises, ce dépôt contient déjà un fichier `CLAUDE.md` (ton profil, les règles, les commandes) et des **permissions raisonnables** dans `.claude/settings.json` (il demande avant `git push`, les installations et les suppressions). Installation et réglages : [tutoriel, section 12](/installer/tutoriel/#12-claude-code-optionnel).
+
+<FinEtape id="A5-e4" titre="Chercher et demander de l'aide" victoire="tu as une méthode claire pour te débloquer seul ou avec de l'aide." prochaine="faire les exercices (le défi et le mini-projet sont versionnés sur GitHub)." />
+
+## Exercices
+
+Pour chaque exercice : crée le fichier dans `mon-apprentissage\parcours-a\`, exécute-le avec `lua`, compare avec le résultat attendu. Les solutions sont **testées automatiquement** avec Lua 5.4.
+
+<Exercice id="A5-ex01" titre="Ton Hello World" niveau="vert" dossier="A5/ex01" fichier="bonjour.lua">
+Écris un programme qui affiche exactement la phrase ci-dessous.
+
+<div slot="indice1">Il faut une seule fonction, celle qui affiche.</div>
+<div slot="indice2">Le texte doit être entre guillemets droits `"`, à l'intérieur des parenthèses.</div>
+<div slot="indice3">`print("...")` avec la phrase exacte, apostrophe comprise.</div>
+<div slot="solution">L'apostrophe de `m'appelle` ne pose pas de problème car la chaîne est entourée de guillemets doubles.</div>
+</Exercice>
+
+<Exercice id="A5-ex02" titre="Fiche de personnage" niveau="vert" dossier="A5/ex02" fichier="fiche.lua">
+Affiche la fiche d'un personnage sur trois lignes.
+
+<div slot="indice1">Une ligne affichée = un `print`.</div>
+<div slot="indice2">Il faut donc trois `print`, l'un sous l'autre.</div>
+<div slot="indice3">Recopie chaque ligne du résultat attendu entre guillemets dans un `print`.</div>
+<div slot="solution">Lua exécute les lignes **dans l'ordre** : l'ordre des `print` est l'ordre d'affichage.</div>
+</Exercice>
+
+<Exercice id="A5-ex03" titre="Plusieurs valeurs" niveau="vert" dossier="A5/ex03" fichier="valeurs.lua">
+Reproduis exactement la sortie ci-dessous (l'espace entre `Argent :` et `150` est une **tabulation**). La dernière ligne doit être calculée par Lua, pas écrite à la main.
+
+<div slot="indice1">`print` accepte plusieurs valeurs séparées par des virgules.</div>
+<div slot="indice2">Les nombres s'écrivent sans guillemets.</div>
+<div slot="indice3">Pour la dernière ligne : `print(10 + 5)`.</div>
+<div slot="solution">Les virgules produisent la tabulation. Sans guillemets, `10 + 5` est un calcul : Lua affiche le résultat.</div>
+</Exercice>
+
+<Exercice id="A5-ex04" titre="Débogage : la fonction inconnue" niveau="vert" type="debug" dossier="A5/ex04" fichier="bienvenue.lua">
+Ce programme plante. Exécute-le, lis l'erreur, corrige-le.
+
+<div slot="indice1">Lis la partie entre parenthèses du message d'erreur.</div>
+<div slot="indice2">`attempt to call a nil value (global 'prnt')` : Lua ne connaît pas `prnt`.</div>
+<div slot="indice3">Une lettre est manquante dans le nom de la fonction.</div>
+<div slot="solution">`prnt` → `print`. Le message nommait exactement le coupable : c'est souvent le cas.</div>
+</Exercice>
+
+<Exercice id="A5-ex05" titre="Débogage : le guillemet perdu" niveau="jaune" type="debug" dossier="A5/ex05" fichier="annonce.lua">
+Ce programme ne s'exécute même pas. Trouve pourquoi.
+
+<div slot="indice1">Ici, aucune ligne ne s'affiche : l'erreur est détectée **avant** l'exécution (erreur de syntaxe).</div>
+<div slot="indice2">Le message parle d'une chaîne non terminée (*unfinished string*).</div>
+<div slot="indice3">Compte les guillemets de chaque ligne : il en faut un nombre pair.</div>
+<div slot="solution">Il manquait le guillemet fermant de la deuxième chaîne. Une erreur de syntaxe empêche tout le fichier de s'exécuter, même les lignes correctes.</div>
+</Exercice>
+
+<Exercice id="A5-ex06" titre="Lecture : qu'affiche ce programme ?" niveau="jaune" type="lecture" dossier="A5/ex06" fichier="lecture.lua">
+Sans l'exécuter, écris sur papier ce que ce programme affiche. Puis vérifie.
+
+<div slot="indice1">Tout ce qui suit `--` sur une ligne est ignoré.</div>
+<div slot="indice2">Un `print` placé **après** `--` sur la même ligne est donc ignoré aussi.</div>
+<div slot="indice3">Le bloc `--[[ ... ]]` est entièrement ignoré.</div>
+<div slot="solution">Trois lignes seulement s'affichent : la ligne 2 est commentée, le `print("Ligne 4")` est dans un commentaire de fin de ligne et le bloc `--[[ ]]` désactive la ligne 5.</div>
+</Exercice>
+
+<Exercice id="A5-ex07" titre="Quelle version ?" niveau="jaune" dossier="A5/ex07" fichier="version.lua">
+Affiche la version de Lua **en utilisant `_VERSION`**, collée au texte, puis la deuxième ligne.
+
+<div slot="indice1">`_VERSION` contient le texte `Lua 5.4`.</div>
+<div slot="indice2">Pour coller deux textes : l'opérateur `..`.</div>
+<div slot="indice3">`print("Je code en " .. _VERSION)` : attention à l'espace avant le guillemet fermant.</div>
+<div slot="solution">Sans l'espace dans `"Je code en "`, tu obtiendrais `Je code enLua 5.4` : `..` colle sans rien ajouter.</div>
+</Exercice>
+
+<Exercice id="A5-ex08" titre="Défi : la bannière du serveur" niveau="rouge" dossier="A5/ex08" fichier="banniere.lua">
+Reproduis exactement cette bannière d'accueil (les bords doivent être alignés).
+
+<div slot="indice1">Une ligne = un `print`. Les espaces comptent.</div>
+<div slot="indice2">Compte les caractères : entre les deux `|`, chaque ligne en a 30, comme les tirets entre les `+`.</div>
+<div slot="indice3">Copie la ligne du haut, puis ajuste le nombre d'espaces autour du texte pour retomber sur 30.</div>
+<div slot="solution">Aligner à la main est fastidieux : au module B2, tu apprendras `string.rep` et `string.format` qui font ce travail pour toi.</div>
+</Exercice>
+
+<Exercice id="A5-ex09" titre="Mini-projet : mon premier script versionné" niveau="jaune" type="projet" dossier="A5/ex09" fichier="bienvenue.lua">
+Dans `mon-apprentissage\parcours-a\`, écris `bienvenue.lua` qui affiche le message d'accueil de **ton** futur serveur (4 lignes, dont une avec `_VERSION`). Exécute-le, puis versionne-le avec Git (`add`, `commit`, `push`) et récupère-le sur l'autre machine avec `git pull`.
+
+<div slot="validation">Le script s'exécute sans erreur sur les deux machines, et le commit apparaît sur GitHub.</div>
+<div slot="indice1">Reprends ce que tu as fait aux exercices 2 et 7.</div>
+<div slot="indice2">Pour Git : `git add parcours-a\bienvenue.lua`, puis un message de commit avec un verbe.</div>
+<div slot="indice3">Sur l'autre machine : `git pull`, puis `lua parcours-a\bienvenue.lua`.</div>
+<div slot="solution">
+
+Ensuite :
+```powershell
+git add parcours-a\bienvenue.lua
+git commit -m "Ajoute le script de bienvenue de mon serveur"
+git push
+```
+Personnalise le nom du serveur et l'auteur (un pseudo, pas ton vrai nom si ton dépôt est public).
+</div>
+</Exercice>
+
+## Quiz du module A5
+
+<Quiz id="A5-quiz" questions={[
+  { q: "Quelle commande exécute le fichier `bonjour.lua` ?", choix: ["`run bonjour.lua`", "`lua bonjour.lua`", "`print bonjour.lua`", "`code bonjour.lua`"], ok: 1, pourquoi: "`lua` est l'interpréteur ; `code` ouvrirait le fichier dans VS Code." },
+  { q: "Que fait `print(\"Salut\")` ?", choix: ["Il imprime sur papier", "Il affiche Salut dans le terminal puis passe à la ligne", "Il crée une variable", "Il enregistre le fichier"], ok: 1, pourquoi: "`print` affiche dans le terminal." },
+  { q: "Comment écrit-on un commentaire sur une ligne en Lua ?", choix: ["`// commentaire`", "`# commentaire`", "`-- commentaire`", "`/* commentaire */`"], ok: 2, pourquoi: "En Lua : `--`. Les autres syntaxes viennent d'autres langages." },
+  { q: "Qu'affiche `print(10 + 5)` ?", choix: ["`10 + 5`", "`15`", "`105`", "Une erreur"], ok: 1, pourquoi: "Sans guillemets, c'est un calcul." },
+  { q: "Qu'affiche `print(\"10 + 5\")` ?", choix: ["`10 + 5`", "`15`", "`105`", "Une erreur"], ok: 0, pourquoi: "Entre guillemets, c'est du texte : affiché tel quel." },
+  { q: "Dans `lua: jeu.lua:7: attempt to call a nil value (global 'prnit')`, où est l'erreur ?", choix: ["Ligne 7 de jeu.lua", "Ligne 1", "Dans Lua lui-même", "Dans le terminal"], ok: 0, pourquoi: "Format : fichier:ligne: message." },
+  { q: "Que signifie `attempt to call a nil value (global 'prnit')` ?", choix: ["Le fichier est introuvable", "On appelle une fonction `prnit` qui n'existe pas", "Il manque un guillemet", "Lua n'est pas installé"], ok: 1, pourquoi: "Faute de frappe dans le nom de la fonction." },
+  { q: "Que fait `..` en Lua ?", choix: ["Il remonte d'un dossier", "Il colle deux textes", "Il commente", "Il additionne"], ok: 1, pourquoi: "`..` concatène. (Dans le terminal, `cd ..` remonte d'un dossier : même symbole, autre contexte.)" },
+  { q: "Bonne pratique pour chercher une erreur sur Internet ?", choix: ["Taper « ça marche pas »", "Copier le message exact et ajouter le langage", "Chercher le nom de son fichier", "Ne jamais chercher"], ok: 1, pourquoi: "Le message exact + `lua` donne des résultats précis." },
+  { q: "Ce qu'on demande d'abord à une IA tuteur ?", choix: ["La solution complète", "Un indice et une question pour avancer soi-même", "D'écrire tout le module", "Son mot de passe"], ok: 1, pourquoi: "Tu veux comprendre, pas copier." },
+]} />
+
+## Récapitulatif
+
+- Créer `fichier.lua` dans VS Code, l'exécuter avec `lua fichier.lua`.
+- `print` affiche ; plusieurs valeurs séparées par des virgules → tabulation ; `--` et `--[[ ]]` pour commenter ; `..` colle du texte.
+- Erreur = **fichier : ligne : message** ; une erreur de syntaxe empêche tout le fichier de s'exécuter.
+- Chercher : message exact + `lua`, sources officielles, attention à la version. IA : indices d'abord.
+
+## Je suis bloqué, que faire ?
+
+`lua` n'est pas reconnu → [tutoriel, section 8.4](/installer/tutoriel/#84-erreurs-fréquentes). `cannot open fichier.lua` → tu n'es pas dans le bon dossier (`pwd`, `dir`). Une erreur que tu ne comprends pas → [Dépannage, section Lua](/outils/depannage/) puis le [prompt modèle n°2](/outils/ia-tuteur/).
+
+<Videos recherche="apprendre Lua débutant français" liste={[
+  { titre: "Apprendre Lua en partant de ZÉRO (Le vrai premier tutoriel)", id: "lIPNlzNMYNk", couvre: "introduction à Lua pour débutants" },
+]} />
+
+## Pour aller plus loin
+
+- [Manuel de référence Lua 5.4 (officiel, en anglais)](https://www.lua.org/manual/5.4/)
+- [Doc Nanos World : environnement Lua des packages](https://docs.nanos-world.com/docs/core-concepts/packages/package-loading-and-lua-environment)
+- [Une IA comme tuteur : prompts modèles](/outils/ia-tuteur/)

@@ -1,0 +1,3 @@
+=== Fiche du personnage ===
+Nom : Sam Rivera
+Métier : chauffeur de taxi

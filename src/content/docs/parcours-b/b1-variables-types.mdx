@@ -1,0 +1,244 @@
+---
+title: "B1 · Variables et types"
+description: Ranger des informations dans des variables, connaître les types de Lua et comprendre nil.
+parcours: B
+module: B1
+duree: 3 h
+ou: les-deux
+prerequis: Parcours A (savoir créer et exécuter un fichier .lua).
+resultat: Une fiche de personnage affichée à partir de variables.
+objectifs:
+  - Créer et modifier des variables avec local
+  - Reconnaître les types number, string, boolean et nil avec type()
+  - Expliquer ce qu'est nil et pourquoi une faute de frappe peut donner nil
+  - Choisir des noms de variables clairs
+sidebar:
+  order: 1
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : ta première variable."
+  quarante="Étapes 1 à 3 et exercices 1 à 3."
+  deuxh="Étapes 1 à 4, exercices 1 à 6. Le reste (défi, mini-projet, quiz) à la séance suivante."
+/>
+
+**Pourquoi c'est utile ?** Sur un serveur roleplay, tout est **donnée** : le nom d'un joueur, son argent, son métier, s'il a le permis. Les variables sont les boîtes où l'on range ces données.
+
+## Étape 1 · Une variable, c'est une boîte étiquetée (20 min)
+
+<Encadre type="analogie">
+Une **variable** est une **boîte avec une étiquette**. L'étiquette est le **nom** (`argent`), le contenu est la **valeur** (`1500`). Tu peux regarder dans la boîte, ou remplacer son contenu.
+</Encadre>
+
+```lua title="b1/variables.lua"
+local nom = "Sam"      -- une boîte « nom » qui contient le texte Sam
+local argent = 1500    -- une boîte « argent » qui contient le nombre 1500
+print(nom)
+print(argent)
+```
+
+Ligne par ligne :
+- `local` : on **crée** une nouvelle variable (on verra au module B5 pourquoi `local` est important ; prends l'habitude de toujours l'écrire) ;
+- `nom` : son nom ;
+- `=` : « reçoit » (ce n'est **pas** « est égal à » des maths) ;
+- `"Sam"` : la valeur rangée dedans.
+
+`print(nom)` affiche **le contenu** de la boîte : `Sam`. Attention : `print("nom")` afficherait le **texte** `nom`.
+
+<FinEtape id="B1-e1" titre="Ma première variable" victoire="tu as rangé des données dans des variables et tu les as affichées." prochaine="modifier une variable (étape 2)." />
+
+## Étape 2 · Changer le contenu (20 min)
+
+```lua title="b1/salaire.lua"
+local argent = 1500
+argent = argent + 200   -- on calcule 1500 + 200, puis on range 1700 dans argent
+argent = argent - 50    -- 1700 - 50 = 1650
+print(argent)           --> 1650
+```
+
+`argent = argent + 200` se lit **de droite à gauche** : Lua calcule d'abord `argent + 200` avec l'ancienne valeur, puis range le résultat dans `argent`. Pas de `local` ici : la boîte existe déjà, on change seulement son contenu.
+
+<Encadre type="piege">
+Écrire `local argent = ...` une deuxième fois crée une **nouvelle** boîte qui cache l'ancienne. Pour modifier une variable existante : son nom, `=`, la nouvelle valeur, sans `local`.
+</Encadre>
+
+<FinEtape id="B1-e2" titre="Modifier une variable" victoire="tu sais faire évoluer une valeur, comme un salaire qui augmente." prochaine="découvrir les types de valeurs (étape 3)." />
+
+## Étape 3 · Les types (25 min)
+
+Chaque valeur a un **type** (sa nature). La fonction `type()` le donne :
+
+| Type | Exemples | Utilisation RP |
+|---|---|---|
+| `number` (nombre) | `1500`, `3.5`, `-20` | argent, santé, vitesse |
+| `string` (chaîne) | `"Sam"`, `"taxi"`, `""` | noms, métiers, messages |
+| `boolean` (booléen) | `true`, `false` | a le permis ? est admin ? |
+| `nil` (rien) | `nil` | « pas de valeur » |
+
+```lua title="b1/types.lua"
+print(type(1500))    --> number
+print(type("taxi"))  --> string
+print(type(true))    --> boolean
+print(type(nil))     --> nil
+```
+
+Lua 5.4 distingue deux sortes de nombres : les **entiers** (`integer`, comme `42`) et les **décimaux** (`float`, comme `42.0` ou `3.5`). `type()` dit `number` pour les deux ; `math.type()` précise lequel. La division `/` donne **toujours** un décimal : `10 / 2` vaut `5.0`.
+
+<Encadre type="retenir">
+`"42"` (avec guillemets) est une **chaîne**, `42` est un **nombre**. Pour Lua, ce sont deux choses différentes.
+</Encadre>
+
+<FinEtape id="B1-e3" titre="Les types" victoire="tu reconnais number, string, boolean et nil." prochaine="comprendre nil et les noms de variables (étape 4)." />
+
+## Étape 4 · nil, fautes de frappe et noms clairs (25 min)
+
+`nil` signifie **« rien »**. Une variable qui n'a jamais reçu de valeur vaut `nil`. Et une **faute de frappe** dans un nom de variable ne provoque pas toujours d'erreur :
+
+```lua title="b1/faute.lua"
+local argent = 100
+print(argnet)   --> nil (Lua cherche une variable « argnet » qui n'existe pas)
+```
+
+Lua n'a pas planté : il a affiché `nil`. C'est un **bug silencieux**. L'extension Lua de VS Code souligne heureusement ce genre de nom inconnu.
+
+Si tu **calcules** avec une variable vide, là Lua s'arrête :
+
+```text
+lua: faute.lua:3: attempt to perform arithmetic on a nil value (global 'argnet')
+```
+
+### Bien nommer
+- Des noms qui disent **ce que contient** la boîte : `argent`, `metierActuel`, `aLePermis`.
+- Une convention : ce cours utilise le **camelCase** (`prixTotal`) ; Nanos World écrit souvent ses exemples en *snake_case* (`prop_table`). Choisis-en une et reste cohérent dans un fichier.
+- Pas d'accents, pas d'espaces, ne commence pas par un chiffre (`1joueur` est interdit).
+- Évite `a`, `x`, `truc` : dans trois semaines, tu ne sauras plus ce qu'il y a dedans.
+
+<FinEtape id="B1-e4" titre="nil et noms clairs" victoire="tu sais pourquoi une faute de frappe peut donner nil, et tu choisis des noms clairs." prochaine="les exercices 1 à 4." />
+
+## Erreurs fréquentes
+
+| Message ou symptôme | Cause | Solution |
+|---|---|---|
+| `nil` affiché au lieu de la valeur | Faute de frappe dans le nom | Compare les noms lettre par lettre |
+| `attempt to perform arithmetic on a nil value (global 'x')` | Calcul avec une variable vide ou mal nommée | Vérifie qu'elle a reçu une valeur avant |
+| `malformed number near '1x'` | Nom qui commence par un chiffre | Commence par une lettre : `joueur1` |
+| `nom` affiché au lieu de `Sam` | Guillemets autour du nom de variable | `print(nom)` sans guillemets |
+
+## Exercices
+
+<Exercice id="B1-ex01" titre="Trois boîtes" niveau="vert" dossier="B1/ex01" fichier="trois.lua">
+Crée trois variables `nom`, `argent` et `metier` (valeurs : `Sam`, `1500`, `taxi`) et affiche-les l'une après l'autre.
+
+<div slot="indice1">Une variable se crée avec `local`, son nom, `=` et sa valeur.</div>
+<div slot="indice2">Le texte va entre guillemets, le nombre sans guillemets.</div>
+<div slot="indice3">Trois `local`, puis trois `print(nomDeLaVariable)` sans guillemets.</div>
+<div slot="solution">`print(nom)` affiche le **contenu** de la variable `nom`.</div>
+</Exercice>
+
+<Exercice id="B1-ex02" titre="Quel type ?" niveau="vert" dossier="B1/ex02" fichier="types.lua">
+Affiche le type de quatre valeurs : un nombre, une chaîne, un booléen et `nil`, dans cet ordre.
+
+<div slot="indice1">Il existe une fonction qui renvoie le type d'une valeur.</div>
+<div slot="indice2">On peut écrire un appel de fonction à l'intérieur d'un autre : `print(...(...))`.</div>
+<div slot="indice3">`print(type(1500))`, et ainsi de suite.</div>
+<div slot="solution">`type` renvoie toujours une **chaîne** : `"number"`, `"string"`…</div>
+</Exercice>
+
+<Exercice id="B1-ex03" titre="Un mois de salaire" niveau="vert" dossier="B1/ex03" fichier="mois.lua">
+Sam a 1500 €. Il reçoit une prime de 200 €, puis paie un plein d'essence de 50 €. Affiche son argent final en modifiant **une seule** variable `argent`.
+
+<div slot="indice1">Une seule variable, plusieurs modifications successives.</div>
+<div slot="indice2">Pour ajouter : `argent = argent + ...`.</div>
+<div slot="indice3">Pas de `local` sur les lignes de modification.</div>
+<div slot="solution">Chaque ligne utilise l'ancienne valeur pour calculer la nouvelle.</div>
+</Exercice>
+
+<Exercice id="B1-ex04" titre="Débogage : l'argent a disparu" niveau="jaune" type="debug" dossier="B1/ex04" fichier="banque.lua">
+Ce programme devrait afficher le solde, mais affiche `nil`. Aucune erreur rouge : trouve le bug.
+
+<div slot="indice1">`nil` veut dire que la variable affichée n'a jamais reçu de valeur.</div>
+<div slot="indice2">Compare le nom de la variable créée et celui de la variable affichée.</div>
+<div slot="indice3">Deux lettres sont inversées.</div>
+<div slot="solution">Bug silencieux typique : Lua ne connaît pas `sodle`, il affiche donc `nil`. L'extension Lua de VS Code l'aurait souligné : regarde toujours les soulignements.</div>
+</Exercice>
+
+<Exercice id="B1-ex05" titre="Lecture : copies et nil" niveau="jaune" type="lecture" dossier="B1/ex05" fichier="lecture.lua">
+Sans exécuter, écris ce que ce programme affiche (les valeurs d'un même `print` sont séparées par une tabulation).
+
+<div slot="indice1">`local b = a` copie la **valeur** de `a` dans `b` à ce moment-là.</div>
+<div slot="indice2">Changer `a` ensuite ne change pas `b`.</div>
+<div slot="indice3">Après `nom = nil`, la boîte est vide : `print(nom)` affiche `nil`, et son type est… `nil`.</div>
+<div slot="solution">`b` garde `5` : les nombres sont copiés. Mettre une variable à `nil` revient à vider la boîte.</div>
+</Exercice>
+
+<Exercice id="B1-ex06" titre="Échanger deux véhicules" niveau="jaune" dossier="B1/ex06" fichier="echange.lua">
+Deux joueurs échangent leurs véhicules. Échange le contenu de `vehiculeA` et `vehiculeB`, puis affiche avant/après.
+
+<div slot="indice1">Si tu fais `vehiculeA = vehiculeB`, l'ancien contenu de `vehiculeA` est perdu…</div>
+<div slot="indice2">Lua permet l'**affectation multiple** : `x, y = 1, 2`.</div>
+<div slot="indice3">`vehiculeA, vehiculeB = vehiculeB, vehiculeA` : Lua calcule toute la partie droite avant de ranger.</div>
+<div slot="solution">Autre solution classique (valable dans tous les langages) : une variable temporaire `local temp = vehiculeA`, puis `vehiculeA = vehiculeB` et `vehiculeB = temp`.</div>
+</Exercice>
+
+<Exercice id="B1-ex07" titre="Défi : entiers, décimaux et fonctions" niveau="rouge" dossier="B1/ex07" fichier="defi-types.lua">
+Prédis puis vérifie l'affichage de six expressions : `type("42")`, `type(42.0)`, `math.type(42)`, `math.type(42.0)`, `type(print)` et `10 / 2`.
+
+<div slot="indice1">Les guillemets changent tout : `"42"` est du texte.</div>
+<div slot="indice2">`math.type` répond `integer` ou `float`. `print` est une valeur comme une autre… de type fonction.</div>
+<div slot="indice3">La division `/` donne toujours un décimal en Lua 5.4.</div>
+<div slot="solution">En Lua, les fonctions sont des valeurs (type `function`) : tu t'en serviras au module B7. Et `10 / 2` affiche `5.0` : utilise `//` (division entière, module B2) si tu veux `5`.</div>
+</Exercice>
+
+<Exercice id="B1-ex08" titre="Mini-projet : fiche de personnage" niveau="jaune" type="projet" dossier="B1/ex08" fichier="fiche-personnage.lua">
+Crée cinq variables (nom, âge, métier, argent, permis de conduire) et affiche la fiche ci-dessous **uniquement avec ces variables** (aucune valeur écrite directement dans les `print`).
+
+<div slot="validation">Changer une seule variable (par exemple l'argent) suffit à mettre à jour la fiche.</div>
+<div slot="indice1">Un type par information : texte, nombre ou booléen.</div>
+<div slot="indice2">`print("Nom :", nom)` affiche le libellé et la valeur séparés par une tabulation.</div>
+<div slot="indice3">Le permis est un booléen : `local permis = true`. `print` affiche `true`.</div>
+<div slot="solution">Range ce fichier dans `mon-apprentissage\parcours-b\b1\` : tu le réutiliseras au module B6 sous forme de table.</div>
+</Exercice>
+
+## Quiz du module B1
+
+<Quiz id="B1-quiz" questions={[
+  { q: "Que fait `local argent = 1500` ?", choix: ["Il compare argent et 1500", "Il crée une variable argent qui contient 1500", "Il affiche 1500", "Il crée un fichier"], ok: 1, pourquoi: "`=` range une valeur dans une variable ; `local` la crée." },
+  { q: "Qu'affiche `print(\"argent\")` si argent vaut 1500 ?", choix: ["`1500`", "`argent`", "`nil`", "Une erreur"], ok: 1, pourquoi: "Avec des guillemets, c'est le texte `argent`, pas la variable." },
+  { q: "Quel est le type de `\"42\"` ?", choix: ["number", "string", "boolean", "nil"], ok: 1, pourquoi: "Entre guillemets : une chaîne." },
+  { q: "Que vaut une variable jamais remplie ?", choix: ["0", "`\"\"`", "`nil`", "`false`"], ok: 2, pourquoi: "`nil` = absence de valeur." },
+  { q: "Après `local a = 5`, `local b = a`, `a = 10`, que vaut b ?", choix: ["5", "10", "nil", "15"], ok: 0, pourquoi: "La valeur 5 a été copiée dans b avant le changement de a." },
+  { q: "Que donne `print(argnet)` si seule `argent` existe ?", choix: ["Une erreur", "`nil`", "La valeur d'argent", "`argnet`"], ok: 1, pourquoi: "Bug silencieux : la variable mal écrite n'existe pas, donc `nil`." },
+  { q: "Quel nom de variable est interdit ?", choix: ["`joueur1`", "`prixTotal`", "`1joueur`", "`_temp`"], ok: 2, pourquoi: "Un nom ne commence pas par un chiffre (`malformed number near '1j'`)." },
+  { q: "Que vaut `10 / 2` en Lua 5.4 ?", choix: ["`5`", "`5.0`", "`2`", "Une erreur"], ok: 1, pourquoi: "`/` donne toujours un décimal (float)." },
+  { q: "Comment échanger x et y en une ligne ?", choix: ["`x = y = x`", "`x, y = y, x`", "`swap(x, y)`", "`x <-> y`"], ok: 1, pourquoi: "L'affectation multiple calcule la droite avant de ranger." },
+  { q: "Quel type pour « le joueur est administrateur » ?", choix: ["number", "string", "boolean", "nil"], ok: 2, pourquoi: "Vrai ou faux : booléen (`true` / `false`)." },
+]} />
+
+## Récapitulatif
+
+- `local nom = valeur` crée une variable ; `nom = nouvelleValeur` la modifie.
+- Types : `number` (entier ou décimal), `string`, `boolean`, `nil` ; `type()` les donne.
+- `nil` = rien ; une faute de frappe dans un nom donne souvent `nil` sans erreur.
+- Des noms clairs, une convention, pas d'accents.
+
+## Je suis bloqué, que faire ?
+
+Affiche tes variables avec `print` à chaque étape pour voir leur contenu réel. Vérifie les guillemets (texte) et l'absence de guillemets (variable). Puis [Dépannage, section Lua](/outils/depannage/).
+
+<Videos recherche="Lua variables tutoriel français débutant" liste={[
+  { titre: "[FR] [Partie 3] Apprendre le Lua: Les bases et les variables", id: "F-ixOxAwW1k", couvre: "les variables en Lua" },
+  { titre: "APPRENDRE LE LUA #1 les bases", id: "T184q0KGig0", couvre: "les bases de Lua" },
+]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : valeurs et types (en anglais)](https://www.lua.org/manual/5.4/manual.html#2.1)
+- [Doc Nanos World : types de base](https://docs.nanos-world.com/docs/scripting-reference/glossary/basic-types)
+- [Aide-mémoire Lua du cours](/outils/aide-memoire/)

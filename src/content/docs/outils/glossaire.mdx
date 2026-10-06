@@ -1,0 +1,101 @@
+---
+title: Glossaire
+description: Les mots techniques du cours, en français, avec leur nom anglais.
+sidebar:
+  order: 1
+---
+
+Les termes sont classés par thème. Le mot anglais est celui que tu verras dans la documentation officielle et dans les messages d'erreur. Utilise `Ctrl+F` pour chercher un mot.
+
+## Bases du développement
+
+| Terme (anglais) | En français | Définition simple |
+|---|---|---|
+| Code source (*source code*) | Code source | Le texte que tu écris dans un langage de programmation. |
+| Programme / script | Programme | Une suite d'instructions que l'ordinateur exécute dans l'ordre. Un *script* est un petit programme interprété (comme en Lua). |
+| Interpréteur (*interpreter*) | Interpréteur | Le logiciel qui lit ton script et l'exécute ligne par ligne (`lua` pour Lua). |
+| Bug | Bogue | Un comportement non voulu du programme. |
+| Débogage (*debugging*) | Débogage | Chercher et corriger un bug. |
+| Syntaxe (*syntax*) | Syntaxe | Les règles d'écriture d'un langage (comme la grammaire). |
+| Message d'erreur (*error message*) | Message d'erreur | Ce que l'interpréteur affiche quand il ne peut pas continuer : il dit **où** (fichier et ligne) et **quoi**. |
+| Documentation (*docs*) | Documentation | Le mode d'emploi officiel d'un langage ou d'un outil. |
+| Client / serveur | Client / serveur | Le client est le programme du joueur (affichage, clavier) ; le serveur est l'arbitre qui garde la vraie version du jeu et la partage. |
+| Multijoueur (*multiplayer*) | Multijoueur | Plusieurs clients connectés au même serveur. |
+
+## Terminal et Windows
+
+| Terme (anglais) | En français | Définition simple |
+|---|---|---|
+| Terminal / shell | Terminal / interpréteur de commandes | La fenêtre où l'on tape des commandes. PowerShell est le *shell* de Windows. |
+| Commande (*command*) | Commande | Un ordre tapé dans le terminal, par exemple `cd Documents`. |
+| Argument | Argument | Ce que tu donnes à une commande : dans `cd Documents`, `Documents` est l'argument. |
+| Dossier courant (*current directory*) | Dossier courant | L'endroit où tu te trouves dans le terminal (affiché avant `>`). |
+| Chemin (*path*) | Chemin | L'adresse d'un fichier : `C:\Users\TonNom\Dev\bonjour.lua`. |
+| PATH | Variable PATH | La liste des dossiers où Windows cherche les programmes quand tu tapes leur nom (`git`, `lua`…). |
+| Gestionnaire de paquets (*package manager*) | Gestionnaire de paquets | Un outil qui installe des logiciels par leur nom : `winget` (Windows), `npm` (JavaScript), LuaRocks (Lua). |
+| Politique d'exécution (*execution policy*) | Politique d'exécution | Le réglage de PowerShell qui autorise ou bloque les scripts `.ps1`. |
+| Administrateur (*administrator*) | Administrateur | Un compte avec tous les droits ; Windows demande une confirmation (UAC) avant une action sensible. |
+
+## Lua
+
+| Terme (anglais) | En français | Définition simple |
+|---|---|---|
+| Variable | Variable | Une boîte avec un nom, qui contient une valeur. |
+| Valeur (*value*) | Valeur | Une donnée : `42`, `"Léo"`, `true`… |
+| Type | Type | La nature d'une valeur : `number`, `string`, `boolean`, `nil`, `table`, `function`. |
+| Chaîne (*string*) | Chaîne de caractères | Du texte entre guillemets : `"Bonjour"`. |
+| Booléen (*boolean*) | Booléen | `true` (vrai) ou `false` (faux). |
+| `nil` | nil (rien) | L'absence de valeur. Une variable jamais remplie vaut `nil`. |
+| Opérateur (*operator*) | Opérateur | Un symbole qui calcule ou compare : `+`, `..`, `==`, `and`… |
+| Expression | Expression | Un morceau de code qui donne une valeur : `prix * 2`. |
+| Condition (`if`) | Condition | « Si … alors … sinon … ». |
+| Boucle (*loop*) | Boucle | Répéter des instructions (`for`, `while`, `repeat`). |
+| Itération (*iteration*) | Tour de boucle | Un passage dans une boucle. |
+| Fonction (*function*) | Fonction | Un bloc de code nommé et réutilisable, qui peut recevoir des paramètres et renvoyer un résultat. |
+| Paramètre / argument | Paramètre / argument | Le paramètre est le nom dans la définition de la fonction ; l'argument est la valeur donnée à l'appel. |
+| Valeur de retour (*return value*) | Valeur de retour | Ce que la fonction renvoie avec `return`. |
+| Portée (*scope*) | Portée | La zone du code où une variable existe. `local` limite la portée au bloc. |
+| Variable globale (*global*) | Variable globale | Une variable visible partout (à éviter : source de bugs). |
+| Table | Table | La structure de données universelle de Lua : liste ET dictionnaire. |
+| Index | Indice | La position dans une liste ; en Lua, la première case est `1`. |
+| Clé / valeur (*key / value*) | Clé / valeur | Dans un dictionnaire, la clé est l'étiquette (`"argent"`), la valeur ce qu'elle contient (`500`). |
+| Closure | Fermeture | Une fonction qui se souvient des variables locales qui existaient autour d'elle quand elle a été créée. |
+| Module | Module | Un fichier Lua qui renvoie une table de fonctions, chargé avec `require`. |
+| Métatable (*metatable*) | Métatable | Une table qui change le comportement d'une autre table (par exemple, chercher une méthode ailleurs avec `__index`). |
+| Méthode (*method*) | Méthode | Une fonction rangée dans un objet, appelée avec `:` (`compte:deposer(10)`). |
+| `pcall` | Appel protégé | Exécute une fonction en attrapant une éventuelle erreur au lieu de tout arrêter. |
+| Concaténation | Concaténation | Coller des chaînes bout à bout avec `..`. |
+| Sérialisation | Sérialisation | Transformer une donnée (une table) en texte pour la sauvegarder ou l'envoyer. |
+
+## Git et GitHub
+
+| Terme (anglais) | En français | Définition simple |
+|---|---|---|
+| Dépôt (*repository*, *repo*) | Dépôt | Un dossier suivi par Git, avec tout son historique. |
+| Commit | Enregistrement (version) | Une photo de tes fichiers à un instant, avec un message. |
+| Index / zone de préparation (*staging area*) | Zone de préparation | Ce qui partira dans le prochain commit (`git add`). |
+| Branche (*branch*) | Branche | Une ligne de travail indépendante ; la principale s'appelle `main`. |
+| Distant (*remote*, `origin`) | Dépôt distant | La copie du dépôt sur GitHub. |
+| Cloner (*clone*) | Cloner | Copier un dépôt distant sur ta machine. |
+| Pousser (*push*) | Envoyer | Envoyer tes commits vers GitHub. |
+| Tirer (*pull*) | Récupérer | Récupérer les commits de GitHub sur ta machine. |
+| Conflit (*merge conflict*) | Conflit de fusion | Deux modifications du même endroit que Git ne sait pas combiner seul. |
+| Fichier non suivi (*untracked file*) | Fichier non suivi | Un fichier que Git voit mais n'enregistre pas encore. |
+| `.gitignore` | Fichier d'exclusion | La liste des fichiers que Git doit ignorer. |
+| Pull Request (PR) | Demande de fusion | Proposer d'intégrer une branche, avec relecture (parcours C). |
+| Issue | Ticket | Une tâche, un bug ou une idée notée sur GitHub. |
+| Adresse noreply | Adresse « ne pas répondre » | L'adresse fournie par GitHub pour signer tes commits sans exposer ta vraie adresse. |
+
+## Nanos World et jeu vidéo
+
+| Terme (anglais) | En français | Définition simple |
+|---|---|---|
+| Package | Paquet | Un dossier de scripts Lua (et de configuration) chargé par le serveur Nanos World. |
+| Game mode | Mode de jeu | Un package qui définit les règles d'une partie ; un seul à la fois. |
+| Serveur dédié (*dedicated server*) | Serveur dédié | Le programme serveur lancé seul (sans jouer), par exemple `NanosWorldServer.exe`. |
+| Événement (*event*) | Événement | Un signal (« un joueur arrive », « un véhicule est détruit ») auquel ton script peut réagir. |
+| Asset | Ressource | Un élément du jeu : modèle 3D, son, texture, map. |
+| Map / level | Carte / niveau | Le monde dans lequel on joue ; dans Unreal, une map s'appelle un *Level*. |
+| Cook | Préparation (« cuisson ») | L'étape où Unreal transforme tes assets dans le format lu par le jeu. |
+| ADK (*Assets Development Kit*) | Kit de développement d'assets | Le projet Unreal fourni par Nanos World pour préparer des assets compatibles. |
+| Roleplay (RP) | Jeu de rôle | Un style de serveur où chacun joue un personnage (métier, argent, maison…). |

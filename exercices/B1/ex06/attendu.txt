@@ -1,0 +1,2 @@
+Avant :	taxi	camion
+Après :	camion	taxi

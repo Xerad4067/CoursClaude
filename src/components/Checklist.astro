@@ -1,0 +1,36 @@
+---
+// Checklist interactive d'une machine : chaque point a sa commande de vérification (lecture seule).
+import { Code } from '@astrojs/starlight/components';
+import { mini } from '../lib/mini.js';
+
+interface Point {
+	id: string;
+	texte: string;
+	commande?: string;
+	attendu?: string;
+}
+interface Props {
+	points: Point[];
+}
+const { points } = Astro.props;
+---
+
+<div class="checklist">
+	{
+		points.map((pt) => (
+			<div class="carte case">
+				<label style="display:flex;gap:0.6rem;align-items:flex-start;cursor:pointer">
+					<input type="checkbox" data-case-checklist={pt.id} />
+					<span set:html={mini(pt.texte)} />
+				</label>
+				{pt.commande && <Code code={pt.commande} lang="powershell" frame="terminal" title="PowerShell · vérification (lecture seule)" />}
+				{pt.attendu && <p class="discret" set:html={'Tu dois voir : ' + mini(pt.attendu)} />}
+			</div>
+		))
+	}
+</div>
+
+<script>
+	import { brancherCases } from '../scripts/progression.js';
+	brancherCases();
+</script>

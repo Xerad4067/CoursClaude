@@ -1,0 +1,226 @@
+---
+title: "B6 · Tables : listes et dictionnaires"
+description: La structure de données de Lua, pour ranger des listes d'objets et des fiches de joueur.
+parcours: B
+module: B6
+duree: 3 h 30
+ou: les-deux
+prerequis: Module B5 (fonctions).
+resultat: Un mini-inventaire avec ajout, retrait contrôlé et affichage trié.
+objectifs:
+  - Créer une liste, lire et ajouter des éléments, connaître sa taille avec #
+  - Parcourir une liste avec ipairs et un dictionnaire avec pairs
+  - Utiliser table.insert, table.remove, table.sort et table.concat
+  - Comprendre qu'une table est partagée (référence), pas copiée
+sidebar:
+  order: 6
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : ta première liste."
+  quarante="Étapes 1 à 3 et exercices 1 à 3."
+  deuxh="Étapes 1 à 4 et le mini-inventaire."
+/>
+
+**Pourquoi c'est utile ?** Un inventaire, la liste des joueurs connectés, la fiche d'un joueur (nom, argent, métier) : tout cela se range dans des **tables**. C'est LA structure de Lua.
+
+## Étape 1 · Les listes (25 min)
+
+<Encadre type="analogie">
+Une **liste** est un **casier numéroté** : case 1, case 2, case 3… En Lua, la numérotation commence à **1**.
+</Encadre>
+
+```lua title="b6/liste.lua"
+local inventaire = { "pain", "eau", "lampe" }
+print(inventaire[1])              --> pain
+print(#inventaire)                --> 3 : nombre d'éléments
+table.insert(inventaire, "corde") -- ajoute à la fin
+print(inventaire[#inventaire])    --> corde : le dernier
+print(inventaire[10])             --> nil : case vide
+```
+
+<FinEtape id="B6-e1" titre="Les listes" victoire="tu ranges et lis des éléments dans une liste." prochaine="parcourir une liste (étape 2)." />
+
+## Étape 2 · Parcourir avec ipairs (20 min)
+
+```lua title="b6/parcourir.lua"
+for i, objet in ipairs(inventaire) do
+  print(i .. ". " .. objet)
+end
+```
+
+`ipairs` donne, à chaque tour, la **position** `i` et la **valeur** `objet`, dans l'ordre 1, 2, 3… Si tu n'as pas besoin de la position, la convention est de l'appeler `_` : `for _, objet in ipairs(inventaire) do`.
+
+<FinEtape id="B6-e2" titre="Parcourir une liste" victoire="tu affiches tous les éléments d'une liste avec une boucle." prochaine="les dictionnaires (étape 3)." />
+
+## Étape 3 · Les dictionnaires (25 min)
+
+Une table peut aussi associer des **clés** (des noms) à des valeurs : c'est une **fiche**.
+
+```lua title="b6/fiche.lua"
+local joueur = { nom = "Sam", argent = 1500, metier = "taxi" }
+print(joueur.nom)                 --> Sam
+joueur.argent = joueur.argent + 100
+print(joueur["argent"])           --> 1600 (autre écriture équivalente)
+joueur.permis = true              -- ajouter une clé
+joueur.metier = nil               -- supprimer une clé
+
+for cle, valeur in pairs(joueur) do
+  print(cle, valeur)              -- ordre NON garanti !
+end
+```
+
+<Encadre type="piege">
+`pairs` parcourt toutes les clés **dans un ordre imprévisible**. Si l'ordre compte (affichage), range les clés dans une liste et trie-la avec `table.sort` (tu le feras dans le mini-projet).
+</Encadre>
+
+<FinEtape id="B6-e3" titre="Les dictionnaires" victoire="tu manipules une fiche de joueur avec des clés." prochaine="les outils table et le piège des références (étape 4)." />
+
+## Étape 4 · Outils `table` et références (25 min)
+
+| Fonction | Effet |
+|---|---|
+| `table.insert(t, v)` | ajoute `v` à la fin |
+| `table.insert(t, pos, v)` | insère `v` à la position `pos` |
+| `table.remove(t)` / `table.remove(t, pos)` | retire (et renvoie) le dernier élément / celui de la position |
+| `table.sort(t)` | trie la liste (ordre alphabétique ou croissant) |
+| `table.concat(t, ", ")` | colle les éléments en un texte |
+
+**Une table n'est pas copiée** quand tu l'affectes à une autre variable : les deux noms désignent **la même** table.
+
+```lua title="b6/reference.lua"
+local a = { 1, 2, 3 }
+local b = a          -- b et a désignent la MÊME table
+b[1] = 100
+print(a[1])          --> 100
+```
+
+<Encadre type="analogie">
+Les nombres et les chaînes se **photocopient** ; une table, on en donne **l'adresse**. Deux personnes avec la même adresse vont dans la même maison.
+</Encadre>
+
+<FinEtape id="B6-e4" titre="Outils table et références" victoire="tu tries, retires, assembles, et tu connais le piège des références." prochaine="les exercices, puis le mini-inventaire." />
+
+## Erreurs fréquentes
+
+| Symptôme / message | Cause | Solution |
+|---|---|---|
+| `nil` au premier élément, le dernier manque | Boucle de 0 à #t - 1 (habitude d'autres langages) | En Lua : de 1 à #t |
+| `attempt to index a nil value (local 'joueur')` | La table n'existe pas | Crée-la avec `{}` avant |
+| `bad argument #1 to 'insert' (table expected, got nil)` | `table.insert` sur une variable vide | Vérifie le nom de la table |
+| Affichage dans un ordre différent à chaque fois | `pairs` n'a pas d'ordre | Trie une liste des clés |
+
+## Exercices
+
+<Exercice id="B6-ex01" titre="Mon sac à dos" niveau="vert" dossier="B6/ex01" fichier="sac.lua">
+Crée la liste `{ "pain", "eau", "lampe" }`, affiche le premier objet et la taille, ajoute `"corde"` et affiche le dernier objet.
+
+<div slot="indice1">Les éléments se lisent avec `[position]`.</div>
+<div slot="indice2">`#inventaire` donne la taille.</div>
+<div slot="indice3">Le dernier : `inventaire[#inventaire]`.</div>
+<div slot="solution">`#` est mis à jour automatiquement après `table.insert`.</div>
+</Exercice>
+
+<Exercice id="B6-ex02" titre="Inventaire numéroté" niveau="vert" dossier="B6/ex02" fichier="liste.lua">
+Affiche chaque objet avec son numéro (`1. pain`…) grâce à `ipairs`.
+
+<div slot="indice1">`for i, objet in ipairs(inventaire) do`.</div>
+<div slot="indice2">Construis la ligne avec `..`.</div>
+<div slot="indice3">`print(i .. ". " .. objet)`.</div>
+<div slot="solution">`ipairs` garantit l'ordre 1, 2, 3… et s'arrête au premier trou (`nil`).</div>
+</Exercice>
+
+<Exercice id="B6-ex03" titre="La fiche du joueur" niveau="vert" dossier="B6/ex03" fichier="fiche.lua">
+Crée la fiche `{ nom = "Sam", argent = 1500, metier = "taxi" }`. Affiche le nom, ajoute 100 € et affiche l'argent avec la syntaxe crochets, ajoute `permis = true`, supprime le métier et affiche-le.
+
+<div slot="indice1">`joueur.nom` et `joueur["nom"]` sont équivalents.</div>
+<div slot="indice2">Ajouter une clé : `joueur.permis = true`.</div>
+<div slot="indice3">Supprimer : affecter `nil`.</div>
+<div slot="solution">Une clé qui vaut `nil` n'existe plus dans la table.</div>
+</Exercice>
+
+<Exercice id="B6-ex04" titre="Débogage : le garage décalé" niveau="jaune" type="debug" dossier="B6/ex04" fichier="garage.lua">
+Le garage contient trois véhicules, mais le programme affiche `nil` en premier et oublie le dernier. Corrige.
+
+<div slot="indice1">Regarde les bornes de la boucle.</div>
+<div slot="indice2">En Lua, la première case est la numéro…</div>
+<div slot="indice3">`for i = 1, #garage do`.</div>
+<div slot="solution">D'autres langages (JavaScript, Python, C#) commencent à 0 : un piège quand tu passeras de l'un à l'autre au parcours D.</div>
+</Exercice>
+
+<Exercice id="B6-ex05" titre="Lecture : la même table" niveau="jaune" type="lecture" dossier="B6/ex05" fichier="references.lua">
+Prédis les cinq lignes affichées.
+
+<div slot="indice1">`local b = a` ne copie pas la table.</div>
+<div slot="indice2">Deux tables créées séparément ne sont jamais `==`, même avec le même contenu.</div>
+<div slot="indice3">`table.concat(c, "-")` colle les éléments avec `-`.</div>
+<div slot="solution">`==` sur des tables compare **l'identité** (la même table ?), pas le contenu.</div>
+</Exercice>
+
+<Exercice id="B6-ex06" titre="La file d'attente du taxi" niveau="jaune" dossier="B6/ex06" fichier="file.lua">
+La file `{ "Kim", "Alex", "Sam" }` : trie-la, affiche-la, sers le premier client (retire-le) et affiche ceux qui restent.
+
+<div slot="indice1">`table.sort` trie sur place.</div>
+<div slot="indice2">`table.remove(file, 1)` retire et **renvoie** le premier.</div>
+<div slot="indice3">`table.concat(file, ", ")` pour l'affichage.</div>
+<div slot="solution">`table.remove` décale automatiquement les éléments suivants.</div>
+</Exercice>
+
+<Exercice id="B6-ex07" titre="Défi : compter les ventes" niveau="rouge" dossier="B6/ex07" fichier="ventes.lua">
+À partir de la liste des ventes du jour, compte combien de fois chaque produit a été vendu, puis affiche `pain`, `eau`, `lampe` dans cet ordre.
+
+<div slot="indice1">Un dictionnaire `compte` dont les clés sont les produits.</div>
+<div slot="indice2">Pour chaque vente : `compte[produit] = (compte[produit] or 0) + 1`.</div>
+<div slot="indice3">Pour l'affichage dans un ordre fixe, parcours une liste `{ "pain", "eau", "lampe" }`.</div>
+<div slot="solution">Le motif `(t[k] or 0) + 1` est l'un des plus utiles de Lua : compter, cumuler, regrouper.</div>
+</Exercice>
+
+<Exercice id="B6-ex08" titre="Mini-projet : mini-inventaire" niveau="rouge" type="projet" dossier="B6/ex08" fichier="inventaire.lua">
+Un inventaire est un dictionnaire `objet → quantité`. Écris `ajouter(objet, quantite)`, `retirer(objet, quantite)` (refuse s'il n'y en a pas assez, renvoie `true`/`false`, supprime l'objet à 0) et `afficher()` (ordre alphabétique). Puis rejoue le scénario attendu.
+
+<div slot="validation">Retirer une lampe absente affiche un refus sans planter ; l'affichage est trié.</div>
+<div slot="indice1">`inventaire[objet] = (inventaire[objet] or 0) + quantite`.</div>
+<div slot="indice2">Pour trier : collecte les noms avec `pairs` dans une liste, puis `table.sort`.</div>
+<div slot="indice3">Dans `retirer`, compare d'abord la quantité actuelle (`or 0`) avec celle demandée.</div>
+<div slot="solution">Ces trois fonctions sont la base de l'inventaire de ton serveur RP (parcours E et G), où il faudra en plus **sauvegarder** les données.</div>
+</Exercice>
+
+## Quiz du module B6
+
+<Quiz id="B6-quiz" questions={[
+  { q: "Quel est l'indice du premier élément d'une liste Lua ?", choix: ["0", "1", "-1", "Au choix"], ok: 1, pourquoi: "En Lua, les listes commencent à 1." },
+  { q: "Que donne `#{ \"a\", \"b\", \"c\" }` ?", choix: ["2", "3", "4", "Une erreur"], ok: 1, pourquoi: "`#` donne le nombre d'éléments." },
+  { q: "Pour parcourir une liste dans l'ordre :", choix: ["`pairs`", "`ipairs`", "`for i = 0, #t`", "`while true`"], ok: 1, pourquoi: "`ipairs` garantit l'ordre 1, 2, 3…" },
+  { q: "`joueur.argent` équivaut à…", choix: ["`joueur[argent]`", "`joueur[\"argent\"]`", "`joueur(argent)`", "`joueur:argent`"], ok: 1, pourquoi: "Avec des crochets, la clé est la chaîne \"argent\"." },
+  { q: "Comment supprimer la clé `metier` ?", choix: ["`joueur.metier = 0`", "`joueur.metier = nil`", "`delete joueur.metier`", "`table.remove(joueur, metier)`"], ok: 1, pourquoi: "Affecter nil supprime la clé." },
+  { q: "Après `local b = a; b[1] = 9`, que vaut `a[1]` ?", choix: ["L'ancienne valeur", "9", "nil", "Une erreur"], ok: 1, pourquoi: "a et b désignent la même table." },
+  { q: "L'ordre de `pairs` est…", choix: ["Alphabétique", "L'ordre de création", "Non garanti", "Inverse"], ok: 2, pourquoi: "Pour un ordre fixe, trie une liste des clés." },
+  { q: "`table.remove(file, 1)` renvoie…", choix: ["Rien", "Le premier élément retiré", "La taille", "La table"], ok: 1, pourquoi: "Pratique pour servir le premier client d'une file." },
+  { q: "`table.concat({ \"a\", \"b\" }, \"-\")` donne…", choix: ["`ab`", "`a-b`", "`a - b`", "`{a,b}`"], ok: 1, pourquoi: "Les éléments collés avec le séparateur." },
+  { q: "Que fait `compte[p] = (compte[p] or 0) + 1` ?", choix: ["Une erreur si p est nouveau", "Compte une occurrence de p, en partant de 0 si p est nouveau", "Remet à zéro", "Supprime p"], ok: 1, pourquoi: "`or 0` évite l'arithmétique sur nil." },
+]} />
+
+## Récapitulatif
+
+- Liste : `{ "a", "b" }`, `t[1]`, `#t`, `ipairs`. Dictionnaire : `{ cle = valeur }`, `t.cle`, `pairs` (ordre non garanti).
+- `table.insert`, `table.remove`, `table.sort`, `table.concat`.
+- Une table est partagée par référence : `b = a` ne copie pas.
+
+## Je suis bloqué, que faire ?
+
+Affiche le contenu d'une table avec une boucle `pairs` pour voir ce qu'elle contient vraiment. Vérifie les bornes de tes boucles (1 à `#t`).
+
+<Videos recherche="Lua tables tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : constructeurs de tables](https://www.lua.org/manual/5.4/manual.html#3.4.9)
+- [Manuel Lua 5.4 : la bibliothèque table](https://www.lua.org/manual/5.4/manual.html#6.6)
+- [Doc Nanos World : bibliothèque table](https://docs.nanos-world.com/docs/scripting-reference/standard-libraries/table)

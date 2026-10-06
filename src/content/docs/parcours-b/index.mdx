@@ -1,0 +1,36 @@
+---
+title: "Parcours B : Lua et logique"
+description: Présentation du parcours B (≈ 24 h), modules, mini-projets et méthode de travail.
+parcours: B
+sidebar:
+  order: 0
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+**Durée : ≈ 24 h · Où : 🔀 les deux machines · Aucun accès à Nanos World nécessaire.**
+
+Ici, tu apprends à **programmer** pour de vrai, en **Lua 5.4** (la version de Nanos World), et surtout à **penser comme un développeur** : découper un problème, tester, lire une erreur. Chaque module se termine par un **mini-projet** sur le thème roleplay ; ensemble, ils forment les briques de ton futur serveur.
+
+| Module | Durée | Mini-projet |
+|---|---|---|
+| [B1 · Variables et types](/parcours-b/b1-variables-types/) | 3 h | Fiche de personnage |
+| [B2 · Opérateurs et chaînes](/parcours-b/b2-operateurs-chaines/) | 3 h | Ticket de caisse |
+| [B3 · Conditions](/parcours-b/b3-conditions/) | 2 h 30 | Contrôle d'achat d'un véhicule |
+| [B4 · Boucles](/parcours-b/b4-boucles/) | 3 h | Jeu de devinettes |
+| [B5 · Fonctions et portée](/parcours-b/b5-fonctions/) | 3 h | Calculateur de salaire |
+| [B6 · Tables : listes et dictionnaires](/parcours-b/b6-tables/) | 3 h 30 | Mini-inventaire |
+| [B7 · Tables imbriquées, closures et modules](/parcours-b/b7-modules-closures/) | 3 h | Annuaire des métiers en modules |
+| [B8 · Objets, erreurs et chaînes avancées](/parcours-b/b8-objets-erreurs/) | 3 h | Mini boutique en texte |
+| [Bilan du parcours B](/parcours-b/bilan-b/) | 30 min | — |
+
+## Comment travailler
+
+1. Dans ton dépôt : `mkdir parcours-b\b1` (un dossier par module).
+2. Pour chaque exemple et exercice : crée le fichier, **tape le code toi-même** (pas de copier-coller : tes doigts apprennent aussi), exécute avec `lua fichier.lua`.
+3. Compare avec le **résultat attendu**. Bloqué ? Ouvre les indices **un par un**.
+4. En fin de séance : `git add`, `git commit`, `git push`.
+
+<Encadre type="retenir">
+Les solutions affichées sont **exactement** celles testées automatiquement (`lua exercices/tester.lua` dans le dépôt du cours). Si ta solution est différente mais affiche le bon résultat, elle est probablement juste aussi : il y a souvent plusieurs bonnes réponses.
+</Encadre>

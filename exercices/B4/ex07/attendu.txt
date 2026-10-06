@@ -1,0 +1,15 @@
+1
+2
+Taxi
+4
+Bus
+Taxi
+7
+8
+Taxi
+Bus
+11
+Taxi
+13
+14
+TaxiBus

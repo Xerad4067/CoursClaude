@@ -1,0 +1,67 @@
+---
+title: "Bilan du parcours B : je programme en Lua"
+description: Point de contrôle du parcours B, auto-évaluation et quiz de bilan.
+parcours: B
+module: Bilan B
+duree: 30 min
+ou: les-deux
+prerequis: Modules B1 à B8.
+resultat: Le parcours B validé, avec tes huit mini-projets sur GitHub.
+sidebar:
+  order: 9
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import Quiz from '../../../components/Quiz.astro';
+
+## ✅ Point de contrôle : tu sais maintenant…
+
+- ranger des données dans des **variables** et reconnaître leurs **types** ;
+- **calculer**, **comparer** et mettre en forme du texte avec `string.format` ;
+- faire **décider** ton programme (`if`, `and`, `or`) et **valider** une saisie ;
+- **répéter** avec `for`, `while`, `repeat`, et dialoguer avec `io.read` ;
+- écrire des **fonctions** claires qui **renvoient** des résultats, avec `local` partout ;
+- organiser des données dans des **tables** (listes, dictionnaires, tables imbriquées) ;
+- découper ton code en **modules**, utiliser des **closures** et des **callbacks** ;
+- créer des **objets** avec des métatables, gérer les **erreurs** avec `pcall` et analyser des commandes avec des **motifs**.
+
+## Ton portfolio du parcours B
+
+Vérifie que ces huit mini-projets sont dans ton dépôt `mon-apprentissage` (dossier `parcours-b`) et poussés sur GitHub :
+
+| Module | Mini-projet |
+|---|---|
+| B1 | Fiche de personnage |
+| B2 | Ticket de caisse |
+| B3 | Contrôle d'achat d'un véhicule |
+| B4 | Jeu de devinettes |
+| B5 | Calculateur de salaire |
+| B6 | Mini-inventaire |
+| B7 | Annuaire des métiers en modules |
+| B8 | Mini boutique en texte |
+
+<Encadre type="astuce" titre="💡 Un README pour tes projets">
+Ajoute un fichier `README.md` dans `parcours-b` qui liste ces projets avec une phrase chacun et la commande pour les lancer (`lua b4/devinettes.lua`). Un recruteur ou un prof de BTS qui ouvre ton GitHub comprendra en 30 secondes ce que tu sais faire.
+</Encadre>
+
+<FinEtape id="Bilan-B-e1" titre="Portfolio du parcours B" victoire="tes huit mini-projets sont sur GitHub, avec un README." prochaine="faire le quiz de bilan, puis exporter ta progression." />
+
+## Quiz de bilan du parcours B
+
+<Quiz id="Bilan-B-quiz" questions={[
+  { q: "Qu'affiche `print(type(\"12\") == \"number\")` ?", choix: ["true", "false", "number", "Une erreur"], ok: 1, pourquoi: "`\"12\"` est une chaîne : son type est string." },
+  { q: "Que vaut `#{ \"a\", \"b\", \"c\" } + 2 * 3` ?", choix: ["15", "9", "11", "Une erreur"], ok: 1, pourquoi: "`#` donne 3, la multiplication passe avant : 3 + 6." },
+  { q: "Quelle valeur est fausse en Lua ?", choix: ["0", "`\"\"`", "`nil`", "`{}`"], ok: 2, pourquoi: "Seuls false et nil sont faux." },
+  { q: "Combien de lignes affiche `for i = 2, 10, 2 do print(i) end` ?", choix: ["4", "5", "9", "10"], ok: 1, pourquoi: "2, 4, 6, 8, 10." },
+  { q: "Une fonction sans `return` renvoie…", choix: ["0", "`nil`", "Une erreur", "Sa dernière ligne"], ok: 1, pourquoi: "Rien, donc nil." },
+  { q: "Après `local t = {}; local u = t; u.x = 5`, que vaut `t.x` ?", choix: ["nil", "5", "Une erreur", "0"], ok: 1, pourquoi: "t et u sont la même table." },
+  { q: "Pourquoi trier une liste de clés avant d'afficher un dictionnaire ?", choix: ["Pour aller plus vite", "Parce que `pairs` n'a pas d'ordre garanti", "C'est obligatoire", "Pour supprimer les doublons"], ok: 1, pourquoi: "L'ordre de pairs est imprévisible." },
+  { q: "Un module oublie `return`. Que reçoit `require` ?", choix: ["La table", "`true`", "`nil`", "Une erreur immédiate"], ok: 1, pourquoi: "D'où `attempt to index a boolean value` ensuite." },
+  { q: "`obj.methode(5)` au lieu de `obj:methode(5)` : que devient self ?", choix: ["obj", "5", "nil", "La classe"], ok: 1, pourquoi: "Le premier argument devient self." },
+  { q: "Quelle est la bonne façon d'exécuter une fonction risquée sans faire planter le serveur ?", choix: ["`try … catch`", "`pcall(f, ...)`", "`error(f)`", "`load(f)`"], ok: 1, pourquoi: "pcall attrape l'erreur (Lua n'a pas de try/catch)." },
+]} />
+
+<Encadre type="retenir">
+Tu as fait le plus dur : apprendre à programmer. La suite (parcours C et D, vague suivante du cours) t'apprend à **penser en développeur**, à travailler en équipe avec Git, et fait le pont avec le BTS SIO SLAM (POO, SQL, Web). Pense à **exporter ta progression** ([Ma progression](/moi/progression/)).
+</Encadre>

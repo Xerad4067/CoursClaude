@@ -1,0 +1,4 @@
+Ouverture dans 3
+Ouverture dans 2
+Ouverture dans 1
+Le magasin est ouvert !

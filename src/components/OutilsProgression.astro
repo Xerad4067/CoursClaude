@@ -1,0 +1,52 @@
+---
+// Exporter / importer / réinitialiser la progression (synchronisation manuelle entre machines).
+---
+
+<div class="carte">
+	<p><strong>Dernier export :</strong> <span id="sync-dernier">jamais</span></p>
+	<p>
+		<button type="button" class="bouton principal" id="sync-exporter">💾 Exporter ma progression</button>
+		<label class="bouton" for="sync-fichier" style="display:inline-block">📂 Importer un fichier…</label>
+		<input type="file" id="sync-fichier" accept="application/json,.json" style="position:absolute;opacity:0;width:1px;height:1px" />
+	</p>
+	<p id="sync-statut" aria-live="polite"></p>
+	<details>
+		<summary>Zone dangereuse</summary>
+		<p><button type="button" class="bouton" id="sync-effacer">🗑️ Effacer toute ma progression sur ce navigateur</button></p>
+	</details>
+</div>
+
+<script>
+	import { charger, sauver, exporter, importer } from '../scripts/progression.js';
+	const statut = document.getElementById('sync-statut')!;
+	const dernier = document.getElementById('sync-dernier')!;
+	const majDate = () => {
+		const p = charger();
+		dernier.textContent = p.derniereExport ? new Date(p.derniereExport).toLocaleString('fr-FR') : 'jamais';
+	};
+	document.getElementById('sync-exporter')!.addEventListener('click', () => {
+		exporter();
+		statut.textContent = '✔ Fichier « progression-cours.json » téléchargé (dossier Téléchargements).';
+		majDate();
+	});
+	document.getElementById('sync-fichier')!.addEventListener('change', async (ev) => {
+		const input = ev.target as HTMLInputElement;
+		const fichier = input.files?.[0];
+		if (!fichier) return;
+		try {
+			const p = await importer(fichier);
+			statut.textContent = `✔ Progression fusionnée : ${Object.keys(p.etapes).length} étapes et ${Object.keys(p.exercices).length} exercices cochés au total.`;
+		} catch (e) {
+			statut.textContent = `❌ Import impossible : ${(e as Error).message}`;
+		}
+		input.value = '';
+	});
+	document.getElementById('sync-effacer')!.addEventListener('click', () => {
+		if (!confirm('Effacer toute la progression de CE navigateur ? Exporte-la d’abord si tu veux la garder.')) return;
+		const vide = { version: 1, etapes: {}, exercices: {}, quiz: {}, checklist: {}, jours: [], derniere: null, journal: [], derniereExport: null };
+		sauver(vide as any);
+		statut.textContent = 'Progression effacée sur ce navigateur.';
+		majDate();
+	});
+	majDate();
+</script>

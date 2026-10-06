@@ -1,0 +1,41 @@
+---
+// Page « Mes réussites » : niveau, badges et modules terminés.
+import { construireManifeste } from '../lib/manifeste.js';
+const manifeste = await construireManifeste();
+---
+
+<div>
+	<script type="application/json" id="manifeste-reussites" set:html={JSON.stringify(manifeste)} />
+	<div class="carte">
+		<h2 id="r-niveau">🌱 Novice</h2>
+		<p id="r-xp" class="discret"></p>
+		<p class="discret">Niveaux : 🌱 Novice (0) → 🔧 Apprenti (300 XP) → 📜 Scripteur (1 500) → 🗺️ Mappeur (3 500) → 🚀 Développeur (6 000). Étape = 10 XP · exercice 🟢 10, 🟡 20, 🔴 30 · quiz = 5 XP par bonne réponse · point de checklist = 5 XP.</p>
+	</div>
+	<h2>Mes badges</h2>
+	<div class="badge-liste" id="r-badges"></div>
+	<h2>Modules terminés</h2>
+	<ul id="r-modules"><li>Aucun module terminé pour l'instant : chaque étape cochée compte !</li></ul>
+</div>
+
+<script>
+	import { charger, calculerXP, niveauPour, badges, avancement } from '../scripts/progression.js';
+	const manifeste = JSON.parse(document.getElementById('manifeste-reussites')!.textContent || '{"pages":[]}');
+	const p = charger();
+	const xp = calculerXP(p, manifeste);
+	const { actuel, suivant } = niveauPour(xp);
+	document.getElementById('r-niveau')!.textContent = `${actuel.icone} Niveau ${actuel.nom}`;
+	document.getElementById('r-xp')!.textContent = suivant ? `${xp} XP · prochain niveau : ${suivant.nom} à ${suivant.xp} XP` : `${xp} XP`;
+	document.getElementById('r-badges')!.innerHTML = badges(p, manifeste)
+		.map((b) => `<div class="carte badge-carte ${b.obtenu ? 'obtenu' : ''}"><div class="icone" aria-hidden="true">${b.icone}</div><strong>${b.nom}</strong><br><span class="discret">${b.detail}</span><br><span>${b.obtenu ? '✅ Obtenu' : '🔒 À débloquer'}</span></div>`)
+		.join('');
+	const modules = new Map<string, any[]>();
+	for (const pg of manifeste.pages) {
+		if (!pg.module) continue;
+		if (!modules.has(pg.module)) modules.set(pg.module, []);
+		modules.get(pg.module)!.push(pg);
+	}
+	const finis = [...modules.entries()].filter(([, pages]) => avancement(p, pages).pourcent === 100);
+	if (finis.length) {
+		document.getElementById('r-modules')!.innerHTML = finis.map(([code, pages]) => `<li>✅ <a href="${pages[0].url}">${code}</a> · ${pages[0].titre}</li>`).join('');
+	}
+</script>

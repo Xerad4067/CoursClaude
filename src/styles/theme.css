@@ -1,0 +1,442 @@
+/* Thème du cours : sombre par défaut, Roboto, lecture confortable, contrastes AA. */
+
+:root {
+	--sl-font: 'Roboto', system-ui, -apple-system, 'Segoe UI', sans-serif;
+	--sl-font-mono: 'Roboto Mono', ui-monospace, 'Cascadia Mono', monospace;
+	--sl-content-width: 46rem;
+	--sl-line-height: 1.75;
+	/* Taille de texte réglable (boutons A− / A+), appliquée avant l'affichage. */
+	--taille-texte: 100%;
+	/* Couleurs d'accent par parcours (lisibles sur fond sombre). */
+	--accent-A: #7cc4ff;
+	--accent-B: #ffd166;
+	--accent-C: #95e06c;
+	--accent-D: #ff9f7f;
+	--accent-E: #c3a6ff;
+	--accent-F: #6ee7d8;
+	--accent-G: #ff8fb8;
+	--accent-H: #e0e0e0;
+	--vert: #4ade80;
+	--jaune: #facc15;
+	--rouge: #f87171;
+	--carte: #1b1e26;
+	--carte-bord: #2c313c;
+}
+
+:root[data-theme='dark'] {
+	--sl-color-accent-low: #11294a;
+	--sl-color-accent: #3b8ee8;
+	--sl-color-accent-high: #b8dcff;
+	--sl-color-white: #ffffff;
+	--sl-color-gray-1: #eceef2;
+	--sl-color-gray-2: #c4c9d4;
+	--sl-color-gray-3: #9aa3b5;
+	--sl-color-gray-4: #5d6578;
+	--sl-color-gray-5: #383e4c;
+	--sl-color-gray-6: #23272f;
+	--sl-color-black: #14161c;
+}
+
+:root[data-theme='light'] {
+	--carte: #f4f6fa;
+	--carte-bord: #d7dbe3;
+	--accent-A: #0b5cad;
+	--accent-B: #8a5a00;
+	--accent-C: #2f6b12;
+	--accent-D: #a33a14;
+	--accent-E: #5b3cc4;
+	--accent-F: #0b6e63;
+	--accent-G: #a3155a;
+	--accent-H: #333333;
+	--vert: #15803d;
+	--jaune: #a16207;
+	--rouge: #b91c1c;
+}
+
+html {
+	font-size: var(--taille-texte);
+}
+
+.sl-markdown-content p,
+.sl-markdown-content li {
+	max-width: 70ch;
+}
+
+/* Liens bien visibles et focus clavier net (navigation au clavier). */
+.sl-markdown-content a {
+	text-underline-offset: 0.2em;
+}
+:focus-visible {
+	outline: 3px solid var(--sl-color-accent-high);
+	outline-offset: 2px;
+}
+
+/* ---------- Cartes génériques ---------- */
+.carte {
+	background: var(--carte);
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.75rem;
+	padding: 1rem 1.25rem;
+	margin-block: 1rem;
+}
+
+/* ---------- En-tête de leçon (durée, machine, prérequis, résultat) ---------- */
+.meta-lecon {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+	gap: 0.5rem 1rem;
+	background: var(--carte);
+	border: 1px solid var(--carte-bord);
+	border-inline-start: 6px solid var(--accent-parcours, var(--sl-color-accent));
+	border-radius: 0.75rem;
+	padding: 0.85rem 1.1rem;
+	margin-top: 1rem;
+	font-size: 0.95rem;
+}
+.meta-lecon dt {
+	font-weight: 700;
+	color: var(--sl-color-gray-2);
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.meta-lecon dd {
+	margin: 0;
+	color: var(--sl-color-white);
+}
+.meta-lecon .objectifs {
+	grid-column: 1 / -1;
+}
+.meta-lecon ul {
+	margin: 0.25rem 0 0;
+	padding-inline-start: 1.2rem;
+}
+
+[data-parcours='A'] { --accent-parcours: var(--accent-A); }
+[data-parcours='B'] { --accent-parcours: var(--accent-B); }
+[data-parcours='C'] { --accent-parcours: var(--accent-C); }
+[data-parcours='D'] { --accent-parcours: var(--accent-D); }
+[data-parcours='E'] { --accent-parcours: var(--accent-E); }
+[data-parcours='F'] { --accent-parcours: var(--accent-F); }
+[data-parcours='G'] { --accent-parcours: var(--accent-G); }
+[data-parcours='H'] { --accent-parcours: var(--accent-H); }
+
+/* ---------- Mode concentration ---------- */
+html[data-concentration='on'] {
+	--sl-nav-height: 0rem;
+}
+html[data-concentration='on'] .header,
+html[data-concentration='on'] .sidebar,
+html[data-concentration='on'] .right-sidebar-container,
+html[data-concentration='on'] starlight-menu-button,
+html[data-concentration='on'] mobile-starlight-toc,
+html[data-concentration='on'] .pagination-links,
+html[data-concentration='on'] .masquer-en-concentration {
+	display: none !important;
+}
+html[data-concentration='on'] .main-frame {
+	padding-inline-start: 0 !important;
+	padding-top: 1rem !important;
+}
+html[data-concentration='on'] .main-pane {
+	margin-inline: auto;
+}
+
+/* ---------- Barre d'outils flottante (concentration, minuteur, taille du texte) ---------- */
+.barre-outils {
+	position: fixed;
+	inset-block-end: 1rem;
+	inset-inline-end: 1rem;
+	z-index: 50;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.4rem;
+	background: var(--sl-color-gray-6);
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 999px;
+	padding: 0.35rem 0.5rem;
+	box-shadow: 0 6px 24px rgb(0 0 0 / 0.35);
+	font-size: 0.9rem;
+}
+.barre-outils button,
+.bouton {
+	font: inherit;
+	cursor: pointer;
+	background: var(--sl-color-gray-5);
+	color: var(--sl-color-white);
+	border: 1px solid transparent;
+	border-radius: 999px;
+	padding: 0.3rem 0.75rem;
+	min-height: 2.25rem;
+}
+.barre-outils button:hover,
+.bouton:hover {
+	border-color: var(--sl-color-accent-high);
+}
+.bouton.principal {
+	background: var(--sl-color-accent);
+	color: #fff;
+}
+.barre-outils .temps {
+	font-family: var(--sl-font-mono);
+	min-width: 3.6rem;
+	text-align: center;
+}
+.barre-outils .menu-minuteur {
+	display: flex;
+	gap: 0.3rem;
+}
+.barre-outils .menu-minuteur[hidden] {
+	display: none;
+}
+@media (max-width: 40rem) {
+	.barre-outils {
+		inset-inline: 0.5rem;
+		justify-content: center;
+		border-radius: 1rem;
+	}
+}
+
+/* ---------- Encadrés pédagogiques ---------- */
+.encadre {
+	border-radius: 0.6rem;
+	padding: 0.75rem 1rem;
+	margin-block: 1.25rem;
+	border: 1px solid var(--carte-bord);
+	border-inline-start: 6px solid var(--couleur-encadre);
+	background: var(--carte);
+}
+.encadre > .titre-encadre {
+	font-weight: 700;
+	margin: 0 0 0.35rem;
+	color: var(--couleur-encadre);
+}
+.encadre > :last-child {
+	margin-bottom: 0;
+}
+.encadre.retenir { --couleur-encadre: var(--accent-A); }
+.encadre.piege { --couleur-encadre: var(--rouge); }
+.encadre.astuce { --couleur-encadre: var(--vert); }
+.encadre.bloque { --couleur-encadre: var(--jaune); }
+.encadre.analogie { --couleur-encadre: var(--accent-E); }
+
+/* ---------- Exercices ---------- */
+.exercice {
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.75rem;
+	padding: 1rem 1.25rem;
+	margin-block: 1.75rem;
+	background: var(--carte);
+	border-inline-start: 6px solid var(--couleur-niveau);
+}
+.exercice.vert { --couleur-niveau: var(--vert); }
+.exercice.jaune { --couleur-niveau: var(--jaune); }
+.exercice.rouge { --couleur-niveau: var(--rouge); }
+.exercice .tete {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+.exercice .tete h3 {
+	margin: 0;
+	font-size: 1.15rem;
+}
+.exercice .etiquettes {
+	display: flex;
+	gap: 0.4rem;
+	flex-wrap: wrap;
+	font-size: 0.85rem;
+	margin-top: 0.35rem;
+}
+.etiquette {
+	border: 1px solid var(--carte-bord);
+	border-radius: 999px;
+	padding: 0.05rem 0.6rem;
+	color: var(--sl-color-gray-2);
+}
+.exercice details,
+.solution-bloc {
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.5rem;
+	padding: 0.4rem 0.8rem;
+	margin-top: 0.6rem;
+	background: var(--sl-color-black);
+}
+.exercice summary {
+	cursor: pointer;
+	font-weight: 600;
+	padding-block: 0.25rem;
+}
+.exercice details[open] > summary {
+	margin-bottom: 0.5rem;
+}
+.exercice .reussi,
+.fin-etape .fait {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.45rem;
+	cursor: pointer;
+	font-weight: 600;
+}
+.exercice .reussi input,
+.fin-etape .fait input,
+.case input {
+	width: 1.2rem;
+	height: 1.2rem;
+	accent-color: var(--vert);
+}
+.sous-titre-exo {
+	font-weight: 700;
+	margin-top: 0.8rem;
+	margin-bottom: 0.2rem;
+	color: var(--sl-color-gray-2);
+}
+
+/* ---------- Fin d'étape (mini-victoire + prochaine action) ---------- */
+.fin-etape {
+	border: 1px dashed var(--vert);
+	border-radius: 0.75rem;
+	padding: 0.8rem 1rem;
+	margin-block: 1.5rem 2.5rem;
+}
+.fin-etape p {
+	margin: 0.25rem 0;
+}
+
+/* ---------- Trois durées ---------- */
+.trois-durees {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+	gap: 0.75rem;
+	margin-block: 1rem;
+}
+.trois-durees > div {
+	background: var(--carte);
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.6rem;
+	padding: 0.7rem 0.9rem;
+}
+.trois-durees strong {
+	display: block;
+	margin-bottom: 0.25rem;
+}
+
+/* ---------- Quiz ---------- */
+.quiz {
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.75rem;
+	padding: 1rem 1.25rem;
+	background: var(--carte);
+}
+.quiz fieldset {
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.6rem;
+	margin: 0 0 1rem;
+	padding: 0.6rem 0.9rem;
+}
+.quiz legend {
+	font-weight: 600;
+	padding-inline: 0.3rem;
+}
+.quiz label {
+	display: flex;
+	gap: 0.5rem;
+	align-items: flex-start;
+	padding: 0.25rem 0;
+	cursor: pointer;
+}
+.quiz .explication {
+	margin-top: 0.4rem;
+	padding: 0.5rem 0.7rem;
+	border-radius: 0.4rem;
+	background: var(--sl-color-black);
+}
+.quiz .explication.juste { border-inline-start: 4px solid var(--vert); }
+.quiz .explication.faux { border-inline-start: 4px solid var(--rouge); }
+.quiz .score {
+	font-size: 1.1rem;
+	font-weight: 700;
+}
+
+/* ---------- Tableau de bord ---------- */
+.barre {
+	height: 0.7rem;
+	border-radius: 999px;
+	background: var(--sl-color-gray-5);
+	overflow: hidden;
+}
+.barre > span {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: var(--accent-parcours, var(--sl-color-accent));
+	transition: width 0.4s;
+}
+.grille-cartes {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+	gap: 1rem;
+}
+.carte-parcours {
+	border-top: 5px solid var(--accent-parcours);
+}
+.carte-parcours h3 {
+	margin-top: 0;
+}
+.badge-liste {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+	gap: 0.75rem;
+}
+.badge-carte {
+	text-align: center;
+	opacity: 0.45;
+}
+.badge-carte.obtenu {
+	opacity: 1;
+	border-color: var(--jaune);
+}
+.badge-carte .icone {
+	font-size: 2rem;
+}
+.discret {
+	color: var(--sl-color-gray-3);
+	font-size: 0.9rem;
+}
+
+/* ---------- Vidéos de secours ---------- */
+.videos details {
+	border: 1px solid var(--carte-bord);
+	border-radius: 0.6rem;
+	padding: 0.5rem 0.9rem;
+	background: var(--carte);
+}
+.videos summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+.video-cadre {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	margin-top: 0.5rem;
+}
+.video-cadre iframe {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	border-radius: 0.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.barre > span { transition: none; }
+}
+
+/* Fichiers Markdown du dépôt importés dans une page : on masque leur titre principal (déjà affiché). */
+.import-md > h1:first-child { display: none; }
+.import-md table { display: block; overflow-x: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

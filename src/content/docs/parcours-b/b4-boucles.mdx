@@ -1,0 +1,226 @@
+---
+title: "B4 · Boucles"
+description: Répéter des actions avec for, while et repeat, accumuler des valeurs, sortir avec break, et coder un jeu de devinettes.
+parcours: B
+module: B4
+duree: 3 h
+ou: les-deux
+prerequis: Module B3 (conditions).
+resultat: Un jeu de devinettes jouable dans le terminal.
+objectifs:
+  - Répéter un bloc avec for (compteur), while et repeat
+  - Construire un total avec un accumulateur
+  - Sortir d'une boucle avec break et éviter les boucles infinies
+  - Lire une saisie clavier avec io.read et tirer un nombre avec math.random
+sidebar:
+  order: 4
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : la boucle for."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Étapes 1 à 4 et le jeu de devinettes."
+/>
+
+**Pourquoi c'est utile ?** Verser un salaire **toutes les 10 minutes**, parcourir **tous** les joueurs connectés, compter les objets d'un inventaire : un serveur répète sans cesse.
+
+## Étape 1 · La boucle for (20 min)
+
+<Encadre type="analogie">
+Une boucle `for`, c'est **faire ses tours de piste** : « de 1 à 5, cours un tour ». Le compteur `i` te dit à quel tour tu en es.
+</Encadre>
+
+```lua title="b4/tours.lua"
+for i = 1, 5 do
+  print("Tour " .. i)
+end
+```
+
+- `i = 1, 5` : `i` vaut 1, puis 2… jusqu'à 5 **inclus** ;
+- un troisième nombre fixe le **pas** : `for i = 10, 1, -1 do` compte à rebours ;
+- `i` n'existe qu'à l'intérieur de la boucle.
+
+<FinEtape id="B4-e1" titre="La boucle for" victoire="tu répètes une action un nombre précis de fois." prochaine="accumuler un total (étape 2)." />
+
+## Étape 2 · L'accumulateur (20 min)
+
+Pour additionner des valeurs dans une boucle, on prépare une variable **avant**, puis on l'augmente à chaque tour :
+
+```lua title="b4/semaine.lua"
+local total = 0              -- l'accumulateur commence à 0
+for jour = 1, 7 do
+  total = total + 85         -- 85 € par jour
+end
+print("Salaire de la semaine :", total)   --> 595
+```
+
+<Encadre type="piege">
+Si tu écris `local total = 0` **dans** la boucle, il est remis à 0 à chaque tour : le total final sera faux.
+</Encadre>
+
+<FinEtape id="B4-e2" titre="Accumuler" victoire="tu calcules un total avec une boucle." prochaine="les boucles while et repeat (étape 3)." />
+
+## Étape 3 · while, repeat et break (20 min)
+
+Quand on ne sait pas **combien** de tours il faut, on utilise une condition :
+
+```lua title="b4/while.lua"
+local argent = 100
+while argent < 1000 do        -- tant que…
+  argent = argent * 2
+end
+print(argent)                 --> 1600
+
+local essence = 0
+repeat                        -- … jusqu'à ce que (au moins un tour)
+  essence = essence + 15
+until essence >= 40
+print(essence)                --> 45
+```
+
+`break` sort immédiatement de la boucle en cours.
+
+<Encadre type="piege" titre="⚠️ La boucle infinie">
+Si la condition d'un `while` ne devient jamais fausse (tu as oublié de modifier la variable), le programme tourne **pour toujours**. Pas de panique : **Ctrl+C** dans le terminal l'arrête.
+</Encadre>
+
+<FinEtape id="B4-e3" titre="while, repeat, break" victoire="tu répètes tant qu'une condition est vraie, et tu sais arrêter une boucle." prochaine="lire le clavier et tirer au hasard (étape 4)." />
+
+## Étape 4 · Clavier et hasard (20 min)
+
+```lua title="b4/clavier.lua"
+io.write("Ton pseudo : ")        -- comme print, mais sans retour à la ligne
+local pseudo = io.read()          -- attend que le joueur tape une ligne + Entrée
+print("Salut " .. pseudo)
+
+local de = math.random(1, 6)      -- entier au hasard entre 1 et 6 inclus
+print("Dé :", de)
+```
+
+`io.read()` renvoie toujours du **texte** : pour un nombre, `tonumber(io.read())`, en vérifiant `nil` (module B3). En Lua 5.4, le générateur de `math.random` est initialisé au hasard au lancement (vérifié en exécutant deux fois le même script : les nombres changent).
+
+<FinEtape id="B4-e4" titre="Clavier et hasard" victoire="ton programme dialogue avec le joueur." prochaine="les exercices, puis le jeu de devinettes." />
+
+## Erreurs fréquentes
+
+| Symptôme | Cause | Solution |
+|---|---|---|
+| Le programme ne s'arrête plus | Boucle infinie | `Ctrl+C`, puis vérifie que la condition change |
+| Une ligne de trop ou de moins | Mauvaises bornes (`0` au lieu de `1`) | Rappel : `for i = 1, 5` fait 5 tours, 1 et 5 inclus |
+| `'do' expected near 'print'` | `do` oublié après `for` ou `while` | `for … do … end` |
+| `attempt to compare nil with number` | `tonumber(io.read())` a renvoyé `nil` | Teste `nil` avant de comparer |
+
+## Exercices
+
+<Exercice id="B4-ex01" titre="Cinq tours de piste" niveau="vert" dossier="B4/ex01" fichier="tours.lua">
+Affiche `Tour 1` à `Tour 5` avec une boucle.
+
+<div slot="indice1">Une boucle `for` avec un compteur.</div>
+<div slot="indice2">`for i = 1, 5 do … end`.</div>
+<div slot="indice3">À l'intérieur : `print("Tour " .. i)`.</div>
+<div slot="solution">Change `5` en `100` : une seule modification, cent lignes. C'est tout l'intérêt des boucles.</div>
+</Exercice>
+
+<Exercice id="B4-ex02" titre="Compte à rebours" niveau="vert" dossier="B4/ex02" fichier="rebours.lua">
+Affiche l'ouverture du magasin : `Ouverture dans 3`, `2`, `1`, puis `Le magasin est ouvert !`.
+
+<div slot="indice1">Un `for` peut compter à l'envers avec un pas négatif.</div>
+<div slot="indice2">`for i = 3, 1, -1 do`.</div>
+<div slot="indice3">Le dernier message est **après** la boucle.</div>
+<div slot="solution">Le troisième nombre du `for` est le pas : `-1` pour reculer.</div>
+</Exercice>
+
+<Exercice id="B4-ex03" titre="Accumulateurs" niveau="jaune" dossier="B4/ex03" fichier="totaux.lua">
+Calcule le salaire d'une semaine (7 jours à 85 €), puis la somme des nombres de 1 à 100.
+
+<div slot="indice1">Une variable `total` initialisée à 0 **avant** la boucle.</div>
+<div slot="indice2">Dans la boucle : `total = total + …`.</div>
+<div slot="indice3">Pour 1 à 100, ajoute `i` lui-même.</div>
+<div slot="solution">La somme de 1 à 100 vaut 5050 : un calcul que l'ordinateur fait instantanément.</div>
+</Exercice>
+
+<Exercice id="B4-ex04" titre="Débogage : un joueur en trop" niveau="jaune" type="debug" dossier="B4/ex04" fichier="places.lua">
+Le parking a 5 places numérotées de 1 à 5, mais ce programme en affiche 6. Corrige.
+
+<div slot="indice1">Compte les lignes affichées et regarde la première.</div>
+<div slot="indice2">La boucle commence au mauvais nombre.</div>
+<div slot="indice3">En Lua, on compte à partir de 1.</div>
+<div slot="solution">Erreur « de un » (*off-by-one*) : l'une des plus fréquentes en programmation, dans tous les langages.</div>
+</Exercice>
+
+<Exercice id="B4-ex05" titre="Lecture : while, break, repeat" niveau="jaune" type="lecture" dossier="B4/ex05" fichier="lecture.lua">
+Prédis tout ce qu'affiche ce programme.
+
+<div slot="indice1">Déroule le `while` sur papier : 1, puis ×3…</div>
+<div slot="indice2">`break` sort de la boucle **avant** le `print` quand `i % 4 == 0`.</div>
+<div slot="indice3">`repeat` ajoute 2 tant que `k < 5` : 2, 4, 6.</div>
+<div slot="solution">`n` passe par 1, 3, 9, 27, 81 : la boucle s'arrête dès que `n` n'est plus inférieur à 50.</div>
+</Exercice>
+
+<Exercice id="B4-ex06" titre="Table des prix" niveau="jaune" dossier="B4/ex06" fichier="prix.lua">
+Une canette coûte 4 €. Affiche le prix pour 1 à 5 canettes, au format attendu.
+
+<div slot="indice1">Une boucle de 1 à 5.</div>
+<div slot="indice2">`string.format` avec deux `%d`.</div>
+<div slot="indice3">`string.format("%d x 4 € = %d €", q, q * 4)`.</div>
+<div slot="solution">Mettre le prix dans une variable (`local prix = 4`) rendrait le programme encore plus facile à modifier.</div>
+</Exercice>
+
+<Exercice id="B4-ex07" titre="Défi : TaxiBus" niveau="rouge" dossier="B4/ex07" fichier="taxibus.lua">
+Pour les nombres de 1 à 15 : affiche `TaxiBus` si le nombre est multiple de 3 **et** de 5, `Taxi` si multiple de 3, `Bus` si multiple de 5, sinon le nombre.
+
+<div slot="indice1">« Multiple de 3 » se teste avec le reste : `i % 3 == 0`.</div>
+<div slot="indice2">L'ordre des tests est crucial (souviens-toi du module B3).</div>
+<div slot="indice3">Teste d'abord le cas « multiple de 3 et de 5 ».</div>
+<div slot="solution">C'est la version roleplay d'un exercice célèbre (*FizzBuzz*), souvent donné en entretien d'embauche.</div>
+</Exercice>
+
+<Exercice id="B4-ex08" titre="Mini-projet : jeu de devinettes" niveau="rouge" type="projet" dossier="B4/ex08" fichier="devinettes.lua">
+Le programme choisit un nombre secret entre 1 et 100. Le joueur propose des nombres ; le programme répond « C'est plus ! » ou « C'est moins ! » jusqu'à ce qu'il trouve, puis affiche le nombre d'essais. Une saisie qui n'est pas un nombre est refusée **sans compter d'essai**.
+
+<div slot="validation">Le résultat attendu ci-dessous correspond au nombre secret 34 et aux saisies 50, abc, 25, 37, 31, 34 (le testeur simule le clavier et le hasard).</div>
+<div slot="indice1">Une boucle `while not trouve do` qui tourne jusqu'à la bonne réponse.</div>
+<div slot="indice2">Dans la boucle : `io.write`, `tonumber(io.read())`, puis teste `nil` avant de comparer.</div>
+<div slot="indice3">Augmente `essais` seulement quand la saisie est un nombre ; mets `trouve = true` quand c'est gagné.</div>
+<div slot="solution">Joue-y vraiment dans ton terminal (`lua devinettes.lua`) ! Améliorations possibles : limiter à 7 essais, proposer de rejouer.</div>
+</Exercice>
+
+## Quiz du module B4
+
+<Quiz id="B4-quiz" questions={[
+  { q: "Combien de fois s'exécute `for i = 1, 5 do … end` ?", choix: ["4", "5", "6", "Une infinité"], ok: 1, pourquoi: "1, 2, 3, 4, 5 : les deux bornes sont incluses." },
+  { q: "Comment compter de 10 à 1 ?", choix: ["`for i = 10, 1 do`", "`for i = 10, 1, -1 do`", "`for i = 1, 10, -1 do`", "`while i = 10`"], ok: 1, pourquoi: "Le pas `-1` fait reculer." },
+  { q: "Où initialiser un accumulateur ?", choix: ["Dans la boucle", "Avant la boucle", "Après la boucle", "Nulle part"], ok: 1, pourquoi: "Dans la boucle, il serait remis à zéro à chaque tour." },
+  { q: "Différence entre `while` et `repeat … until` ?", choix: ["Aucune", "`repeat` fait toujours au moins un tour", "`while` fait toujours au moins un tour", "`repeat` est plus rapide"], ok: 1, pourquoi: "`repeat` teste sa condition à la fin." },
+  { q: "Que fait `break` ?", choix: ["Il casse le programme", "Il sort de la boucle en cours", "Il recommence la boucle", "Il met en pause"], ok: 1, pourquoi: "Sortie immédiate de la boucle." },
+  { q: "Ton programme tourne sans fin. Que fais-tu ?", choix: ["J'éteins l'ordinateur", "`Ctrl+C` dans le terminal", "J'attends", "Je supprime le fichier"], ok: 1, pourquoi: "`Ctrl+C` interrompt le programme." },
+  { q: "Que renvoie `io.read()` ?", choix: ["Un nombre", "Du texte", "Un booléen", "Rien"], ok: 1, pourquoi: "Toujours du texte : utilise `tonumber` pour un nombre." },
+  { q: "`math.random(1, 6)` donne…", choix: ["Un décimal entre 1 et 6", "Un entier entre 1 et 6 inclus", "Toujours 1", "Un entier entre 0 et 6"], ok: 1, pourquoi: "Entier, bornes incluses." },
+  { q: "Comment tester qu'un nombre est pair ?", choix: ["`n / 2 == 0`", "`n % 2 == 0`", "`n // 2`", "`even(n)`"], ok: 1, pourquoi: "Le reste de la division par 2 est 0." },
+  { q: "Après `local t = 0; for i = 1, 3 do t = t + i end`, que vaut t ?", choix: ["3", "6", "0", "123"], ok: 1, pourquoi: "1 + 2 + 3 = 6." },
+]} />
+
+## Récapitulatif
+
+- `for i = debut, fin, pas do … end` pour un nombre connu de tours ; `while condition do … end` et `repeat … until condition` sinon.
+- Accumulateur : initialisé **avant** la boucle. `break` pour sortir. `Ctrl+C` contre la boucle infinie.
+- `io.write` / `io.read` pour dialoguer, `math.random(a, b)` pour le hasard.
+
+## Je suis bloqué, que faire ?
+
+Ajoute `print(i, total)` dans la boucle pour voir chaque tour. Pour une boucle `while`, affiche la variable de la condition : si elle ne change pas, la boucle ne s'arrêtera jamais.
+
+<Videos recherche="Lua boucle for while tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : boucles for](https://www.lua.org/manual/5.4/manual.html#3.3.5)
+- [Manuel Lua 5.4 : fonctions mathématiques (math.random)](https://www.lua.org/manual/5.4/manual.html#6.7)
+- [Doc Nanos World : Timer (répéter une action dans le temps)](https://docs.nanos-world.com/docs/scripting-reference/static-classes/timer)

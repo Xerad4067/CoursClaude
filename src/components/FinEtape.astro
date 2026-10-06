@@ -1,0 +1,23 @@
+---
+// Fin d'une étape de 15-20 minutes : la mini-victoire, la prochaine action et une case à cocher.
+import { mini } from '../lib/mini.js';
+
+interface Props {
+	id: string;
+	titre: string;
+	victoire: string;
+	prochaine: string;
+}
+const { id, titre, victoire, prochaine } = Astro.props;
+---
+
+<div class="fin-etape" id={`fin-${id}`}>
+	<p><strong>🏆 Mini-victoire :</strong> <span set:html={mini(victoire)} /></p>
+	<p><strong>➡️ Prochaine action :</strong> <span set:html={mini(prochaine)} /></p>
+	<label class="fait"><input type="checkbox" data-case-etape={id} /> J'ai terminé l'étape « {titre} » (+10 XP)</label>
+</div>
+
+<script>
+	import { brancherCases } from '../scripts/progression.js';
+	brancherCases();
+</script>

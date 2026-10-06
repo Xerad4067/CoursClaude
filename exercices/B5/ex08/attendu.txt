@@ -1,0 +1,5 @@
+=== Fiches de paie ===
+Sam (taxi) : 35 h -> 420.00 €
+Kim (mécanicienne) : 40 h -> 577.50 €
+Alex (livreur) : 20 h -> 220.00 €
+Total versé : 1217.50 €

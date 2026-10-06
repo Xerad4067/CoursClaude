@@ -1,0 +1,17 @@
+---
+// « Si tu as 15 min / 45 min / 2 h » : quoi faire selon le temps disponible.
+import { mini } from '../lib/mini.js';
+
+interface Props {
+	quinze: string;
+	quarante: string;
+	deuxh: string;
+}
+const { quinze, quarante, deuxh } = Astro.props;
+---
+
+<div class="trois-durees" role="group" aria-label="Que faire selon ton temps disponible">
+	<div><strong>⏱️ Si tu as 15 min</strong><span set:html={mini(quinze)} /></div>
+	<div><strong>⏱️ Si tu as 45 min</strong><span set:html={mini(quarante)} /></div>
+	<div><strong>⏱️ Si tu as 2 h</strong><span set:html={mini(deuxh)} /></div>
+</div>

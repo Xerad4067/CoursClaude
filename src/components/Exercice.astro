@@ -1,0 +1,95 @@
+---
+// Exercice avec 3 indices progressifs et une solution commentée repliable.
+// Si `dossier` est donné, le code vient des fichiers testés dans exercices/<dossier>/ :
+//   solution.lua (solution testée), attendu.txt (sortie attendue),
+//   casse.lua (code à réparer, exercices de débogage), depart.lua (code de départ).
+import { Code } from '@astrojs/starlight/components';
+
+interface Props {
+	id: string;
+	titre: string;
+	niveau: 'vert' | 'jaune' | 'rouge';
+	type?: 'debug' | 'lecture' | 'projet';
+	dossier?: string;
+	fichier?: string;
+	lang?: string;
+}
+const { id, titre, niveau, type, dossier, fichier = 'main.lua', lang = 'lua' } = Astro.props;
+
+const tous = import.meta.glob('/exercices/**/*.{lua,txt}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const lire = (nom: string) => (dossier ? tous[`/exercices/${dossier}/${nom}`]?.replace(/\s+$/, '') : undefined);
+const solution = lire('solution.lua');
+const attendu = lire('attendu.txt');
+const casse = lire('casse.lua');
+const depart = lire('depart.lua');
+if (dossier && !solution) throw new Error(`Exercice ${id} : exercices/${dossier}/solution.lua introuvable`);
+
+const niveaux = { vert: '🟢 Échauffement', jaune: '🟡 Application', rouge: '🔴 Défi' };
+const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 Lecture de code', projet: '🏗️ Mini-projet' };
+---
+
+<section class={`exercice ${niveau}`} id={id}>
+	<div class="tete">
+		<h3>{titre}</h3>
+		<label class="reussi"><input type="checkbox" data-case-exercice={id} /> J'ai réussi</label>
+	</div>
+	<div class="etiquettes">
+		<span class="etiquette">{niveaux[niveau]}</span>
+		{type && <span class="etiquette">{types[type]}</span>}
+		<span class="etiquette">{id}</span>
+	</div>
+
+	<slot />
+
+	{type === 'lecture' && solution && <Code code={solution} lang={lang} title={fichier} />}
+	{depart && <Code code={depart} lang={lang} title={`${fichier} · code de départ`} />}
+	{casse && <Code code={casse} lang={lang} title={`${fichier} · code à réparer`} />}
+	{
+		attendu && type !== 'lecture' && (
+			<>
+				<p class="sous-titre-exo">Résultat attendu dans le terminal :</p>
+				<Code code={attendu} lang="txt" frame="terminal" title="Terminal" />
+			</>
+		)
+	}
+	{
+		Astro.slots.has('validation') && (
+			<>
+				<p class="sous-titre-exo">✔️ Critères de validation</p>
+				<slot name="validation" />
+			</>
+		)
+	}
+
+	<details>
+		<summary>💡 Indice 1 · un petit coup de pouce</summary>
+		<slot name="indice1" />
+	</details>
+	<details>
+		<summary>💡 Indice 2 · la piste</summary>
+		<slot name="indice2" />
+	</details>
+	<details>
+		<summary>💡 Indice 3 · presque la solution</summary>
+		<slot name="indice3" />
+	</details>
+	<details>
+		<summary>✅ Solution commentée</summary>
+		{
+			type === 'lecture' && attendu && (
+				<>
+					<p class="sous-titre-exo">Ce que le programme affiche :</p>
+					<Code code={attendu} lang="txt" frame="terminal" title="Terminal" />
+				</>
+			)
+		}
+		{solution && type !== 'lecture' && <Code code={solution} lang={lang} title={fichier} />}
+		<slot name="solution" />
+		{dossier && <p class="discret">🧪 Solution testée automatiquement avec Lua 5.4 (dossier <code>exercices/{dossier}/</code>).</p>}
+	</details>
+</section>
+
+<script>
+	import { brancherCases } from '../scripts/progression.js';
+	brancherCases();
+</script>

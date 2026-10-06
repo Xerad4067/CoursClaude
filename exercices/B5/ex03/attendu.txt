@@ -1,0 +1,2 @@
+Pleins possibles :	3
+Reste :	10

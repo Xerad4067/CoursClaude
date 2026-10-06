@@ -1,0 +1,5 @@
+0 est vrai en Lua
+La chaîne vide aussi
+nil est faux
+valeur par défaut
+false

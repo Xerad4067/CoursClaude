@@ -1,0 +1,5 @@
++------------------------------+
+|   Bienvenue sur RP Horizon   |
+|  Serveur roleplay de test    |
++------------------------------+
+Tape /aide pour voir les commandes.

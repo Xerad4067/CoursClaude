@@ -1,0 +1,409 @@
+---
+title: "A1 · Le développement, le jeu en réseau et le terminal"
+description: Comprendre ce qu'est programmer, comment marche un jeu multijoueur, et prendre en main PowerShell.
+parcours: A
+module: A1
+duree: 1 h
+ou: les-deux
+prerequis: Aucun. Juste un ordinateur sous Windows 11.
+resultat: Ton dossier de travail Dev créé uniquement avec des commandes.
+objectifs:
+  - Expliquer avec tes mots ce qu'est un programme, un langage et un interpréteur
+  - Distinguer le rôle du client et du serveur dans un jeu multijoueur
+  - Ouvrir PowerShell et lire l'invite de commande
+  - Te déplacer et créer des dossiers avec pwd, dir, cd et mkdir
+sidebar:
+  order: 1
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 seulement : comprendre ce qu'est un programme et un jeu en réseau."
+  quarante="Étapes 1 à 3 : tu sais te déplacer dans le terminal et créer un dossier."
+  deuxh="Tout le module, les 9 exercices et le quiz."
+/>
+
+**Pourquoi c'est utile ?** Un serveur roleplay, c'est un **programme** qui tourne sur un **serveur** et que des **clients** (les joueurs) rejoignent. Comprendre ce découpage dès maintenant t'évitera beaucoup de confusion au parcours E. Et le terminal sera ton outil de tous les jours : installer, lancer tes scripts Lua, utiliser Git, démarrer un serveur.
+
+## Étape 1 · Programmer, c'est quoi ? (15 min)
+
+Un **programme** est une liste d'instructions que l'ordinateur suit **dans l'ordre**, sans jamais improviser. On l'écrit dans un **langage de programmation** (Lua, Python, JavaScript…), qui a sa **syntaxe** (ses règles d'écriture), comme une langue a sa grammaire.
+
+<Encadre type="analogie">
+Un programme, c'est une **recette de cuisine** écrite pour un cuisinier extrêmement obéissant mais sans aucune imagination. Si tu écris « ajoute le sel » sans avoir dit où est le sel, il s'arrête et te dit qu'il ne comprend pas : c'est un **message d'erreur**.
+</Encadre>
+
+Lua est un langage **interprété** : un programme appelé **interpréteur** (ici `lua`) lit ton fichier `.lua` ligne par ligne et exécute chaque instruction. Voici un programme Lua complet de deux lignes (tu l'exécuteras toi-même au module A5) :
+
+```lua title="bienvenue.lua"
+-- Une ligne qui commence par -- est un commentaire : l'ordinateur l'ignore.
+print("Bienvenue sur le serveur !")  -- print affiche un texte
+```
+
+### Et un jeu multijoueur, comment ça marche ?
+
+Dans un jeu en réseau, il y a deux types de programmes :
+- le **client** : le jeu installé chez chaque joueur. Il **affiche** le monde, lit le clavier et la souris, joue les sons ;
+- le **serveur** : un programme qui garde **la vraie version** de la partie (qui a combien d'argent, où sont les véhicules) et la partage avec tous les clients.
+
+<Encadre type="analogie">
+Le serveur est l'**arbitre** d'un match : chaque joueur (client) annonce ce qu'il veut faire, mais c'est l'arbitre qui décide ce qui est valide et qui tient le score officiel. Si un joueur crie « j'ai 1 million d'euros ! », l'arbitre vérifie avant de le croire.
+</Encadre>
+
+C'est pour ça qu'en roleplay, **l'argent se calcule sur le serveur** : si c'était le client, un tricheur pourrait modifier son propre jeu. Dans Nanos World, un *package* contient justement trois dossiers : `Server/` (code du serveur), `Client/` (code du joueur) et `Shared/` (code commun aux deux).
+
+<Encadre type="retenir">
+Programme = instructions dans l'ordre. Langage = règles d'écriture. Interpréteur = le logiciel qui exécute. **Client** = affiche et écoute le joueur ; **serveur** = décide et garde la vérité.
+</Encadre>
+
+<FinEtape id="A1-e1" titre="Programmer, c'est quoi ?" victoire="tu sais expliquer la différence entre client et serveur avec l'image de l'arbitre." prochaine="ouvrir le terminal (étape 2), 15 minutes." />
+
+## Étape 2 · Ouvrir le terminal et le lire (15 min)
+
+Le **terminal** est une fenêtre où tu donnes des ordres en tapant du texte. Sous Windows 11, le terminal s'appelle **Windows Terminal** et il utilise **PowerShell** (le langage de commandes de Windows).
+
+### On le fait ensemble
+1. Appuie sur la touche **Windows**, tape `terminal`, puis **Entrée**.
+2. Tu vois une ligne comme `PS C:\Users\TonNom>`. C'est l'**invite de commande** (*prompt*) :
+   - `PS` : tu es bien dans PowerShell ;
+   - `C:\Users\TonNom` : le **dossier courant**, l'endroit où tu te trouves ;
+   - `>` : le terminal attend ton ordre.
+3. Tape cette commande puis **Entrée** :
+
+```powershell
+pwd
+```
+
+Résultat attendu (avec ton nom) :
+
+```text
+Path
+----
+C:\Users\TonNom
+```
+
+`pwd` (*print working directory*, « affiche le dossier de travail ») t'indique où tu es. Quand l'invite `PS ...>` réapparaît, la commande est terminée.
+
+4. Maintenant, liste le contenu du dossier :
+
+```powershell
+dir
+```
+
+Tu vois une liste avec des colonnes `Mode`, `LastWriteTime`, `Length`, `Name`. Dans `Mode`, un `d` au début veut dire *directory* (dossier).
+
+<Encadre type="piege">
+Le terminal ne pardonne pas les fautes de frappe : `dri` au lieu de `dir` donne une erreur rouge « … n'est pas reconnu… ». Ce n'est pas grave du tout : relis, corrige, recommence. **Une erreur n'abîme jamais rien quand tu ne fais que lire.**
+</Encadre>
+
+<FinEtape id="A1-e2" titre="Ouvrir le terminal" victoire="tu as lu ton dossier courant avec `pwd` et listé son contenu avec `dir`." prochaine="apprendre à te déplacer avec `cd` (étape 3)." />
+
+## Étape 3 · Se déplacer et créer des dossiers (20 min)
+
+Les dossiers de ton ordinateur forment un **arbre** : `C:\` contient `Users`, qui contient ton dossier, qui contient `Documents`, `Downloads`…
+
+| Commande | Effet | Exemple |
+|---|---|---|
+| `cd NomDuDossier` | entrer dans un dossier (*change directory*) | `cd Documents` |
+| `cd ..` | remonter d'un niveau (`..` = le dossier parent) | `cd ..` |
+| `cd ~` | revenir à ton dossier personnel (`~` = « maison ») | `cd ~` |
+| `mkdir NomDuDossier` | créer un dossier (*make directory*) | `mkdir Dev` |
+
+### On le fait ensemble : créer ton dossier de travail
+```powershell
+cd ~
+mkdir Dev
+cd Dev
+pwd
+```
+Résultat attendu de la dernière commande : `C:\Users\TonNom\Dev`.
+
+Explication ligne par ligne :
+1. `cd ~` : on part de la maison, pour être sûr de l'endroit.
+2. `mkdir Dev` : on crée le dossier `Dev` (PowerShell affiche une ligne qui le décrit).
+3. `cd Dev` : on entre dedans.
+4. `pwd` : on vérifie.
+
+<Encadre type="astuce">
+Tape `cd De` puis la touche **Tab** : PowerShell complète tout seul le nom du dossier. Moins de fautes, plus de vitesse. Et la **flèche du haut** rappelle les commandes précédentes.
+</Encadre>
+
+<FinEtape id="A1-e3" titre="Se déplacer et créer des dossiers" victoire="ton dossier `Dev` existe et tu y es entré sans souris." prochaine="lire une erreur du terminal sans paniquer (étape 4)." />
+
+## Étape 4 · Lire une erreur du terminal (10 min)
+
+Tape volontairement :
+
+```powershell
+cd Dossier-Qui-N-Existe-Pas
+```
+
+PowerShell affiche en rouge un message qui contient (en français ou en anglais selon ta version de Windows) l'idée « **Impossible de trouver le chemin d'accès** » / *Cannot find path*, suivi du chemin qu'il a cherché.
+
+Comment lire un message d'erreur :
+1. **Quoi** : « impossible de trouver le chemin » → le dossier n'existe pas **ici**.
+2. **Où** : le chemin affiché montre où il a cherché.
+3. **Que faire** : `dir` pour voir ce qui existe vraiment, puis corriger le nom.
+
+<Encadre type="retenir">
+Un message d'erreur n'est pas une punition : c'est **un indice gratuit**. Les développeurs expérimentés lisent les erreurs **en entier**, calmement, avant de toucher à quoi que ce soit.
+</Encadre>
+
+<FinEtape id="A1-e4" titre="Lire une erreur du terminal" victoire="tu as provoqué une erreur, tu l'as lue et tu sais quoi faire." prochaine="faire les exercices 1 à 3 (10 minutes)." />
+
+## Erreurs fréquentes
+
+| Ce que tu vois | Pourquoi | Solution |
+|---|---|---|
+| `... n'est pas reconnu en tant que nom d'applet de commande` | Faute de frappe dans la commande | Relis lettre par lettre |
+| `Impossible de trouver le chemin d'accès` | Le dossier n'existe pas à cet endroit | `pwd` puis `dir` pour vérifier |
+| `Un élément avec le nom spécifié ... existe déjà` après `mkdir` | Le dossier existe déjà | Rien à faire, entre dedans avec `cd` |
+| Pas de `PS` au début de la ligne | Tu es dans l'invite de commandes (CMD) | Ouvre un onglet PowerShell (flèche `˅` en haut de Windows Terminal) |
+
+## Exercices
+
+<Exercice id="A1-ex01" titre="Où suis-je ?" niveau="vert">
+Ouvre un **nouveau** terminal et affiche le dossier dans lequel il démarre. Note le chemin dans ton journal.
+
+<div slot="indice1">Il existe une commande de trois lettres qui répond exactement à la question « où suis-je ? ».</div>
+<div slot="indice2">C'est l'abréviation de *print working directory*.</div>
+<div slot="indice3">Tape `p`, `w`, `d`, puis Entrée.</div>
+<div slot="solution">
+
+```powershell
+pwd
+```
+Un nouveau terminal démarre en général dans ton dossier personnel, `C:\Users\TonNom`.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex02" titre="Inventaire d'un dossier" niveau="vert">
+Va dans ton dossier `Documents` puis affiche son contenu. Combien de **dossiers** (lignes dont le `Mode` commence par `d`) contient-il ?
+
+<div slot="indice1">Il faut deux commandes : une pour entrer, une pour lister.</div>
+<div slot="indice2">Pour entrer : `cd` suivi du nom du dossier. Pour lister : la commande de l'étape 2.</div>
+<div slot="indice3">`cd ~` d'abord pour partir de la maison, puis `cd Documents`, puis `dir`.</div>
+<div slot="solution">
+
+```powershell
+cd ~
+cd Documents
+dir
+```
+Compte les lignes dont la colonne `Mode` commence par `d` : ce sont les dossiers. Le nombre dépend de ta machine : il n'y a pas de « bonne » valeur, l'important est de savoir lire la colonne `Mode`.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex03" titre="Aller-retour" niveau="vert">
+Depuis `Documents`, remonte d'un niveau, puis vérifie que tu es bien dans ton dossier personnel.
+
+<div slot="indice1">« Remonter d'un niveau » se dit « aller au dossier parent ».</div>
+<div slot="indice2">Le dossier parent s'écrit avec deux points.</div>
+<div slot="indice3">`cd ..` puis la commande qui affiche le dossier courant.</div>
+<div slot="solution">
+
+```powershell
+cd ..
+pwd
+```
+`pwd` affiche `C:\Users\TonNom` : `Documents` est rangé directement dans ton dossier personnel.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex04" titre="Construire une petite arborescence" niveau="jaune">
+Crée cette structure dans `Dev`, **uniquement avec le terminal**, puis reviens à ton dossier personnel en **une seule** commande :
+
+```text
+Dev\
+└── essais\
+    └── a1\
+```
+
+<div slot="validation">`dir ~\Dev\essais` affiche un dossier `a1`, et `pwd` affiche ton dossier personnel à la fin.</div>
+<div slot="indice1">Il faut créer `essais`, entrer dedans, puis créer `a1`.</div>
+<div slot="indice2">Commence par `cd ~\Dev` (le `\` sépare les dossiers dans un chemin Windows).</div>
+<div slot="indice3">`mkdir essais`, `cd essais`, `mkdir a1`… et pour rentrer à la maison d'un coup : le symbole `~`.</div>
+<div slot="solution">
+
+```powershell
+cd ~\Dev
+mkdir essais
+cd essais
+mkdir a1
+cd ~
+pwd
+```
+Astuce : PowerShell accepte aussi `mkdir essais\a1` qui crée les deux dossiers d'un coup. Les deux méthodes sont justes.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex05" titre="Lecture : où vais-je atterrir ?" niveau="jaune" type="lecture">
+Sans rien taper, lis cette suite de commandes. On part de `C:\Users\TonNom`. Dans quel dossier se trouve-t-on à la fin ?
+
+```powershell
+cd Dev
+cd essais
+cd ..
+cd ..
+cd Documents
+```
+
+<div slot="indice1">Suis le chemin avec ton doigt, une commande à la fois, en écrivant le dossier courant après chaque ligne.</div>
+<div slot="indice2">Après les deux premières lignes, tu es dans `C:\Users\TonNom\Dev\essais`. Chaque `cd ..` enlève le dernier morceau du chemin.</div>
+<div slot="indice3">Deux `cd ..` depuis `...\Dev\essais` te ramènent à `C:\Users\TonNom`. Il reste une ligne.</div>
+<div slot="solution">
+
+On arrive dans `C:\Users\TonNom\Documents`.
+1. `cd Dev` → `C:\Users\TonNom\Dev`
+2. `cd essais` → `C:\Users\TonNom\Dev\essais`
+3. `cd ..` → `C:\Users\TonNom\Dev`
+4. `cd ..` → `C:\Users\TonNom`
+5. `cd Documents` → `C:\Users\TonNom\Documents`
+
+Savoir « exécuter le code dans sa tête » est une compétence de développeur : tu la retrouveras avec Lua.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex06" titre="Débogage : trois commandes cassées" niveau="jaune" type="debug">
+Un camarade a tapé ces commandes et n'obtient que des erreurs rouges. Trouve et corrige les trois problèmes (il veut entrer dans `Documents`, créer un dossier `notes`, puis vérifier où il est).
+
+```powershell
+cd Documets
+mkdir
+pdw
+```
+
+<div slot="indice1">Relis chaque commande lettre par lettre, et demande-toi ce que chacune doit recevoir.</div>
+<div slot="indice2">La première a une faute dans le nom du dossier. La troisième a deux lettres inversées. La deuxième n'est pas mal écrite : il lui **manque** quelque chose.</div>
+<div slot="indice3">`mkdir` a besoin du nom du dossier à créer (son **argument**).</div>
+<div slot="solution">
+
+```powershell
+cd Documents
+mkdir notes
+pwd
+```
+- `Documets` → `Documents` (lettre manquante) ;
+- `mkdir` seul ne sait pas quoi créer : PowerShell te demande alors un nom ou affiche une erreur. Il faut lui donner un **argument** : `mkdir notes` ;
+- `pdw` → `pwd`.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex07" titre="Client ou serveur ?" niveau="jaune">
+Pour un serveur roleplay, classe chaque tâche : **client** ou **serveur** ?
+1. Afficher le montant d'argent en haut de l'écran (HUD).
+2. Retirer 500 € du compte quand le joueur achète une voiture.
+3. Jouer le son du klaxon quand le joueur appuie sur une touche.
+4. Vérifier que le joueur a le métier « policier » avant de lui donner une arme de service.
+
+<div slot="indice1">Repense à l'image de l'arbitre : qui doit **décider** et qui doit **afficher** ?</div>
+<div slot="indice2">Tout ce qui touche à l'argent, aux droits et aux règles doit être impossible à tricher.</div>
+<div slot="indice3">Deux tâches concernent l'affichage ou le son chez le joueur ; deux concernent des décisions officielles.</div>
+<div slot="solution">
+
+1. **Client** : l'affichage se fait chez le joueur (mais le montant affiché vient du serveur).
+2. **Serveur** : l'argent officiel ne doit jamais être modifiable par le client.
+3. **Client** : le son et la lecture du clavier se passent chez le joueur.
+4. **Serveur** : une vérification de droits doit être faite par l'arbitre.
+
+Règle de sécurité que tu retrouveras au parcours E : **ne jamais faire confiance au client**.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex08" titre="Défi : le squelette de ton dépôt" niveau="rouge">
+Crée en ligne de commande la structure suivante dans `Dev`, avec un fichier vide `notes.txt`, puis affiche le contenu de `parcours-b` :
+
+```text
+Dev\
+└── brouillon\
+    ├── notes.txt
+    ├── parcours-a\
+    └── parcours-b\
+        └── b1\
+```
+
+<div slot="validation">`dir ~\Dev\brouillon` montre `parcours-a`, `parcours-b` et `notes.txt` ; `dir ~\Dev\brouillon\parcours-b` montre `b1`.</div>
+<div slot="indice1">Tu connais déjà `mkdir`. Pour créer un fichier vide, PowerShell a la commande `New-Item`.</div>
+<div slot="indice2">Place-toi d'abord dans `brouillon` après l'avoir créé : les commandes suivantes seront plus courtes.</div>
+<div slot="indice3">`mkdir parcours-b\b1` crée les deux niveaux d'un coup ; `New-Item notes.txt` crée le fichier.</div>
+<div slot="solution">
+
+```powershell
+cd ~\Dev
+mkdir brouillon
+cd brouillon
+mkdir parcours-a
+mkdir parcours-b\b1
+New-Item notes.txt
+dir
+dir parcours-b
+```
+Tu viens de faire en 8 commandes ce qui prendrait une vingtaine de clics. Ce dossier `brouillon` te sert de bac à sable : tu peux le supprimer plus tard depuis l'Explorateur de fichiers.
+</div>
+</Exercice>
+
+<Exercice id="A1-ex09" titre="Mini-projet : ma fiche « terminal »" niveau="jaune" type="projet">
+Crée dans `~\Dev\brouillon` un fichier `aide-terminal.txt`, ouvre-le avec le Bloc-notes **depuis le terminal**, et écris-y avec tes mots ce que font `pwd`, `dir`, `cd`, `cd ..`, `cd ~` et `mkdir`. Enregistre, puis affiche son contenu dans le terminal.
+
+<div slot="validation">La commande d'affichage montre tes six explications.</div>
+<div slot="indice1">Tu sais créer un fichier vide. Le Bloc-notes s'appelle `notepad` en ligne de commande.</div>
+<div slot="indice2">`notepad nom-du-fichier` ouvre ce fichier dans le Bloc-notes.</div>
+<div slot="indice3">Pour afficher un fichier texte dans PowerShell : `Get-Content nom-du-fichier` (ou son raccourci `cat`).</div>
+<div slot="solution">
+
+```powershell
+cd ~\Dev\brouillon
+New-Item aide-terminal.txt
+notepad aide-terminal.txt
+Get-Content aide-terminal.txt
+```
+Cette fiche est **la tienne** : réécrire avec ses propres mots est l'une des meilleures façons de mémoriser. Tu la déplaceras dans ton dépôt GitHub au module A4.
+</div>
+</Exercice>
+
+## Quiz du module A1
+
+<Quiz id="A1-quiz" questions={[
+  { q: "Qu'est-ce qu'un interpréteur ?", choix: ["Un logiciel qui traduit le français en anglais", "Le logiciel qui lit un programme et exécute ses instructions", "Une personne qui teste le jeu", "Un dossier spécial de Windows"], ok: 1, pourquoi: "L'interpréteur (par exemple `lua`) lit ton fichier et exécute les instructions une par une." },
+  { q: "Dans un jeu multijoueur, qui doit garder le montant officiel d'argent d'un joueur ?", choix: ["Le client du joueur", "Le serveur", "Les deux, chacun sa version", "Personne"], ok: 1, pourquoi: "Le serveur est l'arbitre : si le client décidait, un tricheur pourrait modifier son argent." },
+  { q: "Que signifie `PS` au début de `PS C:\\Users\\Léo>` ?", choix: ["Que tu es dans PowerShell", "Que l'ordinateur est en pause", "Que tu es administrateur", "Que la commande a échoué"], ok: 0, pourquoi: "`PS` indique PowerShell. Sans `PS`, tu es dans l'ancienne invite CMD." },
+  { q: "Quelle commande affiche le dossier courant ?", choix: ["`dir`", "`cd`", "`pwd`", "`mkdir`"], ok: 2, pourquoi: "`pwd` = *print working directory*. `dir` liste le contenu, `cd` déplace, `mkdir` crée." },
+  { q: "Tu es dans `C:\\Users\\Léo\\Dev\\essais`. Où te mène `cd ..` ?", choix: ["`C:\\Users\\Léo`", "`C:\\Users\\Léo\\Dev`", "`C:\\`", "Nulle part, c'est une erreur"], ok: 1, pourquoi: "`..` désigne le dossier parent : on enlève le dernier morceau du chemin." },
+  { q: "Que fait `cd ~` ?", choix: ["Il efface le dossier", "Il ramène à ton dossier personnel", "Il ouvre VS Code", "Il affiche l'aide"], ok: 1, pourquoi: "`~` est un raccourci pour ton dossier personnel (C:\\Users\\TonNom)." },
+  { q: "Quelle commande crée un dossier `jeux` ?", choix: ["`cd jeux`", "`dir jeux`", "`mkdir jeux`", "`New-Item jeux.txt`"], ok: 2, pourquoi: "`mkdir` (*make directory*) crée un dossier. `New-Item jeux.txt` créerait un fichier." },
+  { q: "Quelle touche complète automatiquement un nom de dossier ?", choix: ["Entrée", "Tab", "Échap", "F5"], ok: 1, pourquoi: "Tab complète le nom à partir des premières lettres : moins de fautes de frappe." },
+  { q: "Le terminal affiche `Impossible de trouver le chemin d'accès`. Que fais-tu en premier ?", choix: ["Je réinstalle Windows", "Je vérifie avec `pwd` et `dir` où je suis et ce qui existe", "Je tape la commande plus vite", "Je redémarre l'ordinateur"], ok: 1, pourquoi: "Lis l'erreur : le dossier n'existe pas ici. `pwd` et `dir` te montrent la réalité." },
+  { q: "Dans un package Nanos World, où va le code qui doit tourner chez le joueur ?", choix: ["`Server/`", "`Client/`", "`Config.toml`", "`Packages/`"], ok: 1, pourquoi: "`Client/` contient le code exécuté chez chaque joueur, `Server/` celui du serveur, `Shared/` celui des deux." },
+]} />
+
+## Récapitulatif
+
+- Un **programme** est une suite d'instructions exécutées dans l'ordre ; Lua est **interprété** par le programme `lua`.
+- **Client** = affichage et entrées du joueur ; **serveur** = règles, argent, vérité de la partie. On ne fait jamais confiance au client.
+- Le terminal : `pwd` (où suis-je ?), `dir` (qu'y a-t-il ?), `cd` (aller), `cd ..` (remonter), `cd ~` (maison), `mkdir` (créer un dossier).
+- Une erreur rouge est un **indice** : lis *quoi* et *où*, puis vérifie avec `pwd` et `dir`.
+
+## Je suis bloqué, que faire ?
+
+1. Relis le message d'erreur en entier, puis la commande lettre par lettre.
+2. Isole : tape `cd ~` puis recommence depuis la maison.
+3. Cherche le message dans la page [Dépannage](/outils/depannage/).
+4. Demande à une IA avec le [modèle « je ne comprends pas un message d'erreur »](/outils/ia-tuteur/).
+5. Note ce qui t'a bloqué dans ton [journal](/moi/journal/).
+
+<Videos recherche="PowerShell commandes de base débutant français" liste={[
+  { titre: "15 commandes indispensables pour débuter avec PowerShell", id: "UYs8Cn-qvVg", couvre: "commandes PowerShell de base" },
+  { titre: "Les commandes cd et pwd", id: "Wee5z6I4JbA", couvre: "se déplacer dans les dossiers avec cd et pwd" },
+]} />
+
+## Pour aller plus loin
+
+- [Documentation officielle de Windows Terminal (installation)](https://learn.microsoft.com/windows/terminal/install)
+- [Aide-mémoire du cours : Terminal](/outils/aide-memoire/)
+- [Glossaire : terminal et Windows](/outils/glossaire/)

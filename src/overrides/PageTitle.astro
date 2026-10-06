@@ -1,0 +1,85 @@
+---
+// Titre de page + encadré de leçon (durée, machine, prérequis, résultat attendu, objectifs).
+// Mémorise aussi la page visitée pour « Reprendre où j'en suis ».
+// Même identifiant que le titre par défaut de Starlight (utilisé par la table des matières).
+const PAGE_TITLE_ID = '_top';
+
+const { entry } = Astro.locals.starlightRoute;
+const d = entry.data as Record<string, any>;
+const libellesOu: Record<string, string> = {
+	portable: '💻 Portable',
+	pc: '🖥️ PC fixe',
+	'les-deux': '🔀 Les deux machines',
+};
+const aMeta = d.duree || d.ou || d.prerequis || d.resultat || d.objectifs;
+---
+
+<h1 id={PAGE_TITLE_ID} data-parcours={d.parcours}>{d.title}</h1>
+{
+	aMeta && (
+		<dl class="meta-lecon" data-parcours={d.parcours}>
+			{d.duree && (
+				<div>
+					<dt>Durée</dt>
+					<dd>⏱️ {d.duree}</dd>
+				</div>
+			)}
+			{d.ou && (
+				<div>
+					<dt>Où la faire</dt>
+					<dd>{libellesOu[d.ou]}</dd>
+				</div>
+			)}
+			{d.prerequis && (
+				<div>
+					<dt>Prérequis</dt>
+					<dd>{d.prerequis}</dd>
+				</div>
+			)}
+			{d.resultat && (
+				<div>
+					<dt>Résultat attendu</dt>
+					<dd>{d.resultat}</dd>
+				</div>
+			)}
+			{d.objectifs && (
+				<div class="objectifs">
+					<dt>Objectifs : à la fin, tu sauras…</dt>
+					<dd>
+						<ul>
+							{d.objectifs.map((o: string) => (
+								<li>{o}</li>
+							))}
+						</ul>
+					</dd>
+				</div>
+			)}
+		</dl>
+	)
+}
+<span hidden id="page-courante" data-titre={d.title} data-module={d.module ?? ''}></span>
+
+<script>
+	import { charger, sauver, marquerJour } from '../scripts/progression.js';
+	const el = document.getElementById('page-courante');
+	if (el) {
+		const p = charger();
+		p.derniere = { url: location.pathname, titre: el.dataset.titre, module: el.dataset.module, date: new Date().toISOString() };
+		marquerJour(p);
+		sauver(p, { silencieux: true });
+	}
+</script>
+
+<style>
+	h1 {
+		margin-top: 1rem;
+		font-size: var(--sl-text-h1);
+		line-height: var(--sl-line-height-headings);
+		font-weight: 700;
+		color: var(--sl-color-white);
+	}
+	h1[data-parcours] {
+		border-bottom: 3px solid var(--accent-parcours);
+		padding-bottom: 0.3rem;
+	}
+</style>

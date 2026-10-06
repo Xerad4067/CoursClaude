@@ -1,0 +1,5 @@
+Salaire versé à Sam
+Salaire versé à Kim
+Kim	2200
+Sam	1500
+Alex	300

@@ -1,0 +1,54 @@
+---
+// Journal de bord : notes datées, stockées dans le navigateur et incluses dans l'export.
+---
+
+<div class="carte">
+	<label for="journal-texte"><strong>Nouvelle note</strong> (ce que tu as fait, ce qui t'a bloqué, ta prochaine action)</label>
+	<textarea id="journal-texte" rows="5" style="width:100%;margin-top:0.5rem;font:inherit;padding:0.5rem;border-radius:0.4rem;background:var(--sl-color-black);color:var(--sl-color-white);border:1px solid var(--carte-bord);"></textarea>
+	<p><button type="button" class="bouton principal" id="journal-ajouter">Ajouter au journal</button> <span id="journal-statut" class="discret" aria-live="polite"></span></p>
+</div>
+<div id="journal-liste"></div>
+
+<script>
+	import { charger, sauver, marquerJour } from '../scripts/progression.js';
+	const liste = document.getElementById('journal-liste')!;
+	const texte = document.getElementById('journal-texte') as HTMLTextAreaElement;
+	const statut = document.getElementById('journal-statut')!;
+	const echapper = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+	function afficher() {
+		const p = charger();
+		if (!p.journal.length) {
+			liste.innerHTML = '<p class="discret">Ton journal est vide. Une note de deux lignes à la fin de chaque séance suffit.</p>';
+			return;
+		}
+		liste.innerHTML = p.journal
+			.map((n: any, i: number) => `<div class="carte"><p class="discret">${new Date(n.date).toLocaleString('fr-FR')}</p><p style="white-space:pre-wrap">${echapper(n.texte)}</p><button type="button" class="bouton" data-supprimer="${i}">Supprimer</button></div>`)
+			.join('');
+		liste.querySelectorAll<HTMLButtonElement>('[data-supprimer]').forEach((b) =>
+			b.addEventListener('click', () => {
+				if (!confirm('Supprimer cette note ?')) return;
+				const q = charger();
+				q.journal.splice(Number(b.dataset.supprimer), 1);
+				sauver(q);
+				afficher();
+			}),
+		);
+	}
+
+	document.getElementById('journal-ajouter')!.addEventListener('click', () => {
+		const valeur = texte.value.trim();
+		if (!valeur) {
+			statut.textContent = 'Écris quelque chose avant d’ajouter.';
+			return;
+		}
+		const p = charger();
+		p.journal.unshift({ date: new Date().toISOString(), texte: valeur });
+		marquerJour(p);
+		sauver(p);
+		texte.value = '';
+		statut.textContent = 'Note ajoutée ✔';
+		afficher();
+	});
+	afficher();
+</script>

@@ -1,0 +1,61 @@
+---
+title: "Checklist : où j'en suis sur chaque machine"
+description: Cases à cocher et commandes de vérification (lecture seule) pour le portable et le PC fixe.
+sidebar:
+  order: 2
+---
+
+import Checklist from '../../../components/Checklist.astro';
+import Encadre from '../../../components/Encadre.astro';
+
+Coche chaque point **après** avoir vu le résultat attendu. Les cases sont enregistrées dans ce navigateur (5 XP par case). Toutes les commandes ci-dessous sont en **lecture seule** : elles affichent des informations sans rien modifier. Elles sont issues de la documentation officielle mais **non testées sur Windows**.
+
+<Encadre type="astuce" titre="💡 Tu veux mon avis sur ta machine ?">
+Lance les commandes de la section « Connaître ta machine », copie le résultat (sélection puis `Ctrl+C`) et colle-le dans une conversation avec Claude ou dans ton journal. Ne colle jamais de mot de passe ni de jeton.
+</Encadre>
+
+## Connaître ta machine (les deux)
+
+<Checklist points={[
+  { id: 'chk-info-systeme', texte: "J'ai relevé le modèle, la version de Windows et la mémoire de cette machine", commande: 'systeminfo', attendu: "des lignes comme `Nom du système d'exploitation`, `Modèle du système` et `Mémoire physique totale`" },
+  { id: 'chk-info-processeur', texte: "J'ai relevé le processeur", commande: 'Get-CimInstance Win32_Processor | Select-Object Name', attendu: 'le nom du processeur (Core Ultra 5 225U sur le portable, Core i5-14400F sur le PC fixe)' },
+  { id: 'chk-info-disque', texte: "J'ai vérifié l'espace libre sur le disque C:", commande: 'Get-PSDrive C', attendu: 'les colonnes `Used (GB)` et `Free (GB)`' },
+]} />
+
+## 💻 Portable HP (machine de code)
+
+<Checklist points={[
+  { id: 'chk-p-terminal', texte: 'Le terminal PowerShell s’ouvre et affiche `PS C:\\Users\\...>`', commande: 'pwd', attendu: 'le chemin de ton dossier personnel' },
+  { id: 'chk-p-winget', texte: 'winget est disponible', commande: 'winget --version', attendu: 'un numéro de version' },
+  { id: 'chk-p-code', texte: 'VS Code est installé', commande: 'code --version', attendu: 'trois lignes : version, identifiant, x64' },
+  { id: 'chk-p-git', texte: 'Git est installé', commande: 'git --version', attendu: '`git version 2.xx.x.windows.x`' },
+  { id: 'chk-p-identite', texte: 'Mon identité Git utilise l’adresse noreply', commande: 'git config --global user.email', attendu: 'une adresse qui finit par `@users.noreply.github.com`' },
+  { id: 'chk-p-reglages-git', texte: 'Éditeur, branche main et fins de ligne configurés', commande: 'git config --global --list', attendu: '`core.editor=code --wait`, `init.defaultbranch=main`, `core.autocrlf=true`' },
+  { id: 'chk-p-github', texte: 'Connexion à GitHub réussie par le navigateur (premier push fait)' },
+  { id: 'chk-p-extensions', texte: 'Extensions VS Code installées (Lua, nanos world Lua, correcteur français…)', commande: 'code --list-extensions', attendu: 'au moins `sumneko.lua` et `go-horse-studios.nanos-world`' },
+  { id: 'chk-p-sync', texte: 'Settings Sync de VS Code activé avec mon compte GitHub' },
+  { id: 'chk-p-lua', texte: 'Lua 5.4 est installé', commande: 'lua -v', attendu: '`Lua 5.4.6  Copyright (C) 1994-2023 Lua.org, PUC-Rio`' },
+  { id: 'chk-p-node', texte: 'Node.js LTS est installé', commande: 'node --version', attendu: '`v24.x.x`' },
+  { id: 'chk-p-depot', texte: 'Mon dépôt `mon-apprentissage` est cloné dans `~\\Dev`', commande: 'git -C $HOME\\Dev\\mon-apprentissage status', attendu: '`On branch main` et `Your branch is up to date`' },
+  { id: 'chk-p-site', texte: 'Le site du cours tourne en local (`npm run dev`)' },
+]} />
+
+## 🖥️ PC fixe (machine principale)
+
+<Checklist points={[
+  { id: 'chk-f-terminal', texte: 'Le terminal PowerShell s’ouvre', commande: 'pwd', attendu: 'le chemin de ton dossier personnel' },
+  { id: 'chk-f-winget', texte: 'winget est disponible', commande: 'winget --version', attendu: 'un numéro de version' },
+  { id: 'chk-f-code', texte: 'VS Code est installé (ou déjà présent)', commande: 'code --version', attendu: 'trois lignes : version, identifiant, x64' },
+  { id: 'chk-f-git', texte: 'Git est installé', commande: 'git --version', attendu: '`git version 2.xx.x.windows.x`' },
+  { id: 'chk-f-identite', texte: 'Même identité Git que sur le portable', commande: 'git config --global user.email', attendu: 'la même adresse noreply que sur le portable' },
+  { id: 'chk-f-github', texte: 'Connexion à GitHub réussie par le navigateur' },
+  { id: 'chk-f-sync-vscode', texte: 'Settings Sync activé : j’ai retrouvé mes réglages et extensions' },
+  { id: 'chk-f-lua', texte: 'Lua 5.4 est installé', commande: 'lua -v', attendu: '`Lua 5.4.6 ...`' },
+  { id: 'chk-f-pull', texte: 'Test de synchronisation réussi : `git pull` récupère ce que j’ai poussé depuis le portable', commande: 'git -C $HOME\\Dev\\mon-apprentissage log --oneline -3', attendu: 'les derniers commits faits sur le portable' },
+  { id: 'chk-f-steam', texte: '(Quand l’accès est ouvert) Steam et Nanos World installés' },
+  { id: 'chk-f-unreal', texte: '(Parcours F) Unreal Engine dans la version demandée par la doc Nanos World (5.7.X au 06/10/2026)' },
+]} />
+
+<Encadre type="retenir">
+Quand toutes les cases des deux machines sont cochées, tu as gagné le badge **🧰 Machines prêtes** (au moins 10 cases) et tu peux attaquer sereinement le parcours B.
+</Encadre>

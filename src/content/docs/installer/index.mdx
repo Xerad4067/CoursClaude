@@ -1,0 +1,44 @@
+---
+title: Installer mon environnement
+description: Par où commencer pour installer tes outils sur le portable et le PC fixe.
+sidebar:
+  order: 0
+---
+
+import Encadre from '../../../components/Encadre.astro';
+
+Avant d'écrire la moindre ligne de code, il te faut des outils. Bonne nouvelle : **tout est gratuit**, et tu n'installes que des logiciels **officiels**. Ce qui suit vaut pour tes deux machines ; seules quelques étapes sont réservées au PC fixe.
+
+<Encadre type="piege" titre="⚠️ Honnêteté : commandes non testées sur Windows">
+Chaque commande vient de la documentation officielle (vérifiée le 6 octobre 2026, liste dans `SOURCES.md`), mais je n'ai pas pu l'exécuter sur un vrai Windows. Si ce que tu vois ne correspond pas, note-le dans ton [journal de bord](/moi/journal/) et regarde la page [Dépannage](/outils/depannage/).
+</Encadre>
+
+## L'ordre conseillé
+
+| Ordre | Quoi | Quand | 💻 Portable | 🖥️ PC fixe |
+|---|---|---|---|---|
+| 1 | Terminal et PowerShell | Tout de suite | ✅ | ✅ |
+| 2 | winget | Tout de suite | ✅ | ✅ |
+| 3 | VS Code | Tout de suite | ✅ | ✅ |
+| 4 | Git pour Windows | Tout de suite | ✅ | ✅ |
+| 5 | Identité Git (adresse noreply) | Tout de suite | ✅ | ✅ |
+| 6 | Connexion GitHub par le navigateur | Tout de suite | ✅ | ✅ |
+| 7 | Extensions VS Code | Tout de suite | ✅ | ✅ |
+| 8 | Lua 5.4 | Avant le module A5 | ✅ | ✅ |
+| 9 | Node.js LTS | Pour lancer ce site en local | ✅ | utile |
+| 10 | Dépôt + synchronisation | Module A4 | ✅ | ✅ |
+| 12 | Claude Code | Optionnel | optionnel | optionnel |
+| 13-15 | Steam, Nanos World, serveur, Unreal 5.7 | Quand ton accès est ouvert | serveur seulement | ✅ |
+
+## Les pages de cette section
+
+- **[Tutoriel complet pas à pas](/installer/tutoriel/)** : chaque outil, avec la commande, le résultat attendu, les erreurs fréquentes et la désinstallation.
+- **[Checklist par machine](/installer/checklist/)** : coche ce qui est fait sur chaque machine, avec les commandes de vérification.
+- **[Mon environnement (outils)](/installer/outils/)** : le tableau récapitulatif des outils et des extensions.
+- **[Où travailler](/installer/ou-travailler/)** : quelle machine pour quoi, et comment organiser tes dossiers.
+
+Le parcours A te guide dans cette installation **étape par étape**, avec des pauses et des mini-victoires : commence par le [module A1](/parcours-a/a1-dev-et-terminal/), puis le [module A2](/parcours-a/a2-installer-portable/) pour le portable.
+
+<Encadre type="retenir">
+Deux règles de sécurité qui ne changent jamais : **tu ne tapes jamais ton mot de passe GitHub dans le terminal** (la connexion se fait dans le navigateur), et **tu n'écris jamais de jeton (token) dans un fichier**.
+</Encadre>

@@ -1,0 +1,82 @@
+---
+// Quiz à choix unique avec correction expliquée. Le meilleur score est gardé dans la progression.
+import { mini } from '../lib/mini.js';
+
+interface Question {
+	q: string;
+	choix: string[];
+	ok: number; // index de la bonne réponse (0 = première)
+	pourquoi: string;
+}
+interface Props {
+	id: string;
+	questions: Question[];
+}
+const { id, questions } = Astro.props;
+for (const [i, q] of questions.entries()) {
+	if (q.ok < 0 || q.ok >= q.choix.length) throw new Error(`Quiz ${id}, question ${i + 1} : index de bonne réponse invalide`);
+}
+---
+
+<div class="quiz" data-quiz={id} data-reponses={JSON.stringify(questions.map((q) => q.ok))} id={id}>
+	<p class="discret">{questions.length} questions · une seule bonne réponse par question. Clique sur « Corriger » quand tu as fini : chaque réponse est expliquée. Ton meilleur score est gardé.</p>
+	{
+		questions.map((q, i) => (
+			<fieldset data-index={i}>
+				<legend>
+					<span>{i + 1}. </span>
+					<span set:html={mini(q.q)} />
+				</legend>
+				{q.choix.map((c, j) => (
+					<label>
+						<input type="radio" name={`${id}-q${i}`} value={j} />
+						<span set:html={mini(c)} />
+					</label>
+				))}
+				<div class="explication" hidden set:html={mini(q.pourquoi)} />
+			</fieldset>
+		))
+	}
+	<button type="button" class="bouton principal" data-action="corriger">Corriger</button>
+	<button type="button" class="bouton" data-action="recommencer">Recommencer</button>
+	<p class="score" aria-live="polite"></p>
+</div>
+
+<script>
+	import { charger, enregistrerQuiz } from '../scripts/progression.js';
+
+	document.querySelectorAll<HTMLElement>('[data-quiz]').forEach((quiz) => {
+		const id = quiz.dataset.quiz!;
+		const reponses: number[] = JSON.parse(quiz.dataset.reponses || '[]');
+		const score = quiz.querySelector<HTMLElement>('.score')!;
+		const meilleur = charger().quiz[id];
+		if (meilleur) score.textContent = `Ton meilleur score : ${meilleur.score}/${meilleur.total}`;
+
+		quiz.querySelector('[data-action="corriger"]')!.addEventListener('click', () => {
+			let bonnes = 0;
+			quiz.querySelectorAll<HTMLElement>('fieldset').forEach((f) => {
+				const i = Number(f.dataset.index);
+				const coche = f.querySelector<HTMLInputElement>('input:checked');
+				const juste = coche !== null && Number(coche.value) === reponses[i];
+				if (juste) bonnes++;
+				const exp = f.querySelector<HTMLElement>('.explication')!;
+				exp.hidden = false;
+				exp.classList.toggle('juste', juste);
+				exp.classList.toggle('faux', !juste);
+				exp.setAttribute('aria-label', juste ? 'Bonne réponse' : 'Réponse incorrecte');
+				const prefixe = juste ? '✅ ' : coche ? '❌ ' : '⚪ Pas de réponse. ';
+				if (!exp.dataset.base) exp.dataset.base = exp.innerHTML;
+				exp.innerHTML = prefixe + exp.dataset.base;
+			});
+			enregistrerQuiz(id, bonnes, reponses.length);
+			const message = bonnes === reponses.length ? 'Parfait, bravo ! 🎉' : bonnes >= Math.ceil(reponses.length * 0.7) ? 'Validé ! Relis les explications des erreurs.' : 'Pas encore validé (70 % requis) : relis les explications et la leçon, puis recommence.';
+			score.textContent = `Score : ${bonnes}/${reponses.length}. ${message}`;
+		});
+
+		quiz.querySelector('[data-action="recommencer"]')!.addEventListener('click', () => {
+			quiz.querySelectorAll<HTMLInputElement>('input').forEach((i) => (i.checked = false));
+			quiz.querySelectorAll<HTMLElement>('.explication').forEach((e) => (e.hidden = true));
+			score.textContent = '';
+		});
+	});
+</script>

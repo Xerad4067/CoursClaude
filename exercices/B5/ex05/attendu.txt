@@ -1,0 +1,4 @@
+dans la fonction :	2
+dehors :	1
+compteur :	2
+nil

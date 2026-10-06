@@ -1,0 +1,150 @@
+---
+// Tableau de bord de l'accueil : reprendre, prochaine action, niveau/XP, série, avancement.
+import { construireManifeste } from '../lib/manifeste.js';
+
+const manifeste = await construireManifeste();
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const parcoursInfos = [
+	{ l: 'A', titre: 'Installer et démarrer', duree: '6 h', ou: '💻 + 🖥️', lien: '/parcours-a/' },
+	{ l: 'B', titre: 'Lua et logique', duree: '24 h', ou: '🔀 les deux', lien: '/parcours-b/' },
+	{ l: 'C', titre: 'Penser en développeur + Git approfondi', duree: '16 h', ou: '🔀 les deux', vague: 2 },
+	{ l: 'D', titre: 'Passerelle SLAM (POO, SQL, Web)', duree: '18 h', ou: '🔀 les deux', vague: 2 },
+	{ l: 'E', titre: 'Scripts Nanos World', duree: '34 h', ou: '🖥️ (💻 pour écrire)', vague: 3 },
+	{ l: 'F', titre: 'Mapping (maisons, parcs, grottes)', duree: '28 h', ou: '🖥️ PC fixe', vague: 3 },
+	{ l: 'G', titre: 'Projet fil rouge : mini serveur RP', duree: '16 h', ou: '🖥️ PC fixe', vague: 4 },
+	{ l: 'H', titre: 'Autonomie et employabilité', duree: '6 h', ou: '🔀 les deux', vague: 4 },
+];
+---
+
+<div id="tableau-de-bord">
+	<script type="application/json" id="manifeste" set:html={JSON.stringify(manifeste)} />
+
+	<div class="grille-cartes">
+		<div class="carte">
+			<h2>▶️ Reprendre où j'en suis</h2>
+			<p id="reprendre">Tu n'as encore ouvert aucune leçon. <a href={`${base}/parcours-a/a1-dev-et-terminal/`}>Commence par le module A1</a>.</p>
+		</div>
+		<div class="carte">
+			<h2>➡️ Ta prochaine action</h2>
+			<p id="prochaine">Lis la page « <a href={`${base}/parcours-a/`}>Parcours A</a> » (5 min), puis lance la première étape du module A1.</p>
+			<p id="etape-suivante" class="discret"></p>
+		</div>
+		<div class="carte">
+			<h2 id="niveau-titre">🌱 Novice</h2>
+			<div class="barre" role="progressbar" aria-label="Progression vers le niveau suivant" aria-valuemin="0" aria-valuemax="100" id="barre-xp-role"><span id="barre-xp"></span></div>
+			<p id="xp-texte" class="discret">0 XP</p>
+			<p id="serie"></p>
+		</div>
+	</div>
+
+	<div class="carte" id="rappel-export" hidden>
+		<strong>💾 Pense à exporter ta progression.</strong> Elle est stockée dans <em>ce</em> navigateur uniquement : pour la retrouver sur ton autre machine, va dans <a href={`${base}/moi/progression/`}>Ma progression → Synchroniser</a>.
+	</div>
+
+	<h2>Mes parcours</h2>
+	<div class="grille-cartes">
+		{
+			parcoursInfos.map((p) => (
+				<div class="carte carte-parcours" data-parcours={p.l}>
+					<h3>
+						Parcours {p.l} · {p.titre}
+					</h3>
+					<p class="discret">
+						≈ {p.duree} · {p.ou}
+					</p>
+					{p.lien ? (
+						<>
+							<div class="barre">
+								<span data-barre-parcours={p.l} />
+							</div>
+							<p data-texte-parcours={p.l} class="discret">
+								0 %
+							</p>
+							<a href={base + p.lien}>Ouvrir le parcours {p.l}</a>
+						</>
+					) : (
+						<p class="discret">Rédaction prévue lors de la vague {p.vague} (voir le planning dans PLAN.md).</p>
+					)}
+				</div>
+			))
+		}
+	</div>
+
+	<h2>Détail par module</h2>
+	<div id="modules" class="grille-cartes"></div>
+</div>
+
+<script>
+	import { charger, calculerXP, niveauPour, serieActuelle, avancement } from '../scripts/progression.js';
+
+	const manifeste = JSON.parse(document.getElementById('manifeste')!.textContent || '{"pages":[]}');
+	const echapper = (s: string) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+	function afficher() {
+		const p = charger();
+
+		if (p.derniere) {
+			document.getElementById('reprendre')!.innerHTML = `Dernière page ouverte : <a href="${echapper(p.derniere.url)}">${echapper(p.derniere.titre)}</a>`;
+		}
+
+		// Prochaine action : celle de la dernière étape terminée (la plus récente).
+		const etapes: any[] = [];
+		manifeste.pages.forEach((page: any) => page.etapes.forEach((e: any) => etapes.push({ ...e, page })));
+		const faites = etapes.filter((e) => p.etapes[e.id]);
+		if (faites.length) {
+			const derniere = faites.reduce((a, b) => (p.etapes[b.id] >= p.etapes[a.id] ? b : a));
+			document.getElementById('prochaine')!.innerHTML = `${echapper(derniere.prochaine)}<br><span class="discret">(après « ${echapper(derniere.titre)} »)</span>`;
+		}
+		const suivante = etapes.find((e) => !p.etapes[e.id]);
+		document.getElementById('etape-suivante')!.innerHTML = suivante
+			? `Prochaine étape non terminée : <a href="${echapper(suivante.page.url)}">${echapper(suivante.page.module)} · ${echapper(suivante.titre)}</a>`
+			: etapes.length ? 'Toutes les étapes disponibles sont terminées. Bravo !' : '';
+
+		// Niveau et XP
+		const xp = calculerXP(p, manifeste);
+		const { actuel, suivant } = niveauPour(xp);
+		document.getElementById('niveau-titre')!.textContent = `${actuel.icone} ${actuel.nom}`;
+		const pct = suivant ? Math.round(((xp - actuel.xp) / (suivant.xp - actuel.xp)) * 100) : 100;
+		document.getElementById('barre-xp')!.style.width = `${pct}%`;
+		document.getElementById('barre-xp-role')!.setAttribute('aria-valuenow', String(pct));
+		document.getElementById('xp-texte')!.textContent = suivant ? `${xp} XP · encore ${suivant.xp - xp} XP pour devenir ${suivant.nom}` : `${xp} XP · niveau maximum`;
+		const serie = serieActuelle(p);
+		document.getElementById('serie')!.textContent = serie > 1
+			? `🔥 ${serie} jours d'affilée. ${p.jours.length} jours de travail au total.`
+			: `📅 ${p.jours.length} jour(s) de travail au total. Une pause ne fait rien perdre : tout reste coché.`;
+
+		// Avancement par parcours
+		const lettres = [...new Set(manifeste.pages.map((pg: any) => pg.parcours))] as string[];
+		for (const l of lettres) {
+			const a = avancement(p, manifeste.pages.filter((pg: any) => pg.parcours === l));
+			const barre = document.querySelector<HTMLElement>(`[data-barre-parcours="${l}"]`);
+			const texte = document.querySelector<HTMLElement>(`[data-texte-parcours="${l}"]`);
+			if (barre) barre.style.width = `${a.pourcent}%`;
+			if (texte) texte.textContent = `${a.pourcent} % · ${a.fait}/${a.total} éléments`;
+		}
+
+		// Détail par module
+		const modules = new Map<string, any[]>();
+		for (const pg of manifeste.pages) {
+			if (!pg.module) continue;
+			if (!modules.has(pg.module)) modules.set(pg.module, []);
+			modules.get(pg.module)!.push(pg);
+		}
+		const zone = document.getElementById('modules')!;
+		zone.innerHTML = [...modules.entries()]
+			.map(([code, pages]) => {
+				const a = avancement(p, pages);
+				const premiere = pages[0];
+				return `<div class="carte" data-parcours="${echapper(premiere.parcours)}"><strong><a href="${echapper(premiere.url)}">${echapper(code)}</a></strong> · ${a.pourcent} %<div class="barre"><span style="width:${a.pourcent}%"></span></div></div>`;
+			})
+			.join('');
+
+		// Rappel d'export si progression non sauvegardée depuis 7 jours
+		const aDuProgres = Object.keys(p.etapes).length + Object.keys(p.exercices).length > 0;
+		const ancien = !p.derniereExport || Date.now() - new Date(p.derniereExport).getTime() > 7 * 86400000;
+		document.getElementById('rappel-export')!.hidden = !(aDuProgres && ancien);
+	}
+
+	afficher();
+	window.addEventListener('progression:maj', afficher);
+</script>
