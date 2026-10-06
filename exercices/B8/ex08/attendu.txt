@@ -1,0 +1,7 @@
+=== Supérette du parc ===
+OK : pain x2 pour 4 €
+OK : lampe x1 pour 15 €
+Refusé : Stock insuffisant pour eau
+Refusé : Produit inconnu : velo
+Refusé : Stock insuffisant pour lampe
+Sam a 11 €

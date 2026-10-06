@@ -1,0 +1,2 @@
+{argent = 1500, nom = "Sam", permis = true}
+Sam	1500	true

@@ -1,0 +1,298 @@
+---
+title: "B7 · Tables imbriquées, closures et modules"
+description: Organiser des données complexes, utiliser des fonctions comme valeurs, créer des closures et découper ton code en modules avec require.
+parcours: B
+module: B7
+duree: 3 h
+ou: les-deux
+prerequis: Modules B5 et B6.
+resultat: Un annuaire des métiers rangé dans un module séparé, utilisé par un programme principal.
+objectifs:
+  - Lire et modifier des tables imbriquées
+  - Ranger des fonctions dans des tables et les passer en paramètre
+  - Expliquer ce qu'est une closure et l'utiliser pour protéger une donnée
+  - Créer un module (un fichier qui renvoie une table) et le charger avec require
+sidebar:
+  order: 7
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : les tables imbriquées."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Tout le module jusqu'à l'annuaire en modules."
+/>
+
+**Pourquoi c'est utile ?** Un vrai serveur a **des centaines de lignes** : il faut les ranger en **plusieurs fichiers** (modules). Et Nanos World appelle tes fonctions quand un événement survient : tu lui **passes des fonctions en paramètre** en permanence.
+
+## Étape 1 · Tables dans des tables (20 min)
+
+```lua title="b7/serveur.lua"
+local serveur = {
+  nom = "RP Horizon",
+  joueurs = {
+    { nom = "Sam", argent = 1500 },
+    { nom = "Kim", argent = 900 },
+  },
+}
+print(serveur.joueurs[2].nom)   --> Kim : on descend niveau par niveau
+for _, j in ipairs(serveur.joueurs) do
+  print(j.nom, j.argent)
+end
+```
+
+Lis `serveur.joueurs[2].nom` de gauche à droite : dans `serveur`, la clé `joueurs` (une liste), son 2e élément (une fiche), sa clé `nom`.
+
+<FinEtape id="B7-e1" titre="Tables imbriquées" victoire="tu navigues dans une structure de données à plusieurs niveaux." prochaine="les fonctions comme valeurs (étape 2)." />
+
+## Étape 2 · Les fonctions sont des valeurs (20 min)
+
+En Lua, une fonction se range dans une variable ou une table, et se passe en paramètre :
+
+```lua title="b7/commandes.lua"
+local commandes = {
+  aide = function() print("Commandes : /aide, /argent") end,
+  argent = function() print("Tu as 1500 €") end,
+}
+local tapee = "aide"
+commandes[tapee]()          -- appelle la fonction rangée sous la clé "aide"
+```
+
+C'est exactement le principe des **événements** de Nanos World : tu donnes au jeu une fonction, il l'appelle au bon moment.
+
+```lua title="b7/trier.lua"
+local joueurs = { { nom = "Sam", argent = 1500 }, { nom = "Kim", argent = 2200 } }
+-- table.sort accepte une fonction qui dit si a doit passer avant b
+table.sort(joueurs, function(a, b) return a.argent > b.argent end)
+print(joueurs[1].nom)       --> Kim (le plus riche en premier)
+```
+
+<FinEtape id="B7-e2" titre="Fonctions comme valeurs" victoire="tu ranges des fonctions dans des tables et tu en passes en paramètre." prochaine="les closures (étape 3)." />
+
+## Étape 3 · Les closures (25 min)
+
+Une **closure** (fermeture) est une fonction qui **se souvient** des variables locales qui existaient autour d'elle quand elle a été créée, même après.
+
+```lua title="b7/compteur.lua"
+local function creerCompteur()
+  local n = 0                  -- variable locale de creerCompteur
+  return function()            -- cette fonction « emporte » n avec elle
+    n = n + 1
+    return n
+  end
+end
+local suivant = creerCompteur()
+print(suivant(), suivant())    --> 1   2
+```
+
+<Encadre type="analogie">
+Une closure, c'est un **sac à dos** : la fonction part avec ses variables. Personne d'autre ne peut fouiller dedans : c'est une façon de **protéger** une donnée (un solde, un compteur de tickets).
+</Encadre>
+
+<FinEtape id="B7-e3" titre="Les closures" victoire="tu sais créer une fonction qui garde sa propre mémoire." prochaine="découper ton code en modules (étape 4)." />
+
+## Étape 4 · Les modules avec require (25 min)
+
+Un **module** est un fichier Lua qui **renvoie une table** de fonctions et de données.
+
+```lua title="b7/outils.lua"
+local outils = {}
+
+function outils.pourcentage(valeur, taux)
+  return valeur * taux // 100
+end
+
+return outils                  -- indispensable : c'est ce que require reçoit
+```
+
+```lua title="b7/main.lua"
+local outils = require("outils")   -- charge outils.lua (dans le même dossier)
+print(outils.pourcentage(200, 15)) --> 30
+```
+
+Lance `lua main.lua` **depuis le dossier** qui contient les deux fichiers : `require("outils")` cherche `outils.lua` dans le dossier courant. Un module n'est chargé qu'**une fois** : les `require` suivants renvoient la même table.
+
+<Encadre type="retenir" titre="📌 Et dans Nanos World ?">
+Nanos World a son propre mécanisme pour charger un autre fichier d'un package, `Package.Require` (vu au parcours E). Le principe est le même : découper par responsabilité (argent, métiers, inventaire…).
+</Encadre>
+
+<FinEtape id="B7-e4" titre="Les modules" victoire="ton code est découpé en fichiers qui se chargent avec require." prochaine="les exercices, puis l'annuaire des métiers en modules." />
+
+## Erreurs fréquentes
+
+| Message | Cause | Solution |
+|---|---|---|
+| `attempt to index a nil value (field 'joueur')` | Clé mal écrite dans un chemin `a.b.c` | Vérifie chaque niveau (`print(serveur.joueur)`) |
+| `module 'outils' not found` | Fichier absent du dossier courant, ou mauvais nom | `dir`, puis lance `lua` depuis le bon dossier |
+| `attempt to index a boolean value (local 'outils')` | Le module n'a pas de `return` à la fin | Ajoute `return outils` |
+| `attempt to call a nil value (field 'pourcentag')` | Nom de fonction mal écrit dans le module | Compare les noms |
+
+## Exercices
+
+<Exercice id="B7-ex01" titre="Les joueurs du serveur" niveau="vert" dossier="B7/ex01" fichier="serveur.lua">
+Avec la table `serveur` de l'étape 1, affiche le nom du 2e joueur puis chaque joueur (nom et argent) au format attendu.
+
+<div slot="indice1">On descend niveau par niveau : `serveur.joueurs[2].nom`.</div>
+<div slot="indice2">Pour tous les joueurs : `ipairs(serveur.joueurs)`.</div>
+<div slot="indice3">`print(j.nom .. " : " .. j.argent .. " €")`.</div>
+<div slot="solution">La structure « liste de fiches » est celle que tu utiliseras pour les joueurs connectés.</div>
+</Exercice>
+
+<Exercice id="B7-ex02" titre="Les commandes du chat" niveau="vert" dossier="B7/ex02" fichier="commandes.lua">
+Range deux fonctions `aide` et `argent` dans une table `commandes`, puis appelle-les : directement, avec des crochets, et grâce à une variable contenant le nom de la commande.
+
+<div slot="indice1">`aide = function() … end` dans le constructeur de table.</div>
+<div slot="indice2">`commandes.aide()` et `commandes["argent"]()`.</div>
+<div slot="indice3">`local tapee = "aide"` puis `commandes[tapee]()`.</div>
+<div slot="solution">Une table de commandes remplace une longue suite de `if … elseif` : tu ajoutes une commande en ajoutant une ligne.</div>
+</Exercice>
+
+<Exercice id="B7-ex03" titre="Fonctions en paramètre" niveau="jaune" dossier="B7/ex03" fichier="actions.lua">
+Écris `appliquerATous(liste, action)` qui appelle `action` sur chaque élément, puis utilise-la pour verser un salaire à Sam et Kim. Ensuite, trie les joueurs du plus riche au plus pauvre.
+
+<div slot="indice1">Dans `appliquerATous` : une boucle `ipairs` qui fait `action(v)`.</div>
+<div slot="indice2">Passe une fonction **anonyme** : `appliquerATous(noms, function(nom) … end)`.</div>
+<div slot="indice3">`table.sort(joueurs, function(a, b) return a.argent > b.argent end)`.</div>
+<div slot="solution">Une fonction sans nom passée en paramètre s'appelle une fonction **anonyme** (ou *callback*). Tu en écriras partout avec Nanos World.</div>
+</Exercice>
+
+<Exercice id="B7-ex04" titre="Débogage : le chemin cassé" niveau="jaune" type="debug" dossier="B7/ex04" fichier="annuaire.lua">
+Ce programme plante avec `attempt to index a nil value (field 'joueur')`. Corrige-le.
+
+<div slot="indice1">Le message nomme le champ fautif : `joueur`.</div>
+<div slot="indice2">Compare avec les clés réellement présentes dans la table.</div>
+<div slot="indice3">La clé s'appelle `joueurs` (au pluriel).</div>
+<div slot="solution">Dans un chemin `a.b.c`, si `a.b` vaut `nil`, Lua ne peut pas aller chercher `.c` : le message donne le nom du maillon manquant.</div>
+</Exercice>
+
+<Exercice id="B7-ex05" titre="Lecture : deux compteurs" niveau="jaune" type="lecture" dossier="B7/ex05" fichier="closures.lua">
+Prédis les quatre nombres affichés.
+
+<div slot="indice1">Chaque appel à `creerCompteur()` crée une **nouvelle** variable `n`.</div>
+<div slot="indice2">`c1` et `c2` ont chacun leur propre sac à dos.</div>
+<div slot="indice3">c1 : 1, 2… c2 repart de 1.</div>
+<div slot="solution">Deux closures créées par la même fonction ne partagent pas leurs variables.</div>
+</Exercice>
+
+<Exercice id="B7-ex06" titre="Une caisse protégée" niveau="jaune" dossier="B7/ex06" fichier="caisse.lua">
+Écris `creerCaisse(soldeInitial)` qui renvoie une table de trois fonctions `deposer`, `retirer` (refuse si le solde est insuffisant et renvoie `false`) et `solde`. Le solde doit être **inaccessible** autrement.
+
+<div slot="indice1">Le solde est une variable `local` de `creerCaisse`.</div>
+<div slot="indice2">Les trois fonctions sont créées **dans** `creerCaisse` : ce sont des closures.</div>
+<div slot="indice3">`function caisse.deposer(montant) solde = solde + montant end`.</div>
+<div slot="solution">`c.solde` n'est pas un nombre mais une fonction : impossible d'écrire `c.solde = 1000000` pour tricher sur la valeur.</div>
+</Exercice>
+
+<Exercice id="B7-ex07" titre="Défi : mon premier module" niveau="rouge" dossier="B7/ex07" fichier="main.lua">
+Crée un module `outils.lua` avec deux fonctions : `pourcentage(valeur, taux)` et `formaterArgent(montant)` (celle du défi B5). Dans `main.lua`, charge-le avec `require` et produis l'affichage attendu.
+
+<div slot="indice1">Le module commence par `local outils = {}` et finit par `return outils`.</div>
+<div slot="indice2">Définis les fonctions avec `function outils.nom(...)`.</div>
+<div slot="indice3">Dans `main.lua` : `local outils = require("outils")`, puis `outils.formaterArgent(...)`.</div>
+<div slot="solution">
+
+Le module `outils.lua` (testé avec la solution) :
+```lua title="outils.lua"
+local outils = {}
+
+function outils.pourcentage(valeur, taux)
+  return valeur * taux // 100
+end
+
+function outils.formaterArgent(montant)
+  local texte = tostring(montant)
+  local resultat = ""
+  local compteur = 0
+  for i = #texte, 1, -1 do
+    resultat = string.sub(texte, i, i) .. resultat
+    compteur = compteur + 1
+    if compteur % 3 == 0 and i > 1 then
+      resultat = " " .. resultat
+    end
+  end
+  return resultat .. " €"
+end
+
+return outils
+```
+</div>
+</Exercice>
+
+<Exercice id="B7-ex08" titre="Mini-projet : annuaire des métiers en modules" niveau="rouge" type="projet" dossier="B7/ex08" fichier="main.lua">
+Crée un module `metiers.lua` qui contient la liste des métiers (nom, salaire horaire, véhicule de service) et deux fonctions : `lister()` (renvoie la liste) et `trouver(nom)` (renvoie la fiche ou `nil`). Le programme principal affiche l'annuaire, puis cherche `taxi` et `pilote`.
+
+<div slot="validation">Le programme principal ne contient aucune donnée de métier : tout vient du module.</div>
+<div slot="indice1">Dans le module, la liste est une variable `local` : seules les fonctions sont exposées.</div>
+<div slot="indice2">`trouver` parcourt la liste et compare `fiche.nom == nom`.</div>
+<div slot="indice3">Si rien n'est trouvé, `return nil` (ou rien) : le programme principal teste `if fiche then … else … end`.</div>
+<div slot="solution">
+
+Le module `metiers.lua` (testé avec la solution) :
+```lua title="metiers.lua"
+local metiers = {}
+
+-- Données privées du module : invisibles depuis main.lua.
+local liste = {
+  { nom = "taxi", salaireHoraire = 12, vehicule = "Taxi" },
+  { nom = "mecanicien", salaireHoraire = 14, vehicule = "Dépanneuse" },
+  { nom = "livreur", salaireHoraire = 11, vehicule = "Camionnette" },
+}
+
+function metiers.lister()
+  return liste
+end
+
+function metiers.trouver(nom)
+  for _, fiche in ipairs(liste) do
+    if fiche.nom == nom then
+      return fiche
+    end
+  end
+  return nil
+end
+
+return metiers
+```
+Ce module deviendra une brique de ton serveur RP : le jour où tu ajoutes un métier, tu ne touches qu'à ce fichier.
+</div>
+</Exercice>
+
+## Quiz du module B7
+
+<Quiz id="B7-quiz" questions={[
+  { q: "Que donne `serveur.joueurs[1].nom` ?", choix: ["Le nom du serveur", "Le nom du premier joueur", "Une erreur", "La liste des joueurs"], ok: 1, pourquoi: "On descend : joueurs → 1er élément → nom." },
+  { q: "En Lua, une fonction peut…", choix: ["Seulement être appelée", "Être rangée dans une variable ou une table et passée en paramètre", "Seulement être globale", "Être appelée avant sa définition"], ok: 1, pourquoi: "Les fonctions sont des valeurs." },
+  { q: "Qu'est-ce qu'une closure ?", choix: ["Une boucle fermée", "Une fonction qui garde l'accès aux variables locales de l'endroit où elle a été créée", "Un module", "Une erreur de syntaxe"], ok: 1, pourquoi: "Le « sac à dos » de variables." },
+  { q: "Que doit faire un module à la fin du fichier ?", choix: ["`print` ses fonctions", "`return` une table", "Appeler `require`", "Rien"], ok: 1, pourquoi: "`require` reçoit ce que le module renvoie." },
+  { q: "`attempt to index a boolean value (local 'outils')` après un require signifie…", choix: ["Le fichier est introuvable", "Le module n'a pas de `return` (require a reçu true)", "Lua est mal installé", "La fonction n'existe pas"], ok: 1, pourquoi: "Sans return, require renvoie true." },
+  { q: "Où `require(\"outils\")` cherche-t-il le fichier (configuration par défaut) ?", choix: ["Sur Internet", "Notamment dans le dossier courant, sous le nom outils.lua", "Dans Windows", "Dans GitHub"], ok: 1, pourquoi: "Lance lua depuis le dossier qui contient le module." },
+  { q: "Que fait `table.sort(t, function(a, b) return a.argent > b.argent end)` ?", choix: ["Trie par argent croissant", "Trie par argent décroissant", "Supprime les pauvres", "Une erreur"], ok: 1, pourquoi: "a passe avant b si a est plus riche." },
+  { q: "Pourquoi découper en modules ?", choix: ["Lua l'impose", "Pour organiser le code par responsabilité et le réutiliser", "Pour aller plus vite à l'exécution", "Pour cacher le code aux joueurs"], ok: 1, pourquoi: "Chaque fichier a un rôle clair." },
+  { q: "Deux compteurs créés par la même fonction de fabrique…", choix: ["Partagent leur valeur", "Ont chacun leur propre valeur", "Provoquent une erreur", "Valent toujours 0"], ok: 1, pourquoi: "Chaque appel crée de nouvelles variables locales." },
+  { q: "`commandes[tapee]()` sert à…", choix: ["Afficher la table", "Appeler la fonction dont le nom est dans la variable tapee", "Supprimer une commande", "Créer une commande"], ok: 1, pourquoi: "On choisit la fonction à appeler par son nom." },
+]} />
+
+## Récapitulatif
+
+- Tables imbriquées : `a.b[2].c`, on descend niveau par niveau.
+- Fonctions = valeurs : dans des tables, en paramètre (callbacks), anonymes.
+- Closure : fonction + ses variables locales d'origine ; utile pour protéger une donnée.
+- Module : fichier qui `return` une table ; `local m = require("nom")`.
+
+## Je suis bloqué, que faire ?
+
+Pour un chemin qui plante, affiche chaque niveau : `print(serveur)`, `print(serveur.joueurs)`, `print(serveur.joueurs[1])`. Pour un module : vérifie le `return` final et le dossier courant (`pwd`, `dir`).
+
+<Videos recherche="Lua modules require closures tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : require](https://www.lua.org/manual/5.4/manual.html#pdf-require)
+- [Manuel Lua 5.4 : visibilité et closures (règles de portée)](https://www.lua.org/manual/5.4/manual.html#3.5)
+- [Doc Nanos World : communication entre packages](https://docs.nanos-world.com/docs/core-concepts/scripting/communicating-between-packages)

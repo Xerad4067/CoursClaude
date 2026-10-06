@@ -1,0 +1,4 @@
+Sam : 150 €
+Kim : 300 €
+Refusé -> Sam : solde insuffisant
+Sam : 150 €
