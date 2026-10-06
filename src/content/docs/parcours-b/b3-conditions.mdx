@@ -1,0 +1,230 @@
+---
+title: "B3 · Conditions"
+description: Prendre des décisions avec if, elseif, else, and, or, not, et comprendre ce qui est vrai ou faux en Lua.
+parcours: B
+module: B3
+duree: 2 h 30
+ou: les-deux
+prerequis: Modules B1 et B2 (variables, comparaisons).
+resultat: Un contrôle d'achat de véhicule qui accepte ou refuse selon des règles.
+objectifs:
+  - Écrire des conditions avec if, elseif et else
+  - Combiner des conditions avec and, or et not
+  - Savoir que seuls false et nil sont faux en Lua
+  - Valider une saisie avec tonumber et une valeur par défaut avec or
+sidebar:
+  order: 3
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : ton premier if."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Tout le module."
+/>
+
+**Pourquoi c'est utile ?** Un serveur roleplay passe son temps à **décider** : ce joueur peut-il acheter ce véhicule ? entrer dans ce bâtiment ? utiliser cette commande admin ?
+
+## Étape 1 · if, else (20 min)
+
+<Encadre type="analogie">
+Une condition, c'est le **videur** d'une boîte de nuit : « **si** tu as 18 ans ou plus, **alors** tu entres, **sinon** tu rentres chez toi ».
+</Encadre>
+
+```lua title="b3/permis.lua"
+local age = 17
+if age >= 18 then
+  print("Tu peux passer le permis")
+else
+  print("Encore " .. 18 - age .. " an(s) à attendre")
+end
+```
+
+- `if condition then` : si la condition est vraie, on exécute le bloc qui suit ;
+- `else` : sinon, on exécute l'autre bloc ;
+- `end` : fin du `if` (obligatoire !).
+
+Le code à l'intérieur est **indenté** (décalé de 2 espaces) : Lua s'en moque, mais toi, tu vois tout de suite ce qui dépend de quoi.
+
+<FinEtape id="B3-e1" titre="if et else" victoire="ton programme choisit entre deux chemins." prochaine="plusieurs cas avec elseif (étape 2)." />
+
+## Étape 2 · elseif : plusieurs cas (20 min)
+
+```lua title="b3/sante.lua"
+local sante = 35
+if sante >= 70 then
+  print("En forme")
+elseif sante >= 30 then
+  print("Blessé")
+else
+  print("Critique")
+end
+```
+
+Lua teste **dans l'ordre** et s'arrête au **premier** cas vrai. Ici `35 >= 70` est faux, `35 >= 30` est vrai → `Blessé`, et le reste est ignoré.
+
+<Encadre type="piege">
+L'ordre compte : si tu testes `sante >= 30` **avant** `sante >= 70`, un joueur à 90 sera classé « Blessé ». Range les cas du plus restrictif au plus large.
+</Encadre>
+
+<FinEtape id="B3-e2" titre="elseif" victoire="tu gères plusieurs cas dans le bon ordre." prochaine="combiner des conditions (étape 3)." />
+
+## Étape 3 · and, or, not (20 min)
+
+| Opérateur | Vrai si… | Exemple RP |
+|---|---|---|
+| `a and b` | les deux sont vrais | assez d'argent **et** le permis |
+| `a or b` | au moins un est vrai | admin **ou** modérateur |
+| `not a` | `a` est faux | **pas** banni |
+
+```lua title="b3/acces.lua"
+local estAdmin, estModo = false, true
+if estAdmin or estModo then
+  print("Accès au panneau de modération")
+end
+```
+
+<FinEtape id="B3-e3" titre="and, or, not" victoire="tu combines plusieurs règles dans une seule condition." prochaine="découvrir ce qui est « vrai » en Lua (étape 4)." />
+
+## Étape 4 · Vrai, faux… et les surprises de Lua (20 min)
+
+En Lua, **seuls `false` et `nil` sont faux**. Tout le reste est vrai, **y compris `0` et la chaîne vide `""`** (différent d'autres langages).
+
+Conséquence pratique : `or` donne une **valeur par défaut**.
+
+```lua title="b3/defaut.lua"
+local saisie = "abc"
+local montant = tonumber(saisie) or 0   -- tonumber renvoie nil, donc on prend 0
+print(montant)                          --> 0
+```
+
+`a or b` vaut `a` si `a` est vrai, sinon `b`. Et `a and b` vaut `a` si `a` est faux, sinon `b`.
+
+<Encadre type="retenir">
+Vérifie toujours une saisie : `local n = tonumber(texte)`, puis `if n == nil then ... end`. Sur un serveur, **toute donnée venant d'un joueur est suspecte**.
+</Encadre>
+
+<FinEtape id="B3-e4" titre="Vrai et faux en Lua" victoire="tu sais que 0 est vrai en Lua et tu utilises or pour une valeur par défaut." prochaine="les exercices, puis le contrôle d'achat de véhicule." />
+
+## Erreurs fréquentes
+
+| Message | Cause | Solution |
+|---|---|---|
+| `'then' expected near '='` | `=` au lieu de `==` dans la condition | Comparer, c'est `==` |
+| `'end' expected (to close 'if' at line 3) near <eof>` | `end` oublié | Un `end` par `if` (pas par `elseif`) |
+| `'then' expected near 'print'` | `then` oublié | `if condition then` |
+| Un cas n'est jamais atteint | Mauvais ordre des `elseif` | Du plus restrictif au plus large |
+
+## Exercices
+
+<Exercice id="B3-ex01" titre="Le permis" niveau="vert" dossier="B3/ex01" fichier="permis.lua">
+Avec `local age = 17`, affiche si le joueur peut passer le permis (18 ans) ou combien d'années il doit attendre.
+
+<div slot="indice1">Deux cas : `if … else … end`.</div>
+<div slot="indice2">La condition : `age >= 18`.</div>
+<div slot="indice3">Dans le `else` : `"Encore " .. 18 - age .. " an(s) à attendre"`.</div>
+<div slot="solution">Change `age` en 20 et relance : l'autre branche s'exécute. Tester **les deux** chemins est un réflexe à prendre.</div>
+</Exercice>
+
+<Exercice id="B3-ex02" titre="État de santé" niveau="vert" dossier="B3/ex02" fichier="sante.lua">
+Avec `local sante = 35`, affiche `Santé 35 : ` suivi de « En forme » (≥ 70), « Blessé » (≥ 30) ou « Critique ».
+
+<div slot="indice1">Trois cas : `if`, `elseif`, `else`.</div>
+<div slot="indice2">Commence par le cas le plus restrictif (≥ 70).</div>
+<div slot="indice3">Range le texte de l'état dans une variable `etat`, puis un seul `print` à la fin.</div>
+<div slot="solution">Déclarer `local etat` **avant** le `if` permet de l'utiliser après le `end` (les variables créées dans un bloc disparaissent à la fin du bloc : on y reviendra au module B5).</div>
+</Exercice>
+
+<Exercice id="B3-ex03" titre="Les droits d'accès" niveau="vert" dossier="B3/ex03" fichier="acces.lua">
+Avec 800 €, le permis, un joueur non admin mais modérateur : affiche les trois messages attendus avec `and`, `or` et `not`.
+
+<div slot="indice1">Une condition par message.</div>
+<div slot="indice2">Location : argent suffisant **et** permis. Panneau : admin **ou** modo.</div>
+<div slot="indice3">Commandes admin refusées : `if not estAdmin then`.</div>
+<div slot="solution">Lis tes conditions à voix haute en français : si la phrase est juste, la condition l'est souvent aussi.</div>
+</Exercice>
+
+<Exercice id="B3-ex04" titre="Débogage : la condition qui ne compile pas" niveau="jaune" type="debug" dossier="B3/ex04" fichier="caisse.lua">
+Ce programme refuse de s'exécuter. Lis l'erreur et corrige.
+
+<div slot="indice1">Le message dit qu'il attendait `then` près d'un `=`.</div>
+<div slot="indice2">Dans une condition, on compare : quel est l'opérateur de comparaison d'égalité ?</div>
+<div slot="indice3">`==`.</div>
+<div slot="solution">`=` range une valeur et n'a pas sa place dans une condition. Lua le détecte avant même d'exécuter.</div>
+</Exercice>
+
+<Exercice id="B3-ex05" titre="Lecture : qu'est-ce qui est vrai ?" niveau="jaune" type="lecture" dossier="B3/ex05" fichier="vrai-faux.lua">
+Prédis les lignes affichées.
+
+<div slot="indice1">Seuls `false` et `nil` sont faux en Lua.</div>
+<div slot="indice2">`nil or X` donne `X`.</div>
+<div slot="indice3">`false and X` donne `false` (on s'arrête au premier faux).</div>
+<div slot="solution">`0` et `""` sont **vrais** en Lua, contrairement à JavaScript ou Python : un piège classique quand on change de langage.</div>
+</Exercice>
+
+<Exercice id="B3-ex06" titre="Le tarif du métro" niveau="jaune" dossier="B3/ex06" fichier="tarif.lua">
+Tarifs : moins de 12 ans gratuit, moins de 26 ans 2 €, 65 ans et plus 1 €, sinon 3 €. Affiche le tarif pour `local age = 70`.
+
+<div slot="indice1">Quatre cas, donc `if`, deux `elseif`, `else`.</div>
+<div slot="indice2">Un âge de 70 ans est aussi « 26 ans ou plus » : l'ordre des tests compte.</div>
+<div slot="indice3">Teste `< 12`, puis `< 26`, puis `>= 65`, puis le reste.</div>
+<div slot="solution">Essaie aussi avec 8, 20 et 40 pour vérifier chaque branche.</div>
+</Exercice>
+
+<Exercice id="B3-ex07" titre="Défi : sécuriser un dépôt bancaire" niveau="rouge" dossier="B3/ex07" fichier="depot.lua">
+Deux saisies arrivent : `"abc"` et `"120"`. Pour la première, affiche le montant converti avec 0 par défaut. Pour la seconde, refuse un texte non numérique (« Saisie invalide »), un montant ≤ 0 (« Le montant doit être positif »), sinon confirme le dépôt.
+
+<div slot="indice1">`tonumber(saisie) or 0` donne 0 quand la conversion échoue.</div>
+<div slot="indice2">Pour la validation : teste d'abord `nil`, ensuite le signe.</div>
+<div slot="indice3">`if montant == nil then … elseif montant <= 0 then … else … end`.</div>
+<div slot="solution">Pourquoi tester `nil` en premier ? Parce que `nil <= 0` provoquerait l'erreur `attempt to compare nil with number`.</div>
+</Exercice>
+
+<Exercice id="B3-ex08" titre="Mini-projet : contrôle d'achat d'un véhicule" niveau="jaune" type="projet" dossier="B3/ex08" fichier="concession.lua">
+À la concession, la Sultan coûte 15 000 €. Le joueur a 12 000 €, 19 ans et le permis. Règles, dans l'ordre : sans permis → refus ; moins de 18 ans → refus ; argent insuffisant → indiquer combien il manque ; sinon → achat et argent restant.
+
+<div slot="validation">Change les variables (permis à `false`, argent à 20 000…) : chaque règle doit pouvoir s'afficher.</div>
+<div slot="indice1">Commence par écrire les règles en français, puis traduis-les en `if` / `elseif`.</div>
+<div slot="indice2">Le montant manquant : `prixVehicule - argent`.</div>
+<div slot="indice3">Dans le dernier cas, mets à jour `argent` avant de l'afficher.</div>
+<div slot="solution">Au module B5, tu transformeras ce contrôle en **fonction** pour l'utiliser avec n'importe quel joueur et n'importe quel véhicule.</div>
+</Exercice>
+
+## Quiz du module B3
+
+<Quiz id="B3-quiz" questions={[
+  { q: "Que manque-t-il : `if argent > 100 print(\"riche\") end` ?", choix: ["`do`", "`then`", "`:`", "Rien"], ok: 1, pourquoi: "`if condition then … end`." },
+  { q: "Combien de `end` pour un `if … elseif … elseif … else` ?", choix: ["Un seul", "Un par elseif", "Trois", "Aucun"], ok: 0, pourquoi: "Un seul `end` ferme tout le bloc `if`." },
+  { q: "En Lua, `0` est…", choix: ["Faux", "Vrai", "Une erreur dans un if", "nil"], ok: 1, pourquoi: "Seuls `false` et `nil` sont faux." },
+  { q: "Que vaut `nil or \"inconnu\"` ?", choix: ["`nil`", "`\"inconnu\"`", "`false`", "Une erreur"], ok: 1, pourquoi: "`or` renvoie le second si le premier est faux." },
+  { q: "`argent >= 500 and aLePermis` est vrai si…", choix: ["L'une des deux conditions est vraie", "Les deux sont vraies", "Aucune n'est vraie", "argent vaut 500 exactement"], ok: 1, pourquoi: "`and` exige les deux." },
+  { q: "Avec `sante = 90`, que donne ce code : `if sante >= 30 then print(\"Blessé\") elseif sante >= 70 then print(\"En forme\") end` ?", choix: ["En forme", "Blessé", "Rien", "Les deux"], ok: 1, pourquoi: "Le premier cas vrai gagne : mauvais ordre des tests." },
+  { q: "Que vaut `not nil` ?", choix: ["`nil`", "`true`", "`false`", "Une erreur"], ok: 1, pourquoi: "nil est faux, donc `not nil` est vrai." },
+  { q: "Quelle erreur provoque `if x = 5 then` ?", choix: ["`'then' expected near '='`", "`attempt to call a nil value`", "Aucune", "`malformed number`"], ok: 0, pourquoi: "Dans une condition, on compare avec `==`." },
+  { q: "Pourquoi valider une saisie joueur ?", choix: ["Pour aller plus vite", "Parce qu'une donnée venant d'un joueur peut être invalide ou malveillante", "Lua l'exige", "Pour l'XP"], ok: 1, pourquoi: "Règle de sécurité : ne jamais faire confiance au client." },
+  { q: "`tonumber(\"12a\") or 0` vaut…", choix: ["12", "0", "nil", "\"12a\""], ok: 1, pourquoi: "`\"12a\"` n'est pas un nombre : `tonumber` renvoie nil, donc 0." },
+]} />
+
+## Récapitulatif
+
+- `if … then … elseif … then … else … end` ; Lua s'arrête au premier cas vrai.
+- `and`, `or`, `not` ; seuls `false` et `nil` sont faux ; `x or valeurParDefaut`.
+- Comparer = `==` ; toujours valider les saisies (`tonumber` puis test de `nil`).
+
+## Je suis bloqué, que faire ?
+
+Ajoute un `print` **avant** le `if` pour voir les valeurs réelles testées (`print("age =", age)`). Vérifie ensuite chaque condition à voix haute.
+
+<Videos recherche="Lua conditions if else tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : structures de contrôle](https://www.lua.org/manual/5.4/manual.html#3.3.4)
+- [Manuel Lua 5.4 : opérateurs logiques](https://www.lua.org/manual/5.4/manual.html#3.4.5)
+- [Doc Nanos World : sécurité des événements distants](https://docs.nanos-world.com/docs/core-concepts/scripting/security-remote-events)

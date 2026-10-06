@@ -1,0 +1,224 @@
+---
+title: "B5 · Fonctions et portée"
+description: Créer des fonctions avec paramètres et valeurs de retour, comprendre local et la portée des variables.
+parcours: B
+module: B5
+duree: 3 h
+ou: les-deux
+prerequis: Modules B1 à B4.
+resultat: Un calculateur de salaire réutilisable pour plusieurs employés.
+objectifs:
+  - Définir et appeler une fonction avec des paramètres
+  - Renvoyer une ou plusieurs valeurs avec return
+  - Expliquer la portée d'une variable locale (bloc, fonction, fichier)
+  - Donner une valeur par défaut à un paramètre
+sidebar:
+  order: 5
+---
+
+import Encadre from '../../../components/Encadre.astro';
+import FinEtape from '../../../components/FinEtape.astro';
+import TroisDurees from '../../../components/TroisDurees.astro';
+import Exercice from '../../../components/Exercice.astro';
+import Quiz from '../../../components/Quiz.astro';
+import Videos from '../../../components/Videos.astro';
+
+<TroisDurees
+  quinze="Étape 1 : ta première fonction."
+  quarante="Étapes 1 et 2 et exercices 1 à 3."
+  deuxh="Tout le module jusqu'au calculateur de salaire."
+/>
+
+**Pourquoi c'est utile ?** Dans Nanos World, presque tout ton code sera des **fonctions** appelées quand quelque chose arrive (un joueur se connecte, un véhicule explose). Et une fonction bien nommée rend ton code lisible : `verserSalaire(joueur)` se comprend tout seul.
+
+## Étape 1 · Définir et appeler (20 min)
+
+<Encadre type="analogie">
+Une fonction, c'est une **recette** rangée dans un classeur : tu l'écris une fois (définition), puis tu dis « fais la recette des crêpes » autant de fois que tu veux (appel). Les **paramètres** sont les ingrédients que tu fournis à chaque fois.
+</Encadre>
+
+```lua title="b5/saluer.lua"
+local function saluer(nom)            -- définition : nom est un paramètre
+  print("Bienvenue, " .. nom .. " !")
+end
+
+saluer("Sam")                          -- appel : "Sam" est l'argument
+saluer("Kim")
+```
+
+La fonction doit être **définie avant** d'être appelée : Lua lit le fichier de haut en bas.
+
+<FinEtape id="B5-e1" titre="Définir et appeler" victoire="tu as écrit une fonction et tu l'as appelée deux fois." prochaine="renvoyer un résultat avec return (étape 2)." />
+
+## Étape 2 · return : renvoyer un résultat (20 min)
+
+```lua title="b5/salaire-jour.lua"
+local function salaireJour(heures, tauxHoraire)
+  return heures * tauxHoraire          -- la fonction « répond » cette valeur
+end
+
+local gain = salaireJour(7, 12)        -- on récupère la réponse
+print(gain)                            --> 84
+```
+
+Différence clé : `print` **affiche** (pour toi), `return` **renvoie** (pour le programme, qui peut réutiliser la valeur). Une fonction peut renvoyer **plusieurs** valeurs : `return quotient, reste`.
+
+<FinEtape id="B5-e2" titre="return" victoire="tes fonctions calculent et renvoient des résultats réutilisables." prochaine="comprendre la portée des variables (étape 3)." />
+
+## Étape 3 · La portée : qui voit quoi ? (25 min)
+
+Une variable `local` n'existe **que dans le bloc** où elle est créée (fichier, fonction, `if`, boucle, `do … end`).
+
+```lua title="b5/portee.lua"
+local argent = 100            -- visible dans tout le fichier, après cette ligne
+
+local function payer(prix)
+  local reste = argent - prix -- reste n'existe que dans payer
+  argent = reste              -- payer peut modifier argent (créé avant elle)
+end
+
+payer(30)
+print(argent)                 --> 70
+print(reste)                  --> nil : reste n'existe plus ici
+```
+
+<Encadre type="retenir" titre="📌 Toujours local">
+Sans `local`, une variable est **globale** : visible partout, modifiable par n'importe quel fichier. Sur un serveur avec plusieurs packages, c'est la source de bugs incompréhensibles (deux scripts qui utilisent la même variable `argent`). Règle : **`local` partout**, sauf raison précise.
+</Encadre>
+
+<FinEtape id="B5-e3" titre="La portée" victoire="tu sais où une variable existe et pourquoi on écrit local." prochaine="paramètres par défaut et bonnes fonctions (étape 4)." />
+
+## Étape 4 · Paramètres optionnels et bonnes pratiques (20 min)
+
+Un argument non fourni vaut `nil` : avec `or`, on donne une valeur par défaut.
+
+```lua title="b5/remise.lua"
+local function appliquerRemise(prix, pourcentage)
+  pourcentage = pourcentage or 10      -- 10 % si rien n'est précisé
+  return prix - prix * pourcentage // 100
+end
+print(appliquerRemise(200))       --> 180
+print(appliquerRemise(200, 25))   --> 150
+```
+
+Une bonne fonction : **un nom avec un verbe** (`calculerSalaire`, `afficherFiche`), **une seule tâche**, **courte** (moins de 20 lignes), et elle **renvoie** plutôt qu'elle n'affiche quand c'est un calcul.
+
+<FinEtape id="B5-e4" titre="Bonnes fonctions" victoire="tu écris des fonctions claires, avec des valeurs par défaut." prochaine="les exercices, puis le calculateur de salaire." />
+
+## Erreurs fréquentes
+
+| Message | Cause | Solution |
+|---|---|---|
+| `attempt to call a nil value (global 'calculerTaxe')` | Fonction appelée avant sa définition, ou nom mal écrit | Définis la fonction plus haut dans le fichier |
+| La fonction affiche mais `print(f())` affiche `nil` | Pas de `return` | Ajoute `return valeur` |
+| `attempt to perform arithmetic on a nil value (local 'taux')` | Argument oublié à l'appel | Passe tous les arguments, ou donne une valeur par défaut |
+| Variable « qui disparaît » | Créée avec `local` dans un bloc | Déclare-la avant le bloc |
+
+## Exercices
+
+<Exercice id="B5-ex01" titre="Fonction de bienvenue" niveau="vert" dossier="B5/ex01" fichier="saluer.lua">
+Écris une fonction `saluer(nom)` et appelle-la pour Sam puis pour Kim.
+
+<div slot="indice1">`local function nomDeLaFonction(parametre) … end`.</div>
+<div slot="indice2">Dans la fonction, un `print` qui utilise `nom`.</div>
+<div slot="indice3">Deux appels : `saluer("Sam")` puis `saluer("Kim")`.</div>
+<div slot="solution">Une seule définition, deux appels : si tu veux changer le message, tu ne le modifies qu'à un endroit.</div>
+</Exercice>
+
+<Exercice id="B5-ex02" titre="Salaire d'une journée" niveau="vert" dossier="B5/ex02" fichier="salaire-jour.lua">
+Écris `salaireJour(heures, tauxHoraire)` qui **renvoie** le gain, puis affiche le résultat pour 7 h à 12 € et 4 h à 15 €.
+
+<div slot="indice1">La fonction ne doit pas afficher : elle renvoie.</div>
+<div slot="indice2">`return heures * tauxHoraire`.</div>
+<div slot="indice3">`print(salaireJour(7, 12))`.</div>
+<div slot="solution">Parce qu'elle renvoie un nombre, on pourra réutiliser `salaireJour` dans d'autres calculs (somme de la semaine, comparaison…).</div>
+</Exercice>
+
+<Exercice id="B5-ex03" titre="Deux valeurs de retour" niveau="jaune" dossier="B5/ex03" fichier="pleins.lua">
+Avec 130 €, combien de pleins à 40 € peux-tu faire, et combien reste-t-il ? Écris `divisionEntiere(a, b)` qui renvoie les **deux** valeurs.
+
+<div slot="indice1">`//` donne le quotient, `%` le reste.</div>
+<div slot="indice2">`return a // b, a % b`.</div>
+<div slot="indice3">Récupère-les avec `local pleins, reste = divisionEntiere(130, 40)`.</div>
+<div slot="solution">Plusieurs valeurs de retour, c'est une particularité pratique de Lua (beaucoup de langages n'en renvoient qu'une).</div>
+</Exercice>
+
+<Exercice id="B5-ex04" titre="Débogage : la fonction introuvable" niveau="jaune" type="debug" dossier="B5/ex04" fichier="taxe.lua">
+Ce programme plante avec `attempt to call a nil value`. Corrige-le sans changer le calcul.
+
+<div slot="indice1">Lua lit le fichier de haut en bas.</div>
+<div slot="indice2">Au moment de l'appel, la fonction existe-t-elle déjà ?</div>
+<div slot="indice3">Déplace la définition au-dessus de l'appel.</div>
+<div slot="solution">Ordre habituel d'un fichier : les fonctions d'abord, le code qui les utilise ensuite.</div>
+</Exercice>
+
+<Exercice id="B5-ex05" titre="Lecture : la portée" niveau="jaune" type="lecture" dossier="B5/ex05" fichier="portee.lua">
+Prédis les quatre lignes affichées.
+
+<div slot="indice1">Le `local x = 2` dans la fonction crée une **autre** variable `x`.</div>
+<div slot="indice2">`incrementer` modifie la variable `compteur` créée avant elle.</div>
+<div slot="indice3">`secret` n'existe que dans le bloc `do … end`.</div>
+<div slot="solution">Le `x` de la fonction **cache** celui du fichier sans le modifier. C'est pour ça qu'on évite de réutiliser les mêmes noms.</div>
+</Exercice>
+
+<Exercice id="B5-ex06" titre="Remise par défaut" niveau="jaune" dossier="B5/ex06" fichier="remise.lua">
+Écris `appliquerRemise(prix, pourcentage)` avec 10 % par défaut. Affiche le résultat pour 200 € (sans pourcentage) et pour 200 € à 25 %.
+
+<div slot="indice1">Un paramètre non fourni vaut `nil`.</div>
+<div slot="indice2">`pourcentage = pourcentage or 10`.</div>
+<div slot="indice3">Le calcul : `prix - prix * pourcentage // 100`.</div>
+<div slot="solution">`//` garde un résultat entier ; avec `/`, tu obtiendrais `180.0`.</div>
+</Exercice>
+
+<Exercice id="B5-ex07" titre="Défi : formater l'argent" niveau="rouge" dossier="B5/ex07" fichier="formater.lua">
+Écris `formaterArgent(montant)` qui renvoie le montant avec une espace tous les trois chiffres et le symbole € : `42 €`, `1 650 €`, `1 500 000 €` (entiers positifs).
+
+<div slot="indice1">Transforme le nombre en texte avec `tostring`, puis parcours-le **de la fin vers le début**.</div>
+<div slot="indice2">`for i = #texte, 1, -1 do` et `string.sub(texte, i, i)` pour prendre un chiffre.</div>
+<div slot="indice3">Compte les chiffres ajoutés ; tous les 3 (et s'il en reste), ajoute une espace devant.</div>
+<div slot="solution">Ce genre de petite fonction utilitaire sera utile pour ton HUD roleplay. Tu pourrais aussi gérer les nombres négatifs en défi bonus.</div>
+</Exercice>
+
+<Exercice id="B5-ex08" titre="Mini-projet : calculateur de salaire" niveau="rouge" type="projet" dossier="B5/ex08" fichier="paie.lua">
+Écris `calculerSalaire(heures, tauxHoraire)` : au-delà de 35 h, les heures supplémentaires sont payées 25 % de plus. Puis `afficherFiche(nom, metier, heures, taux)` qui affiche une ligne et **renvoie** le salaire, pour calculer le total versé aux trois employés.
+
+<div slot="validation">Kim (40 h à 14 €) touche 35 × 14 + 5 × 14 × 1,25 = 577,50 €.</div>
+<div slot="indice1">Heures normales : `math.min(heures, 35)` ; heures sup : `math.max(heures - 35, 0)`.</div>
+<div slot="indice2">`afficherFiche` appelle `calculerSalaire`, affiche avec `string.format("%.2f")`, puis `return salaire`.</div>
+<div slot="indice3">`local total = afficherFiche(...) + afficherFiche(...) + afficherFiche(...)`.</div>
+<div slot="solution">Deux fonctions, deux rôles : l'une **calcule**, l'autre **affiche**. C'est ce découpage que tu retrouveras pour verser les salaires par minuterie sur ton serveur.</div>
+</Exercice>
+
+## Quiz du module B5
+
+<Quiz id="B5-quiz" questions={[
+  { q: "Dans `local function saluer(nom)`, `nom` est…", choix: ["Un argument", "Un paramètre", "Une valeur de retour", "Une variable globale"], ok: 1, pourquoi: "Paramètre dans la définition ; argument à l'appel." },
+  { q: "Différence entre `print` et `return` ?", choix: ["Aucune", "`print` affiche, `return` renvoie une valeur au code appelant", "`return` affiche en rouge", "`print` arrête la fonction"], ok: 1, pourquoi: "Un résultat renvoyé peut être réutilisé." },
+  { q: "Que vaut un paramètre non fourni à l'appel ?", choix: ["0", "`\"\"`", "`nil`", "Une erreur immédiate"], ok: 2, pourquoi: "Il vaut nil ; `x = x or defaut` donne une valeur par défaut." },
+  { q: "Pourquoi écrire `local` devant les variables ?", choix: ["C'est plus rapide à taper", "Pour limiter leur portée et éviter les conflits entre scripts", "Lua l'exige", "Pour les afficher"], ok: 1, pourquoi: "Les globales sont partagées partout : source de bugs." },
+  { q: "`local a, b = f()` avec `return 3, 10` : que vaut b ?", choix: ["3", "10", "nil", "13"], ok: 1, pourquoi: "Les valeurs sont rangées dans l'ordre." },
+  { q: "Appel avant définition d'une `local function` :", choix: ["Fonctionne", "`attempt to call a nil value`", "Avertissement seulement", "Le programme ignore la ligne"], ok: 1, pourquoi: "Lua lit de haut en bas : la fonction n'existe pas encore." },
+  { q: "Une variable `local` créée dans un `if` existe…", choix: ["Partout", "Seulement dans ce bloc if", "Dans tout le fichier après le if", "Jusqu'à la fin de la fonction suivante"], ok: 1, pourquoi: "La portée d'une locale est son bloc." },
+  { q: "Meilleur nom de fonction ?", choix: ["`f`", "`truc`", "`calculerSalaire`", "`salaire2`"], ok: 2, pourquoi: "Un verbe + ce qu'elle fait." },
+  { q: "Que renvoie une fonction sans `return` ?", choix: ["0", "`nil`", "`false`", "Une erreur"], ok: 1, pourquoi: "Rien (nil)." },
+  { q: "`math.max(40 - 35, 0)` vaut…", choix: ["0", "5", "35", "40"], ok: 1, pourquoi: "Le plus grand de 5 et 0." },
+]} />
+
+## Récapitulatif
+
+- `local function nom(params) … return valeur end` ; définir **avant** d'appeler.
+- `return` renvoie (une ou plusieurs valeurs), `print` affiche.
+- Portée : une locale vit dans son bloc ; **`local` partout**.
+- Paramètre par défaut : `p = p or valeur`. Une fonction = un verbe, une tâche, peu de lignes.
+
+## Je suis bloqué, que faire ?
+
+Teste ta fonction **seule** avec des valeurs simples (`print(calculerSalaire(1, 10))`) avant de l'utiliser ailleurs. Ajoute des `print` au début de la fonction pour voir les paramètres reçus.
+
+<Videos recherche="Lua fonctions tutoriel français" liste={[]} />
+
+## Pour aller plus loin
+
+- [Manuel Lua 5.4 : définitions de fonctions](https://www.lua.org/manual/5.4/manual.html#3.4.11)
+- [Manuel Lua 5.4 : variables locales et portée](https://www.lua.org/manual/5.4/manual.html#3.5)
+- [Doc Nanos World : guide des événements (fonctions appelées par le jeu)](https://docs.nanos-world.com/docs/core-concepts/scripting/events-guide)

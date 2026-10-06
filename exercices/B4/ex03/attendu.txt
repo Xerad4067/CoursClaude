@@ -1,0 +1,2 @@
+Salaire de la semaine :	595
+Somme de 1 à 100 :	5050
