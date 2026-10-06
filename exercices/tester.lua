@@ -92,6 +92,16 @@ local function executer(chemin, dossier, config)
     return resultat
   end
 
+  -- Prélude optionnel : config.prelude = "nanos" charge exercices/_outils/nanos.lua dans l'environnement
+  -- (simulateur pédagogique de l'API Nanos World, voir exercices/_outils/LISEZMOI.md).
+  if config.prelude then
+    local cheminPrelude = base .. "/_outils/" .. config.prelude .. ".lua"
+    local prelude, errPrelude = loadfile(cheminPrelude, "t", env)
+    if not prelude then return false, "", "prélude introuvable : " .. tostring(errPrelude) end
+    local okP, errP = pcall(prelude)
+    if not okP then return false, table.concat(morceaux), "prélude : " .. tostring(errP) end
+  end
+
   local morceau, errChargement = loadfile(chemin, "t", env)
   if not morceau then return false, table.concat(morceaux), errChargement end
   local ok, err = pcall(morceau)
@@ -111,17 +121,36 @@ local function premiereDifference(obtenu, attendu)
   return "différence invisible (espaces ?)"
 end
 
-local modules = {}
-for lettre in ("ABCDEFGH"):gmatch(".") do
-  for chiffre = 1, 9 do modules[#modules + 1] = lettre .. chiffre end
+-- Découverte des modules : tous les sous-dossiers de exercices/ (sauf ceux qui commencent par « _ »).
+-- Si le système ne permet pas de lister un dossier, on retombe sur la liste classique A1 … H9.
+local function listerModules()
+  local liste = {}
+  local windows = package.config:sub(1, 1) == "\\"
+  local dossier = base
+  local commande = windows and ('dir /b /ad "' .. dossier:gsub("/", "\\") .. '" 2>nul') or ('ls -1 "' .. dossier .. '" 2>/dev/null')
+  local ok, p = pcall(io.popen, commande)
+  if ok and p then
+    for nom in p:lines() do
+      if not nom:match("^_") and not nom:match("%.") then liste[#liste + 1] = nom end
+    end
+    p:close()
+  end
+  if #liste == 0 then
+    for lettre in ("ABCDEFGH"):gmatch(".") do
+      for chiffre = 1, 9 do liste[#liste + 1] = lettre .. chiffre end
+    end
+  end
+  table.sort(liste)
+  return liste
 end
+local modules = listerModules()
 
 local total, reussis, cassesVerifies = 0, 0, 0
 local echecs = {}
 
 for _, module in ipairs(modules) do
   if not filtre or filtre == module then
-    for n = 1, 30 do
+    for n = 1, 40 do
       local nom = string.format("ex%02d", n)
       local dossier = base .. "/" .. module .. "/" .. nom
       local cheminSolution = dossier .. "/solution.lua"

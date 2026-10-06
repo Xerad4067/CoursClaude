@@ -212,7 +212,7 @@ On doit y voir `user.name=...`, `user.email=...@users.noreply.github.com`, `core
 </Exercice>
 
 <Exercice id="A2-ex04" titre="Débogage : l'adresse qui fuit" niveau="jaune" type="debug">
-Un ami a configuré Git ainsi : `git config --global user.email "lucas.martin@gmail.com"`. Au premier `push`, GitHub refuse avec `GH007: Your push would publish a private email address.` Explique le problème et corrige la configuration.
+Un ami a configuré Git ainsi : `git config --global user.email "lucas.martin@exemple.fr"`. Au premier `push`, GitHub refuse avec `GH007: Your push would publish a private email address.` Explique le problème et corrige la configuration.
 
 <div slot="indice1">Lis le message : GitHub parle d'adresse **privée** qui serait **publiée**.</div>
 <div slot="indice2">L'option « Block command line pushes that expose my email » est activée sur son compte : c'est une protection.</div>

@@ -16,6 +16,7 @@
 	--accent-F: #6ee7d8;
 	--accent-G: #ff8fb8;
 	--accent-H: #e0e0e0;
+	--accent-X: #ffb86b;
 	--vert: #4ade80;
 	--jaune: #facc15;
 	--rouge: #f87171;
@@ -48,6 +49,7 @@
 	--accent-F: #0b6e63;
 	--accent-G: #a3155a;
 	--accent-H: #333333;
+	--accent-X: #8a4b00;
 	--vert: #15803d;
 	--jaune: #a16207;
 	--rouge: #b91c1c;
@@ -120,6 +122,7 @@ html {
 [data-parcours='F'] { --accent-parcours: var(--accent-F); }
 [data-parcours='G'] { --accent-parcours: var(--accent-G); }
 [data-parcours='H'] { --accent-parcours: var(--accent-H); }
+[data-parcours='X'] { --accent-parcours: var(--accent-X); }
 
 /* ---------- Mode concentration ---------- */
 html[data-concentration='on'] {
@@ -440,3 +443,17 @@ html[data-concentration='on'] .main-pane {
 .import-md > h1:first-child { display: none; }
 .import-md table { display: block; overflow-x: auto; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Rappel de début de module (révision espacée) */
+.rappel {
+	margin: 1.2rem 0;
+	padding: 1rem 1.2rem;
+	border-radius: 0.6rem;
+	border: 1px dashed var(--accent-parcours, var(--sl-color-accent));
+	background: var(--sl-color-bg-nav);
+}
+.rappel ol { margin: 0.6rem 0 0; padding-inline-start: 1.4rem; }
+.rappel li { margin-block: 0.6rem; }
+.rappel details { margin-top: 0.3rem; }
+.rappel summary { cursor: pointer; color: var(--sl-color-accent-high); }
+.rappel > .titre-encadre { margin: 0 0 0.4rem; font-weight: 700; }

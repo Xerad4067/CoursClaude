@@ -1,0 +1,35 @@
+---
+// Révision espacée : 3 à 5 questions de rappel en début de module (à partir du parcours C).
+// On répond dans sa tête (ou à voix haute), puis on déplie la réponse. Rien n'est enregistré : c'est un échauffement.
+import { mini } from '../lib/mini.js';
+
+interface Question {
+	q: string;
+	r: string;
+	de?: string; // d'où vient la notion, par exemple « B5 »
+}
+interface Props {
+	questions: Question[];
+}
+const { questions } = Astro.props;
+if (questions.length < 3 || questions.length > 5) throw new Error(`Rappel : 3 à 5 questions attendues, ${questions.length} reçues`);
+---
+
+<aside class="rappel" aria-label="Rappel avant de commencer">
+	<p class="titre-encadre">🔁 Rappel : 3 minutes pour réveiller ta mémoire</p>
+	<p class="discret">Réponds dans ta tête (ou à voix haute), <strong>puis</strong> déplie la réponse. Se tromper ici est normal et utile : c'est comme ça que ça reste.</p>
+	<ol>
+		{
+			questions.map((q) => (
+				<li>
+					<span set:html={mini(q.q)} />
+					{q.de && <span class="discret"> (vu en {q.de})</span>}
+					<details>
+						<summary>Voir la réponse</summary>
+						<span set:html={mini(q.r)} />
+					</details>
+				</li>
+			))
+		}
+	</ol>
+</aside>

@@ -14,16 +14,31 @@ interface Props {
 	fichier?: string;
 	lang?: string;
 }
-const { id, titre, niveau, type, dossier, fichier = 'main.lua', lang = 'lua' } = Astro.props;
+const { id, titre, niveau, type, dossier, fichier: fichierDonne, lang: langDonnee } = Astro.props;
 
-const tous = import.meta.glob('/exercices/**/*.{lua,txt}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
-const lire = (nom: string) => (dossier ? tous[`/exercices/${dossier}/${nom}`]?.replace(/\s+$/, '') : undefined);
-const solution = lire('solution.lua');
+// Le langage se déduit du fichier de solution présent : solution.lua, .py, .js, .sql, .sh ou .html.
+const tous = import.meta.glob('/exercices/**/*.{lua,py,js,sql,sh,html,txt}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
+const langages = [
+	{ ext: 'lua', lang: 'lua', defaut: 'main.lua', test: 'Lua 5.4' },
+	{ ext: 'py', lang: 'python', defaut: 'main.py', test: 'Python 3' },
+	{ ext: 'js', lang: 'js', defaut: 'main.js', test: 'Node.js' },
+	{ ext: 'sql', lang: 'sql', defaut: 'requetes.sql', test: 'SQLite' },
+	{ ext: 'sh', lang: 'bash', defaut: 'git.sh', test: 'Git (script bash, Linux)' },
+	{ ext: 'html', lang: 'html', defaut: 'index.html', test: 'Chromium' },
+];
+const brut = (nom: string) => (dossier ? tous[`/exercices/${dossier}/${nom}`]?.replace(/\s+$/, '') : undefined);
+const trouve = dossier ? langages.find((l) => brut(`solution.${l.ext}`) !== undefined) : undefined;
+const ext = trouve?.ext ?? 'lua';
+const lang = langDonnee ?? trouve?.lang ?? 'lua';
+const fichier = fichierDonne ?? trouve?.defaut ?? 'main.lua';
+const lire = (nom: string) => brut(nom.replace('.EXT', `.${ext}`));
+const solution = lire('solution.EXT');
 const attendu = lire('attendu.txt');
-const casse = lire('casse.lua');
-const depart = lire('depart.lua');
-if (dossier && !solution) throw new Error(`Exercice ${id} : exercices/${dossier}/solution.lua introuvable`);
+const casse = lire('casse.EXT');
+const depart = lire('depart.EXT');
+if (dossier && !solution) throw new Error(`Exercice ${id} : exercices/${dossier}/solution.(lua|py|js|sql|sh|html) introuvable`);
 
+const etiquetteAttendu = ext === 'html' ? 'Ce que la page doit afficher (texte visible) :' : ext === 'sql' ? 'Résultat attendu :' : 'Résultat attendu dans le terminal :';
 const niveaux = { vert: '🟢 Échauffement', jaune: '🟡 Application', rouge: '🔴 Défi' };
 const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 Lecture de code', projet: '🏗️ Mini-projet' };
 ---
@@ -47,8 +62,8 @@ const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 
 	{
 		attendu && type !== 'lecture' && (
 			<>
-				<p class="sous-titre-exo">Résultat attendu dans le terminal :</p>
-				<Code code={attendu} lang="txt" frame="terminal" title="Terminal" />
+				<p class="sous-titre-exo">{etiquetteAttendu}</p>
+				<Code code={attendu} lang="txt" frame={ext === 'html' || ext === 'sql' ? 'none' : 'terminal'} title={ext === 'html' ? 'Texte affiché dans la page' : ext === 'sql' ? 'Résultat' : 'Terminal'} />
 			</>
 		)
 	}
@@ -85,7 +100,7 @@ const types: Record<string, string> = { debug: '🐞 Débogage', lecture: '👀 
 		}
 		{solution && type !== 'lecture' && <Code code={solution} lang={lang} title={fichier} />}
 		<slot name="solution" />
-		{dossier && <p class="discret">🧪 Solution testée automatiquement avec Lua 5.4 (dossier <code>exercices/{dossier}/</code>).</p>}
+		{dossier && <p class="discret">🧪 Solution testée automatiquement avec {trouve?.test ?? 'Lua 5.4'} (dossier <code>exercices/{dossier}/</code>).</p>}
 	</details>
 </section>
 

@@ -9,8 +9,8 @@ export const collections = {
 		loader: docsLoader(),
 		schema: docsSchema({
 			extend: z.object({
-				// Lettre du parcours (A à H) : sert aux couleurs et au tableau de bord.
-				parcours: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']).optional(),
+				// Lettre du parcours (A à H, ou X pour la salle d'entraînement) : sert aux couleurs et au tableau de bord.
+				parcours: z.enum(['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'X']).optional(),
 				// Code du module, par exemple « B3 ».
 				module: z.string().optional(),
 				// Durée réaliste pour un débutant, par exemple « 2 h 30 ».

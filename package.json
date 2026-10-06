@@ -6,7 +6,12 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "verifier": "node scripts/verifier-mdx.mjs && node scripts/verifier-modules.mjs",
+    "liens": "node scripts/verifier-liens.mjs",
+    "test:lua": "lua exercices/tester.lua",
+    "test:autres": "python exercices/tester_autres.py",
+    "test:navigateur": "node exercices/tester_navigateur.mjs"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.2",
